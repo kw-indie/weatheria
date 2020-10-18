@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:aapt="http://schemas.android.com/aapt">
+	<target android:name="sky">
+		<aapt:attr name="android:animation">
+			<objectAnimator android:duration="1000"
+				android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+				android:propertyName="translateY"
+				android:repeatCount="1"
+				android:repeatMode="reverse"
+				android:valueFrom="-1"
+				android:valueTo="0" />
+		</aapt:attr>
+	</target>
+	<aapt:attr name="android:drawable">
+		<vector android:width="24dp"
+			android:height="24dp"
+			android:viewportWidth="1"
+			android:viewportHeight="1">
+			<group android:name="sky"
+				android:translateY="-2">
+				<path android:pathData="M0,0 H1 V2 H0Z">
+					<aapt:attr name="android:fillColor">
+						<gradient android:endX="0"
+							android:endY="2"
+							android:startX="0"
+							android:startY="0"
+							android:type="linear">
+							<item android:color="@color/sky_night"
+								android:offset="0" />
+							<item android:color="@color/sky_mid"
+								android:offset="0.5" />
+							<item android:color="@color/sky_day"
+								android:offset="1" />
+						</gradient>
+					</aapt:attr>
+				</path>
+			</group>
+		</vector>
+	</aapt:attr>
+</animated-vector>

@@ -1,0 +1,21 @@
+<resources>
+
+	<style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+		<!--<item name="colorPrimary">@color/primary</item>
+		<item name="colorPrimaryVariant">@color/primaryVariant</item>
+		<item name="colorOnPrimary">@color/onPrimary</item>
+		<item name="colorSecondary">@color/secondary</item>
+		<item name="colorOnSecondary">@color/onSecondary</item>
+		<item name="colorSecondaryVariant">@color/secondaryVariant</item>
+		<item name="colorSurface"></item>
+		<item name="colorOnSurface"></item>
+		<item name="android:colorBackground"></item>-->
+
+		<!--api 19 >= x > 21-->
+		<!--<item name="android:windowTranslucentStatus">true</item>-->
+
+		<!--has no effect pre api 29-->
+		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+		<!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+	</style>
+</resources>

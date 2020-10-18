@@ -1,0 +1,60 @@
+<resources>
+	<string name="app_name">Weatheria</string>
+
+	<!-- home -->
+	<string name="action_add_location">Add location</string>
+	<string name="action_delete">Delete location</string>
+	<string name="action_delete_all">Delete All locations</string>
+	<string name="action_settings">Settings</string>
+	<string name="empty_pager">No location to show forecast for.\nWhy not add one?</string>
+	<string name="f_last_update">Last update: %s</string>
+	<string name="f_comma_sep">%1$s, %2$s</string>
+	<string name="f_feels_like">Feels like %s</string>
+	<string name="metric_speed">m/s</string>
+	<string name="imp_speed">mph</string>
+	<string name="comma">,</string>
+	<string name="cd_weather_icon">Weather icon</string>
+	<string name="cd_wind_speed_dir">Wind speed and direction</string>
+	<string name="cd_humidity">Humidity</string>
+	<string name="cd_sunrise">Sunrise time</string>
+	<string name="cd_sunset">Sunset time</string>
+	<string-array name="dir_letters">
+		<item>E</item>
+		<item>NE</item>
+		<item>N</item>
+		<item>NW</item>
+		<item>W</item>
+		<item>SW</item>
+		<item>S</item>
+		<item>SE</item>
+	</string-array>
+
+	<!-- map -->
+	<string name="action_give_permission">Give permission</string>
+
+	<!-- errors -->
+	<string name="error_location_denied">Location permission not granted</string>
+	<string name="error_location_disabled">Location service disabled</string>
+	<string name="error_get_location_failed">Failed to get location. Try again later</string>
+	<string name="error_no_internet">No Internet connection</string>
+	<string name="error_timed_out">Request timed out</string>
+	<string name="error_server_error">Server response error. Try a different location or try again later</string>
+	<string name="error_parsing_resp">Response parsing error. Try a different location</string>
+	<string name="error_unknown">Unknown error</string>
+
+	<!-- preference -->
+	<string name="cat_header_general">General</string>
+	<string name="key_units" translatable="false">units</string>
+	<string name="title_units">Units</string>
+	<string-array name="units_entries">
+		<item>Metric</item>
+		<item>Imperial</item>
+	</string-array>
+	<string-array name="units_entry_values">
+		<item>0</item>
+		<item>1</item>
+	</string-array>
+	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
+	<string name="title_auto_refresh">Auto refresh (min)</string>
+	<string name="summary_auto_refresh">0 = Never</string>
+</resources>

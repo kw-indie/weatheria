@@ -8,9 +8,21 @@ class WeatherInfoRepo private constructor(
 	private val service: WeatherService
 ) {
 
-	fun getAllInfo() = dao.getAllInfo()
+	fun loadAllInfo() = dao.loadAllInfo()
 
-	suspend fun insert(info: WeatherInfo) = dao.insert(info.location, info.current)
+	suspend fun fetch(lat: String, lng: String) = WeatherInfo(
+		service.current(lat, lng)
+	)
+
+	suspend fun fetch(query: String) = WeatherInfo(
+		service.current(query)
+	)
+
+	suspend fun fetchUpdate(locationId: Int) = WeatherInfo.Update(
+		service.current(locationId)
+	)
+
+	suspend fun save(info: WeatherInfo) = dao.insert(info.location, info.current)
 
 	suspend fun update(info: WeatherInfo.Update) = dao.update(info)
 

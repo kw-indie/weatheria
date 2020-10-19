@@ -31,9 +31,7 @@ import asceapps.weatheria.api.CurrentResponse
 	]
 )
 data class CurrentWeather(
-	// since it's a 1-to-1 relation, we can get away with this
 	@PrimaryKey @ColumnInfo(name = COL_ID) val id: Int,
-	// basic info
 	val temp: Int,
 	@ColumnInfo(name = COL_FEEL) val feelsLike: Int,
 	val min: Int,
@@ -41,7 +39,6 @@ data class CurrentWeather(
 	val main: String,
 	val desc: String,
 	val icon: String,
-	// details
 	val humidity: Int,
 	@ColumnInfo(name = COL_WIND_DIR) val windDir: Int,
 	@ColumnInfo(name = COL_WIND_SPEED) val windSpeed: Float,

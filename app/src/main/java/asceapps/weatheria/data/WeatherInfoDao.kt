@@ -19,7 +19,7 @@ abstract class WeatherInfoDao {
 		"INNER JOIN " + CurrentWeather.TABLE_NAME + " AS CW " +
 		"ON CW." + CurrentWeather.COL_ID + " == L." + Location.COL_ID + " " +
 		"ORDER BY L." + Location.COL_CREATED_AT + " DESC")
-	abstract fun getAllInfo(): LiveData<List<WeatherInfo>>
+	abstract fun loadAllInfo(): LiveData<List<WeatherInfo>>
 
 	// can make return type int[] to return ids of inserted rows, but  our api provides the ids as well.
 	// all these additions are made in a single transaction.

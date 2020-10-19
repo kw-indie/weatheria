@@ -3,37 +3,29 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	tools:context=".ui.home.HomePagerFragment">
-
 	<data>
-
-		<import type="asceapps.weatheria.util.Utils" />
-
+		<import type="asceapps.weatheria.util.Utils"/>
 		<variable
 			name="metric"
-			type="Boolean" />
-
+			type="Boolean"/>
 		<variable
 			name="info"
-			type="asceapps.weatheria.data.WeatherInfo" />
+			type="asceapps.weatheria.data.WeatherInfo"/>
 	</data>
-
 	<androidx.core.widget.NestedScrollView
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:scrollbars="none">
-
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:padding="@dimen/_16sdp">
-
 			<androidx.constraintlayout.widget.Guideline
 				android:id="@+id/mid_v_guideline"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:orientation="vertical"
-				app:layout_constraintGuide_percent="0.5" />
-
+				app:layout_constraintGuide_percent="0.5"/>
 			<TextView
 				android:id="@+id/tv_location"
 				android:layout_width="wrap_content"
@@ -45,8 +37,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toTopOf="parent"
-				tools:text="@tools:sample/cities" />
-
+				tools:text="@tools:sample/cities"/>
 			<TextView
 				android:id="@+id/tv_time"
 				android:layout_width="wrap_content"
@@ -58,8 +49,7 @@
 				app:layout_constraintEnd_toEndOf="@+id/tv_location"
 				app:layout_constraintStart_toStartOf="@+id/tv_location"
 				app:layout_constraintTop_toBottomOf="@id/tv_location"
-				tools:text="Mon, Jan 31, 12:59 PM" />
-
+				tools:text="Mon, Jan 31, 12:59 PM"/>
 			<ImageView
 				android:id="@+id/iv_icon"
 				android:layout_width="@dimen/_72sdp"
@@ -72,8 +62,7 @@
 				app:layout_constraintBottom_toTopOf="@id/tv_min_max"
 				app:layout_constraintDimensionRatio="1:1"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
-				app:layout_constraintTop_toBottomOf="@+id/tv_time" />
-
+				app:layout_constraintTop_toBottomOf="@+id/tv_time"/>
 			<TextView
 				android:id="@+id/tv_min_max"
 				android:layout_width="wrap_content"
@@ -85,8 +74,7 @@
 				app:layout_constraintEnd_toEndOf="@id/iv_icon"
 				app:layout_constraintStart_toStartOf="@id/iv_icon"
 				app:layout_constraintTop_toBottomOf="@id/iv_icon"
-				tools:text="155°\t\t|\t\t199°" />
-
+				tools:text="155°\t\t|\t\t199°"/>
 			<TextView
 				android:id="@+id/tv_temp"
 				android:layout_width="wrap_content"
@@ -98,8 +86,7 @@
 				app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
 				app:layout_constraintStart_toEndOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toTopOf="@+id/iv_icon"
-				tools:text="99°" />
-
+				tools:text="99°"/>
 			<TextView
 				android:id="@+id/tv_feels_like"
 				android:layout_width="wrap_content"
@@ -109,8 +96,7 @@
 				app:layout_constraintBaseline_toBaselineOf="@id/tv_min_max"
 				app:layout_constraintEnd_toEndOf="@id/tv_temp"
 				app:layout_constraintStart_toStartOf="@id/tv_temp"
-				tools:text="Feels like 99°" />
-
+				tools:text="Feels like 99°"/>
 			<TextView
 				android:id="@+id/tv_weather"
 				android:layout_width="wrap_content"
@@ -126,8 +112,7 @@
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/tv_min_max"
 				app:layout_constraintWidth_max="@dimen/_128sdp"
-				tools:text="chance of fish rain and blood" />
-
+				tools:text="chance of fish rain and blood"/>
 			<TextView
 				android:id="@+id/tv_wind"
 				android:layout_width="@dimen/_120sdp"
@@ -143,8 +128,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_weather"
-				tools:text="150 m/s, SW" />
-
+				tools:text="150 m/s, SW"/>
 			<TextView
 				android:id="@+id/tv_humidity"
 				android:layout_width="@dimen/_120sdp"
@@ -161,8 +145,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_wind"
-				tools:text="70 %" />
-
+				tools:text="70 %"/>
 			<TextView
 				android:id="@+id/tv_sunrise"
 				android:layout_width="@dimen/_120sdp"
@@ -179,8 +162,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_humidity"
-				tools:text="5:35 AM" />
-
+				tools:text="5:35 AM"/>
 			<TextView
 				android:id="@+id/tv_sunset"
 				android:layout_width="@dimen/_120sdp"
@@ -197,7 +179,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_sunrise"
-				tools:text="7:41 PM" />
+				tools:text="7:41 PM"/>
 		</androidx.constraintlayout.widget.ConstraintLayout>
 	</androidx.core.widget.NestedScrollView>
 </layout>

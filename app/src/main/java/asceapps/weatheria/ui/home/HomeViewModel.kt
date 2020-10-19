@@ -8,7 +8,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
-import asceapps.weatheria.data.WeatherInfo
 import asceapps.weatheria.data.WeatherInfoRepo
 import asceapps.weatheria.util.isCoordinate
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ class HomeViewModel(
 	private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-	val infoList = repo.getAllInfo()
+	val infoList = repo.loadAllInfo()
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 	private val _refreshing = MutableLiveData<Boolean>()
@@ -34,14 +33,13 @@ class HomeViewModel(
 	fun addNewLocation(query: String) = viewModelScope.launch {
 		_refreshing.value = true
 		try {
-			val currentResponse = if(isCoordinate(query)) {
+			val info = if(isCoordinate(query)) {
 				val coords = query.split(',').map {it.trim()}
-				repo.current(coords[0], coords[1])
+				repo.fetch(coords[0], coords[1])
 			} else {
-				repo.current(query.trim())
+				repo.fetch(query.trim())
 			}
-			// todo get other data as well
-			repo.insert(WeatherInfo(currentResponse))
+			repo.save(info)
 		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e
@@ -53,8 +51,8 @@ class HomeViewModel(
 	fun update(locationId: Int) = viewModelScope.launch {
 		_refreshing.value = true
 		try {
-			val newInfo = WeatherInfo.Update(repo.current(locationId))
-			repo.update(newInfo)
+			val updated = repo.fetchUpdate(locationId)
+			repo.update(updated)
 		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e

@@ -1,12 +1,16 @@
 package asceapps.weatheria.data
 
 import androidx.room.Embedded
+import androidx.room.Relation
 import asceapps.weatheria.api.CurrentResponse
 
 data class WeatherInfo(
 	@Embedded
 	val location: Location,
-	@Embedded
+	@Relation(
+		parentColumn = Location.COL_ID,
+		entityColumn = CurrentWeather.COL_ID
+	)
 	val current: CurrentWeather
 ) {
 

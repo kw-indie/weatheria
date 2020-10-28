@@ -8,7 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
-import asceapps.weatheria.data.WeatherInfoRepo
+import asceapps.weatheria.model.WeatherInfoRepo
 import asceapps.weatheria.util.isCoordinate
 import kotlinx.coroutines.launch
 

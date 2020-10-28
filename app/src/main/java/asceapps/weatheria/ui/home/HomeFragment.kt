@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
-import asceapps.weatheria.data.WeatherInfoRepo
 import asceapps.weatheria.databinding.FragmentHomeBinding
+import asceapps.weatheria.model.WeatherInfoRepo
 import asceapps.weatheria.ui.MainActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map

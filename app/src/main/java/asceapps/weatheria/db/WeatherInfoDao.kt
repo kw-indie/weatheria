@@ -1,4 +1,4 @@
-package asceapps.weatheria.data
+package asceapps.weatheria.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -7,6 +7,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import asceapps.weatheria.data.CurrentWeather
+import asceapps.weatheria.data.Location
+import asceapps.weatheria.data.WeatherInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class WeatherInfoDao {
@@ -50,4 +54,37 @@ abstract class WeatherInfoDao {
 
 	@Query("DELETE FROM " + Location.TABLE_NAME)
 	abstract suspend fun deleteAll()
+
+	@Transaction
+	@Query("SELECT * FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " ASC")
+	abstract fun getAll(): Flow<List<WeatherInfoEntity>>
+
+	@Query("SELECT " + Column.LOC_ID + " FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " ASC")
+	abstract fun getLocationIds(): Flow<List<Int>>
+
+	@Transaction
+	@Query("SELECT * FROM " + Table.LOCATIONS + " WHERE " + Column.LOC_ID + " = :locationId")
+	abstract fun get(locationId: Int): Flow<WeatherInfoEntity>
+
+	@Query("SELECT MAX(" + Column.DT + ") FROM " + Table.DAILY + " WHERE " + Column.LOC_ID + " = :locationId")
+	abstract suspend fun getDtOfLastDailyFor(locationId: Int): Int?
+
+	@Query("SELECT MAX(" + Column.DT + ") FROM " + Table.HOURLY +
+		" WHERE " + Column.LOC_ID + " = :locationId")
+	abstract suspend fun getDtOfLastHourlyFor(locationId: Int): Int?
+
+	@Insert
+	abstract suspend fun insertLocation(l: LocationEntity)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	abstract suspend fun insertCurrent(c: CurrentEntity)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	abstract suspend fun insertHourly(h: List<HourlyEntity>)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	abstract suspend fun insertDaily(d: List<DailyEntity>)
+
+	@Insert
+	abstract suspend fun insertWeatherCondition(wc: List<WeatherConditionEntity>)
 }

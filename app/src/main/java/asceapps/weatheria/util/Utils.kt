@@ -6,6 +6,7 @@ import android.content.Context
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import asceapps.weatheria.R
+import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.data.WeatherInfo
 import coil.load
 import java.time.Instant
@@ -17,7 +18,7 @@ import java.time.format.FormatStyle
 
 @BindingAdapter("icon")
 fun loadIconFromUrl(view: ImageView, icon: String) {
-	view.load("https://openweathermap.org/img/wn/$icon@2x.png") {
+	view.load(WeatherService.iconUrlFor(icon)) {
 		// placeholder(res_id)
 		// error(res_id)
 		// transformations(CircleCropTransformation())

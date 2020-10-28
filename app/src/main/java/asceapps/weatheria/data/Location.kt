@@ -17,7 +17,7 @@ import com.google.gson.annotations.SerializedName
  * @param updatedAt when this location's weather info was last updated
  */
 @Entity(tableName = Location.TABLE_NAME)
-data class Location(
+class Location(
 	@PrimaryKey val id: Int,
 	val lat: Float,
 	val lng: Float,

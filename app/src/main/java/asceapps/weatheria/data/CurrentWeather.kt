@@ -30,7 +30,7 @@ import asceapps.weatheria.api.CurrentResponse
 			onDelete = ForeignKey.CASCADE)
 	]
 )
-data class CurrentWeather(
+class CurrentWeather(
 	@PrimaryKey @ColumnInfo(name = COL_ID) val id: Int,
 	val temp: Int,
 	@ColumnInfo(name = COL_FEEL) val feelsLike: Int,
@@ -58,9 +58,9 @@ data class CurrentWeather(
 	constructor(resp: CurrentResponse): this(
 		resp.id,
 		resp.main.temp.toInt(),
-		resp.main.feel.toInt(),
-		resp.main.min.toInt(),
-		resp.main.max.toInt(),
+		resp.main.feel_like.toInt(),
+		0,
+		100,
 		resp.weather[0].main,
 		resp.weather[0].description,
 		resp.weather[0].icon,

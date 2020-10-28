@@ -1,7 +1,10 @@
-package asceapps.weatheria.data
+package asceapps.weatheria.model
 
 import android.content.Context
 import asceapps.weatheria.api.WeatherService
+import asceapps.weatheria.data.WeatherInfo
+import asceapps.weatheria.db.AppDB
+import asceapps.weatheria.db.WeatherInfoDao
 
 class WeatherInfoRepo private constructor(
 	private val dao: WeatherInfoDao,

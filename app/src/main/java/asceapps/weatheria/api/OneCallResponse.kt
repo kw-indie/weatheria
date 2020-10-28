@@ -26,9 +26,9 @@ class OneCallResponse(
 	 * @param wind_speed wind_speed in m/s
 	 * @param wind_deg wind_deg direction in degrees
 	 * @param pressure pressure at sea level in hPa
-	 * @param humidity humidity in % [0-100]
+	 * @param humidity humidity in % (0-100)
 	 * @param dew_point dew_point temp at which dew forms
-	 * @param clouds clouds cloudiness in % [0-100]
+	 * @param clouds clouds cloudiness in % (0-100)
 	 */
 	abstract class BaseData(
 		val dt: Int,
@@ -63,7 +63,7 @@ class OneCallResponse(
 
 	/**
 	 * @param dt beginning of forecast data hour
-	 * @param pop probability of precipitation [0-1]
+	 * @param pop probability of precipitation (0-1)
 	 */
 	class Hourly(
 		dt: Int,

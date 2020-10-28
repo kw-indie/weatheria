@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
 
 object Mapper {
 
-	fun map(from: FindResponse): List<FoundLocation> {
+	fun dtoToModel(from: FindResponse): List<FoundLocation> {
 		return from.list.map {
 			val coord = it.coord
 			val weather = it.weather[0]
@@ -36,26 +36,22 @@ object Mapper {
 		}
 	}
 
-	fun map(foundLocation: FoundLocation, resp: OneCallResponse):
-		Pair<Map<Int, WeatherConditionEntity>, WeatherInfoEntity> {
-		val conditions = HashMap<Int, WeatherConditionEntity>()
+	fun dtoToEntity(foundLocation: FoundLocation, resp: OneCallResponse,
+		conditions: MutableMap<Int, WeatherConditionEntity>): WeatherInfoEntity {
 		val location = with(foundLocation) {
 			LocationEntity(id, lat, lng, name, country, resp.timezone_offset)
 		}
 		// if we are parsing with a found location, all nullables are non-null
-		val current = extractCurrent(location.id, resp.current!!, conditions)
-		val hourly = extractHourly(location.id, resp.hourly!!, conditions)
-		val daily = extractDaily(location.id, resp.daily!!, conditions)
-		return Pair(
-			conditions,
-			WeatherInfoEntity(location, current, hourly, daily)
-		)
+		val current = extractCurrentEntity(location.id, resp.current!!, conditions)
+		val hourly = extractHourlyEntity(location.id, resp.hourly!!, conditions)
+		val daily = extractDailyEntity(location.id, resp.daily!!, conditions)
+		return WeatherInfoEntity(location, current, hourly, daily)
 	}
 
-	fun extractCurrent(locationId: Int, resp: OneCallResponse.Current,
+	fun extractCurrentEntity(locationId: Int, resp: OneCallResponse.Current,
 		conditions: MutableMap<Int, WeatherConditionEntity>): CurrentEntity {
 		return with(resp) {
-			val condition = map(weather[0])
+			val condition = dtoToEntity(weather[0])
 			conditions.putIfAbsent(condition.id, condition)
 			CurrentEntity(
 				locationId,
@@ -76,12 +72,12 @@ object Mapper {
 		}
 	}
 
-	fun extractHourly(locationId: Int, respList: List<OneCallResponse.Hourly>,
+	fun extractHourlyEntity(locationId: Int, respList: List<OneCallResponse.Hourly>,
 		conditions: MutableMap<Int, WeatherConditionEntity>): List<HourlyEntity> {
 		return respList.map {
 			with(it) {
 				val weather = weather[0]
-				conditions.putIfAbsent(weather.id, map(weather))
+				conditions.putIfAbsent(weather.id, dtoToEntity(weather))
 				HourlyEntity(
 					locationId,
 					dt,
@@ -103,14 +99,14 @@ object Mapper {
 		}
 	}
 
-	fun extractDaily(locationId: Int, respList: List<OneCallResponse.Daily>,
+	fun extractDailyEntity(locationId: Int, respList: List<OneCallResponse.Daily>,
 		conditions: MutableMap<Int, WeatherConditionEntity>): List<DailyEntity> {
 		return respList.map {
 			with(it) {
 				val weather = weather[0]
 				val temp = it.temp
 				val feel = it.feels_like
-				conditions.putIfAbsent(weather.id, map(weather))
+				conditions.putIfAbsent(weather.id, dtoToEntity(weather))
 				DailyEntity(
 					locationId,
 					dt,
@@ -150,7 +146,7 @@ object Mapper {
 		}
 	}
 
-	fun map(conditions: Map<Int, WeatherConditionEntity>, info: WeatherInfoEntity): WeatherInfo {
+	fun entityToModel(conditions: Map<Int, WeatherConditionEntity>, info: WeatherInfoEntity): WeatherInfo {
 		val zoneOffset = ZoneOffset.ofTotalSeconds(info.location.zoneOffset)
 		val location = with(info.location) {
 			Location(id, lat, lng, name, country, zoneOffset)
@@ -205,7 +201,7 @@ object Mapper {
 		)
 	}
 
-	private fun map(from: WeatherCondition) = with(from) {
+	private fun dtoToEntity(from: WeatherCondition) = with(from) {
 		WeatherConditionEntity(id, main, description, icon)
 	}
 }

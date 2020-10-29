@@ -4,13 +4,9 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	tools:context=".ui.home.HomePagerFragment">
 	<data>
-		<import type="asceapps.weatheria.util.Utils"/>
-		<variable
-			name="metric"
-			type="Boolean"/>
 		<variable
 			name="info"
-			type="asceapps.weatheria.data.WeatherInfo"/>
+			type="asceapps.weatheria.model.WeatherInfo"/>
 	</data>
 	<androidx.core.widget.NestedScrollView
 		android:layout_width="match_parent"
@@ -31,7 +27,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_24sdp"
-				android:text="@{@string/f_comma_sep(info.location.city, info.location.country)}"
+				android:text="@{@string/f_comma_sep(info.location.name, info.location.country)}"
 				android:textSize="@dimen/_14ssp"
 				android:textStyle="bold"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
@@ -45,7 +41,7 @@
 				android:alpha="0.5"
 				android:gravity="center_horizontal"
 				android:textSize="@dimen/_12ssp"
-				android:text="@{Utils.formatNowDateTime(info.location.timezone)}"
+				android:text="@{info.dtString(info.now)}"
 				app:layout_constraintEnd_toEndOf="@+id/tv_location"
 				app:layout_constraintStart_toStartOf="@+id/tv_location"
 				app:layout_constraintTop_toBottomOf="@id/tv_location"
@@ -58,7 +54,7 @@
 				android:layout_marginEnd="@dimen/_8sdp"
 				android:contentDescription="@string/cd_weather_icon"
 				android:scaleType="fitXY"
-				app:icon="@{info.current.icon}"
+				app:icon="@{info.current.icon.url}"
 				app:layout_constraintBottom_toTopOf="@id/tv_min_max"
 				app:layout_constraintDimensionRatio="1:1"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
@@ -68,7 +64,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_8sdp"
-				android:text="@{Utils.formatMinMax(info.current.min, info.current.max, metric)}"
+				android:text="@{info.todayMinMaxString}"
 				android:textSize="@dimen/_12ssp"
 				app:layout_constraintBottom_toTopOf="@id/tv_weather"
 				app:layout_constraintEnd_toEndOf="@id/iv_icon"
@@ -81,7 +77,7 @@
 				android:layout_height="0dp"
 				android:layout_marginStart="@dimen/_8sdp"
 				android:gravity="bottom|center_horizontal"
-				android:text="@{Utils.formatTemp(info.current.temp, metric)}"
+				android:text="@{info.current.temp.format}"
 				android:textSize="@dimen/_48ssp"
 				app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
 				app:layout_constraintStart_toEndOf="@id/mid_v_guideline"
@@ -91,7 +87,7 @@
 				android:id="@+id/tv_feels_like"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@{@string/f_feels_like(Utils.formatTemp(info.current.feelsLike, metric))}"
+				android:text="@{@string/f_feels_like(info.current.feelsLike.format)}"
 				android:textSize="@dimen/_12ssp"
 				app:layout_constraintBaseline_toBaselineOf="@id/tv_min_max"
 				app:layout_constraintEnd_toEndOf="@id/tv_temp"
@@ -120,7 +116,7 @@
 				android:contentDescription="@string/cd_wind_speed_dir"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{Utils.formatWind(context,info,metric)}"
+				android:text="@{info.windString(context)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableTint="?attr/colorOnSurface"
 				app:drawableStartCompat="@drawable/ic_wind"
@@ -137,7 +133,7 @@
 				android:contentDescription="@string/cd_humidity"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{Utils.formatHumidity(info.current.humidity)}"
+				android:text="@{info.current.humidity.format}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableStartCompat="@drawable/ic_humidity"
 				app:drawableTint="?attr/colorOnSurface"
@@ -154,7 +150,7 @@
 				android:contentDescription="@string/cd_sunrise"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{Utils.formatTime(info.current.sunrise, info.location.timezone)}"
+				android:text="@{info.tString(info.today.sunrise)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableStartCompat="@drawable/anim_sunrise"
 				app:drawableTint="?attr/colorOnSurface"
@@ -171,7 +167,7 @@
 				android:contentDescription="@string/cd_sunset"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{Utils.formatTime(info.current.sunset, info.location.timezone)}"
+				android:text="@{info.tString(info.today.sunset)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableStartCompat="@drawable/anim_sunset"
 				app:drawableTint="?attr/colorOnSurface"

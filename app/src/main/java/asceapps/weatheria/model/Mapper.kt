@@ -10,10 +10,8 @@ import asceapps.weatheria.db.LocationEntity
 import asceapps.weatheria.db.WeatherConditionEntity
 import asceapps.weatheria.db.WeatherInfoEntity
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.math.roundToInt
 
@@ -194,10 +192,7 @@ object Mapper {
 		}
 		return WeatherInfo(
 			location, current, hourly, daily,
-			LocalDateTime.ofInstant(
-				Instant.ofEpochSecond(info.current.dt.toLong()),
-				ZoneId.systemDefault()
-			)
+			Instant.ofEpochSecond(info.current.dt.toLong())
 		)
 	}
 

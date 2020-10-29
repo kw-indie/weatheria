@@ -22,10 +22,11 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfoRepo
+import asceapps.weatheria.model.setMetric
 import asceapps.weatheria.ui.MainActivity
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.onEach
 
 class HomeFragment: Fragment() {
 
@@ -112,7 +113,7 @@ class HomeFragment: Fragment() {
 			R.id.action_add_location ->
 				NavHostFragment.findNavController(this).navigate(R.id.action_open_map)
 			R.id.action_delete ->
-				viewModel.delete(adapter.getItemId(binding.pager.currentItem).toInt())
+				viewModel.delete(adapter.getItem(binding.pager.currentItem).location)
 			R.id.action_delete_all -> viewModel.deleteAll()
 			R.id.action_settings ->
 				NavHostFragment.findNavController(this).navigate(R.id.action_settings)
@@ -125,7 +126,7 @@ class HomeFragment: Fragment() {
 		binding.swipeRefresh.apply {
 			isRefreshing = true
 			setOnRefreshListener {
-				viewModel.update(adapter.getItemId(binding.pager.currentItem).toInt())
+				viewModel.update(adapter.getItem(binding.pager.currentItem).location)
 			}
 		}
 		viewModel.refreshing.observe(viewLifecycleOwner) {binding.swipeRefresh.isRefreshing = it}
@@ -216,13 +217,11 @@ class HomeFragment: Fragment() {
 				val info = adapter.getItem(pos)
 				binding.tvLastUpdate.text = getString(
 					R.string.f_last_update,
-					DateUtils.getRelativeTimeSpanString(info.location.updatedAt)
+					DateUtils.getRelativeTimeSpanString(info.updateTime.epochSecond)
 				)
-				// icon name has d or n for day/night
-				if('d' in info.current.icon) {
-					animateToDay()
-				} else {
-					animateToNight()
+				when(info.isDaytime) {
+					true -> animateToDay()
+					false -> animateToNight()
 				}
 			}
 		}
@@ -232,12 +231,13 @@ class HomeFragment: Fragment() {
 	private fun setUpPreferences() {
 		val dataStore = (requireActivity() as MainActivity).dataStore
 		val unitsKey = preferencesKey<String>(getString(R.string.key_units))
-		val unitsFlow = dataStore.data.map {it[unitsKey] ?: "0"}
-		lifecycleScope.launch {
-			unitsFlow.collect {
-				adapter.metric = it == "0"
+		dataStore.data
+			.map {prefs -> prefs[unitsKey] ?: "0"}
+			.map {it == "0"}
+			.onEach {
+				setMetric(it, if(it) getString(R.string.metric_speed) else getString(R.string.imp_speed))
 			}
-		}
+			.launchIn(lifecycleScope)
 	}
 
 	private fun setUpErrorHandler() {

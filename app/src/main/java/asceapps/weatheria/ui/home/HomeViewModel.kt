@@ -1,15 +1,10 @@
 package asceapps.weatheria.ui.home
 
 import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
+import asceapps.weatheria.model.Location
 import asceapps.weatheria.model.WeatherInfoRepo
-import asceapps.weatheria.util.isCoordinate
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -17,7 +12,7 @@ class HomeViewModel(
 	private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-	val infoList = repo.loadAllInfo()
+	val infoList = repo.getAll().asLiveData()
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 	private val _refreshing = MutableLiveData<Boolean>()
@@ -33,13 +28,12 @@ class HomeViewModel(
 	fun addNewLocation(query: String) = viewModelScope.launch {
 		_refreshing.value = true
 		try {
-			val info = if(isCoordinate(query)) {
+			if(isCoordinate(query)) {
 				val coords = query.split(',').map {it.trim()}
-				repo.fetch(coords[0], coords[1])
+				repo.get(coords[0], coords[1])
 			} else {
-				repo.fetch(query.trim())
+				repo.get(query.trim())
 			}
-			repo.save(info)
 		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e
@@ -48,11 +42,10 @@ class HomeViewModel(
 		}
 	}
 
-	fun update(locationId: Int) = viewModelScope.launch {
+	fun update(l: Location) = viewModelScope.launch {
 		_refreshing.value = true
 		try {
-			val updated = repo.fetchUpdate(locationId)
-			repo.update(updated)
+			repo.getUpdate(l)
 		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e
@@ -61,8 +54,8 @@ class HomeViewModel(
 		}
 	}
 
-	fun delete(locationId: Int) = viewModelScope.launch {
-		repo.delete(locationId)
+	fun delete(l: Location) = viewModelScope.launch {
+		repo.delete(l)
 	}
 
 	fun deleteAll() = viewModelScope.launch {
@@ -72,6 +65,10 @@ class HomeViewModel(
 	companion object {
 
 		private const val SELECTED_PAGE_KEY = "SP"
+
+		private fun isCoordinate(str: String) = str.matches(Regex(
+			"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
+		))
 	}
 
 	class Factory(

@@ -5,12 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import asceapps.weatheria.BuildConfig
-import asceapps.weatheria.data.CurrentWeather
-import asceapps.weatheria.data.Location
 
 @Database(
 	entities = [
-		Location::class, CurrentWeather::class,
 		LocationEntity::class,
 		CurrentEntity::class,
 		HourlyEntity::class,

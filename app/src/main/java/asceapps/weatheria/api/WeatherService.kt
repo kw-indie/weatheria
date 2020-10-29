@@ -18,7 +18,7 @@ interface WeatherService {
 	suspend fun oneCall(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
 	@GET("$ONE_CALL$EXCLUDE,$HOURLY,$DAILY")
-	suspend fun currentNew(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
+	suspend fun current(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
 	@GET("$ONE_CALL$EXCLUDE,$CURRENT,$DAILY")
 	suspend fun hourly(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
@@ -32,31 +32,19 @@ interface WeatherService {
 	@GET(FIND)
 	suspend fun find(@Query("q") query: String): FindResponse
 
-	// we are not using current from oneCall cuz bastards don't provide location data
-	@GET(WEATHER)
-	suspend fun current(@Query(LAT) lat: String, @Query(LON) lng: String): CurrentResponse
-
-	@GET(WEATHER)
-	suspend fun current(@Query("q") query: String): CurrentResponse
-
-	@GET(WEATHER)
-	suspend fun current(@Query("id") locationId: Int): CurrentResponse
-
 	companion object {
 
 		private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 		private const val LAT = "lat"
 		private const val LON = "lon"
 		// oneCall?lat=xx&lon=yy&exclude=minutely,hourly,daily,alerts
-		private const val ONE_CALL = "oneCall"
+		private const val ONE_CALL = "onecall"
 		private const val EXCLUDE = "?exclude=minutely"
 		private const val CURRENT = "current"
 		private const val HOURLY = "hourly"
 		private const val DAILY = "daily"
 		// find?q=york&type=like&sort=population&cnt=3
 		private const val FIND = "find"
-		// weather?q=york
-		private const val WEATHER = "weather"
 		// 5day/3hr forecast?q=york&cnt=16 (2days)
 		private const val FORECAST = "forecast"
 

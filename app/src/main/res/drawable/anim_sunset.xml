@@ -2,50 +2,58 @@
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:aapt="http://schemas.android.com/aapt">
 	<aapt:attr name="android:drawable">
-		<vector android:width="24dp"
+		<vector
+			android:width="24dp"
 			android:height="24dp"
 			android:tint="?attr/colorControlNormal"
 			android:viewportWidth="24"
 			android:viewportHeight="24">
 			<group android:name="arrow">
-				<path android:strokeColor="@android:color/white"
+				<path
+					android:strokeColor="@android:color/white"
 					android:strokeWidth="1"
-					android:pathData="M 9 2 L 12 5 L 15 2" />
+					android:pathData="M 9 2 L 12 5 L 15 2"/>
 			</group>
-			<path android:pathData="M4 18.75 H20 M7 21 H17"
+			<path
+				android:pathData="M4 18.75 H20 M7 21 H17"
 				android:strokeWidth="1"
-				android:strokeColor="@android:color/white" />
-			<clip-path android:pathData="M0,7 H24, V18.5, H0Z" />
-			<path android:strokeColor="@android:color/white"
+				android:strokeColor="@android:color/white"/>
+			<clip-path android:pathData="M0,7 H24, V18.5, H0Z"/>
+			<path
+				android:strokeColor="@android:color/white"
 				android:strokeWidth="1"
-				android:pathData="M 18 18 A 6 6 0 0 1 12 24 A 6 6 0 0 1 6 18 A 6 6 0 0 1 12 12 A 6 6 0 0 1 18 18 Z" />
-			<group android:name="rays"
+				android:pathData="M 18 18 A 6 6 0 0 1 12 24 A 6 6 0 0 1 6 18 A 6 6 0 0 1 12 12 A 6 6 0 0 1 18 18 Z"/>
+			<group
+				android:name="rays"
 				android:pivotX="12"
 				android:pivotY="18">
-				<path android:pathData="M 20.56 20.781 L 19.371 20.395 M 20.559 15.219 L 19.371 15.605 M 17.29 10.718 L 16.556 11.73 M 12 9 L 12 10.25 M 6.71 10.719 L 7.444 11.73 M 3.44 15.219 L 4.629 15.605 M 3.441 20.781 L 4.629 20.395 M 6.71 25.282 L 7.444 24.27 M 12 27 L 12 25.75 M 17.29 25.281 L 16.556 24.27"
+				<path
+					android:pathData="M 20.56 20.781 L 19.371 20.395 M 20.559 15.219 L 19.371 15.605 M 17.29 10.718 L 16.556 11.73 M 12 9 L 12 10.25 M 6.71 10.719 L 7.444 11.73 M 3.44 15.219 L 4.629 15.605 M 3.441 20.781 L 4.629 20.395 M 6.71 25.282 L 7.444 24.27 M 12 27 L 12 25.75 M 17.29 25.281 L 16.556 24.27"
 					android:strokeWidth="1"
 					android:strokeColor="@android:color/white"
-					android:strokeLineCap="square" />
+					android:strokeLineCap="square"/>
 			</group>
 		</vector>
 	</aapt:attr>
 	<target android:name="arrow">
 		<aapt:attr name="android:animation">
-			<objectAnimator android:duration="1000"
+			<objectAnimator
+				android:duration="1000"
 				android:interpolator="@android:anim/decelerate_interpolator"
 				android:propertyName="translateY"
 				android:repeatCount="2"
 				android:valueFrom="-5"
-				android:valueTo="0" />
+				android:valueTo="0"/>
 		</aapt:attr>
 	</target>
 	<target android:name="rays">
 		<aapt:attr name="android:animation">
-			<objectAnimator android:duration="3000"
+			<objectAnimator
+				android:duration="3000"
 				android:interpolator="@android:anim/decelerate_interpolator"
 				android:propertyName="rotation"
 				android:valueFrom="0"
-				android:valueTo="180" />
+				android:valueTo="180"/>
 		</aapt:attr>
 	</target>
 </animated-vector>

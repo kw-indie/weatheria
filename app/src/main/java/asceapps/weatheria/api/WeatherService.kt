@@ -14,28 +14,39 @@ import java.util.concurrent.TimeUnit
 
 interface WeatherService {
 
-	@GET(PATH_FIND)
-	suspend fun find(@Query("lat") lat: String, @Query("lon") lng: String): FindResponse
+	@GET("$ONE_CALL$EXCLUDE")
+	suspend fun oneCall(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
-	@GET("$PATH_FIND?sort=population")
+	@GET("$ONE_CALL$EXCLUDE,$HOURLY,$DAILY")
+	suspend fun current(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
+
+	@GET("$ONE_CALL$EXCLUDE,$CURRENT,$DAILY")
+	suspend fun hourly(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
+
+	@GET("$ONE_CALL$EXCLUDE,$CURRENT,$HOURLY")
+	suspend fun daily(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
+
+	@GET(FIND)
+	suspend fun find(@Query(LAT) lat: String, @Query(LON) lng: String): FindResponse
+
+	@GET(FIND)
 	suspend fun find(@Query("q") query: String): FindResponse
-
-	@GET(PATH_CURRENT)
-	suspend fun current(@Query("lat") lat: String, @Query("lon") lng: String): CurrentResponse
-
-	@GET(PATH_CURRENT)
-	suspend fun current(@Query("q") query: String): CurrentResponse
-
-	@GET(PATH_CURRENT)
-	suspend fun current(@Query("id") locationId: Int): CurrentResponse
 
 	companion object {
 
-		private const val BASE_URL: String = "https://api.openweathermap.org/data/2.5/"
-		private const val PATH_FIND: String = "find" // find?q=york&type=like&sort=population&cnt=3&appid=xxx
-		private const val PATH_CURRENT: String = "weather" // weather?q=york&appid=xxx
-		private const val PATH_FORECAST: String = "forecast" // 5day/3hr forecast?q=york&appid=xxx
-		private const val PARAM_APP_ID: String = "appid"
+		private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+		private const val LAT = "lat"
+		private const val LON = "lon"
+		// oneCall?lat=xx&lon=yy&exclude=minutely,hourly,daily,alerts
+		private const val ONE_CALL = "onecall"
+		private const val EXCLUDE = "?exclude=minutely"
+		private const val CURRENT = "current"
+		private const val HOURLY = "hourly"
+		private const val DAILY = "daily"
+		// find?q=york&type=like&sort=population&cnt=3
+		private const val FIND = "find"
+		// 5day/3hr forecast?q=york&cnt=16 (2days)
+		private const val FORECAST = "forecast"
 
 		/**
 		 * @param context to get cache dir
@@ -48,7 +59,7 @@ interface WeatherService {
 					.maxStale(1, TimeUnit.HOURS)
 					.build()
 				val newUrl = chain.request().url.newBuilder()
-					.addQueryParameter(PARAM_APP_ID, BuildConfig.WEATHER_APP_ID)
+					.addQueryParameter("appId", BuildConfig.WEATHER_APP_ID)
 					.build()
 				val request = chain.request().newBuilder()
 					.cacheControl(cacheControl)
@@ -67,5 +78,7 @@ interface WeatherService {
 				.build()
 				.create(WeatherService::class.java)
 		}
+
+		fun iconUrlFor(icon: String) = "https://openweathermap.org/img/wn/$icon@2x.png"
 	}
 }

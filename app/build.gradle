@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android' // for kotlin lang support
 apply plugin: 'kotlin-android-extensions' // for most features: coroutines, parcelize, etc.
 apply plugin: 'kotlin-kapt' // for annotations: data binding, etc
 apply plugin: 'androidx.navigation.safeargs.kotlin' // for navigation passed arguments
-apply plugin: 'dagger.hilt.android.plugin'
+//apply plugin: 'dagger.hilt.android.plugin'
 
 android {
 	compileSdkVersion targetSdkVer
@@ -66,37 +66,67 @@ android {
 dependencies {
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
 
+	// kotlin
 	implementation "androidx.core:core-ktx:$coreVer"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer"
+
+	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
-	implementation "androidx.appcompat:appcompat:$appCompatVer"
+
+	// to use viewModels delegate
 	implementation "androidx.activity:activity-ktx:$activityVer"
 	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
-	implementation "androidx.navigation:navigation-runtime-ktx:$navVer"
-	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
-	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
+
+	// general
 	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
 	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
 	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
 	implementation "androidx.viewpager2:viewpager2:$viewPagerVer"
-	implementation "androidx.core:core-animation:$animatorVer"
-	implementation "androidx.vectordrawable:vectordrawable-seekable:$vectorDrawableSeekableVer"
+	implementation "com.google.android.material:material:$materialVer"
+
+	// viewModel & liveData
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
+
+	// nav
+	// runtime offers findNavController() and navArgs property
+	implementation "androidx.navigation:navigation-runtime-ktx:$navVer"
+	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
+	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
+
+	// seekable anim vector drawable
+	// core offers listeners, interpolators, etc
+	implementation "androidx.core:core-animation:$animatorVer"
+	implementation "androidx.vectordrawable:vectordrawable-seekable:$vectorDrawableSeekableVer"
+
+	// preferences fragment
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
+
+	// data store
+	implementation "androidx.datastore:datastore-preferences:$dataStoreVer"
+
+	// room
+	// runtime is core
+	// ktx adds suspend and Flow support
 	kapt "androidx.room:room-compiler:$roomVer"
 	implementation "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
-	implementation "com.google.android.material:material:$materialVer"
-	implementation "com.google.android.libraries.maps:maps:$mapsVer"
-	implementation "com.google.code.gson:gson:$gsonVer"
+
+	// retrofit
 	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
 	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVer"
-	implementation "androidx.datastore:datastore-preferences:$dataStoreVer"
-	implementation "com.google.dagger:hilt-android:$hiltVer"
-	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
+
+	// maps
+	implementation "com.google.android.libraries.maps:maps:$mapsVer"
+
+	// hilt
+//	implementation "com.google.dagger:hilt-android:$hiltVer"
+//	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
+//	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltViewModelVer"
+
+	// coil
 	implementation "io.coil-kt:coil:$coilVer"
 
 	// multi screen size support

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
-
-	<item android:id="@+id/action_ok"
+	<item
+		android:id="@+id/action_ok"
 		android:icon="@drawable/ic_check"
 		android:title="@android:string/ok"
-		app:showAsAction="ifRoom" />
-
-	<item android:id="@+id/action_give_permission"
+		app:showAsAction="ifRoom"/>
+	<item
+		android:id="@+id/action_give_permission"
 		android:title="@string/action_give_permission"
-		app:showAsAction="never" />
-
+		app:showAsAction="never"/>
 </menu>

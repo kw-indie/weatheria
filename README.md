@@ -1,14 +1,11 @@
 ### App description:
-Fetch current weather for your current location from OpenWeatherMap api
-Optionally, if you can't or don't want to give your current location, you can manually enter a location's name from the settings screen.
-The fetched data is automatically stored locally on the device and loaded on app restart.
-You can delete stored data by swiping a record left or right.
-Supports Android APIs from 16 to 29.
+Fetch weather info for any location from OpenWeatherMap api
+When offline, you still get the best estimated readings according to the last update.
+Supports Android APIs 21 and above.
 
 ### Used libs:
 
 * **Navigation components, Data binding & Material design**: building ui
-* **Volley**: http requests and image loading
 * **Room**: local storage database
 * **intuit**: multi screen size support
 

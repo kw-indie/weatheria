@@ -2,9 +2,13 @@ package asceapps.weatheria.db
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = Table.LOCATIONS)
+@Entity(
+	tableName = Table.LOCATIONS,
+	indices = [Index(Column.POS, unique = true)]
+)
 class LocationEntity(
 	@PrimaryKey @ColumnInfo(name = Column.LOC_ID) val id: Int,
 	val lat: Float,
@@ -12,5 +16,5 @@ class LocationEntity(
 	val name: String,
 	val country: String,
 	val zoneOffset: Int,
-	@ColumnInfo(name = Column.POS, index = true) val pos: Int = 0
+	@ColumnInfo(name = Column.POS) var pos: Int = 0
 )

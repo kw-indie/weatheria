@@ -19,7 +19,7 @@ abstract class WeatherInfoDao {
 	// no update for location since it's static once retrieved from api and inserted into db.
 
 	@Transaction
-	@Query("SELECT * FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " ASC")
+	@Query("SELECT * FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " DESC")
 	abstract fun getAllInfo(): Flow<List<WeatherInfoEntity>>
 
 	@Query("SELECT " + Column.LOC_ID + " FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " ASC")
@@ -32,13 +32,6 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM " + Table.LOCATIONS + " WHERE " + Column.LOC_ID + " = :locationId")
 	abstract suspend fun getInfo(locationId: Int): WeatherInfoEntity
 
-	@Query("SELECT MAX(" + Column.DT + ") FROM " + Table.DAILY + " WHERE " + Column.LOC_ID + " = :locationId")
-	abstract suspend fun getDtOfLastDailyFor(locationId: Int): Int?
-
-	@Query("SELECT MAX(" + Column.DT + ") FROM " + Table.HOURLY +
-		" WHERE " + Column.LOC_ID + " = :locationId")
-	abstract suspend fun getDtOfLastHourlyFor(locationId: Int): Int?
-
 	@Transaction
 	open suspend fun insert(
 		wc: List<WeatherConditionEntity>,
@@ -48,6 +41,7 @@ abstract class WeatherInfoDao {
 		d: List<DailyEntity>
 	) {
 		insertWeatherCondition(wc)
+		l.pos = getMaxPosInLocations()
 		insertLocation(l)
 		insertCurrent(c)
 		insertHourly(h)
@@ -80,7 +74,10 @@ abstract class WeatherInfoDao {
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	protected abstract suspend fun insertWeatherCondition(wc: List<WeatherConditionEntity>)
 
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	@Query("SELECT IFNULL(MAX(" + Column.POS + "), 0) + 1 FROM " + Table.LOCATIONS)
+	protected abstract suspend fun getMaxPosInLocations(): Int
+
+	@Insert(onConflict = OnConflictStrategy.ABORT)
 	protected abstract suspend fun insertLocation(l: LocationEntity)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

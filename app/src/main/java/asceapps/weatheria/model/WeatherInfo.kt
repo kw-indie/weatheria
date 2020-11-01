@@ -43,6 +43,14 @@ class WeatherInfo(
 			today?.run {now in sunrise..sunset}
 		}
 
+	// for distinctUntilChanged
+	override fun equals(other: Any?): Boolean {
+		return other != null &&
+			other is WeatherInfo &&
+			location.id == other.location.id &&
+			updateTime == other.updateTime
+	}
+
 	fun dtString(temporal: TemporalAccessor): String = dtFormatter.format(temporal)
 
 	fun tString(temporal: TemporalAccessor): String = tFormatter.format(temporal)

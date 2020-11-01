@@ -10,10 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.datastore.preferences.preferencesKey
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
@@ -24,9 +22,6 @@ import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfoRepo
 import asceapps.weatheria.model.setMetric
 import asceapps.weatheria.ui.MainActivity
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 
 class HomeFragment: Fragment() {
 
@@ -83,6 +78,7 @@ class HomeFragment: Fragment() {
 		args.latLng?.let {
 			viewModel.addNewLocation("${it.latitude},${it.longitude}")
 		}
+		arguments?.clear() // fixes stupid re-reading of the args
 	}
 
 	override fun onDestroyView() {
@@ -217,7 +213,7 @@ class HomeFragment: Fragment() {
 				val info = adapter.getItem(pos)
 				binding.tvLastUpdate.text = getString(
 					R.string.f_last_update,
-					DateUtils.getRelativeTimeSpanString(info.updateTime.epochSecond)
+					DateUtils.getRelativeTimeSpanString(info.updateTime.toEpochMilli())
 				)
 				when(info.isDaytime) {
 					true -> animateToDay()
@@ -229,15 +225,12 @@ class HomeFragment: Fragment() {
 	}
 
 	private fun setUpPreferences() {
-		val dataStore = (requireActivity() as MainActivity).dataStore
-		val unitsKey = preferencesKey<String>(getString(R.string.key_units))
-		dataStore.data
-			.map {prefs -> prefs[unitsKey] ?: "0"}
-			.map {it == "0"}
-			.onEach {
-				setMetric(it, if(it) getString(R.string.metric_speed) else getString(R.string.imp_speed))
-			}
-			.launchIn(lifecycleScope)
+		val prefs = (requireActivity() as MainActivity).prefs
+		val unitsKey = getString(R.string.key_units)
+		val units = prefs.getString(unitsKey, "0")
+		val isMetric = units == "0"
+		val speedUnit = if(isMetric) getString(R.string.metric_speed) else getString(R.string.imp_speed)
+		setMetric(isMetric, speedUnit)
 	}
 
 	private fun setUpErrorHandler() {

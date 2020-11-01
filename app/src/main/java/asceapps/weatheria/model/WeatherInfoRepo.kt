@@ -17,14 +17,12 @@ class WeatherInfoRepo private constructor(
 
 	fun getAll() = dao.getAllInfo()
 		.distinctUntilChanged()
-		.flowOn(Dispatchers.IO)
 		.map {infoList ->
-			val conditionIds = mutableListOf<Int>()
-			infoList.forEach {info -> conditionIds += Mapper.extractConditionIds(info)}
-			val conditions = dao.getConditions(conditionIds)
-				.associateBy {it.id}
+			val conditionIds = infoList.flatMap {info -> Mapper.extractConditionIds(info)}
+			val conditions = dao.getConditions(conditionIds).associateBy {it.id}
 			infoList.map {info -> Mapper.entityToModel(conditions, info)}
 		}
+		.flowOn(Dispatchers.IO)
 
 	suspend fun find(lat: String, lng: String) = Mapper.dtoToModel(service.find(lat, lng))
 
@@ -35,12 +33,10 @@ class WeatherInfoRepo private constructor(
 		val findResp = service.find(lat, lng)
 		val foundLocations = Mapper.dtoToModel(findResp)
 		// todo let user choose a location
-		val selectedLocation = foundLocations[0]
-		val oneCallResp = service.oneCall(
-			selectedLocation.lat.toString(),
-			selectedLocation.lng.toString())
+		val selectedLoc = foundLocations[0]
+		val oneCallResp = service.oneCall(selectedLoc.lat.toString(), selectedLoc.lng.toString())
 		val conditionsMap = HashMap<Int, WeatherConditionEntity>()
-		val weatherInfoEntity = Mapper.dtoToEntity(selectedLocation, oneCallResp, conditionsMap)
+		val weatherInfoEntity = Mapper.dtoToEntity(selectedLoc, oneCallResp, conditionsMap)
 		with(weatherInfoEntity) {
 			dao.insert(conditionsMap.values.toList(), location, current, hourly, daily)
 		}

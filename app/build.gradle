@@ -103,9 +103,6 @@ dependencies {
 	// preferences fragment
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
 
-	// data store
-	implementation "androidx.datastore:datastore-preferences:$dataStoreVer"
-
 	// room
 	// runtime is core
 	// ktx adds suspend and Flow support

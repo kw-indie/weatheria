@@ -29,7 +29,9 @@ class HomeViewModel(
 		_refreshing.value = true
 		try {
 			if(isCoordinate(query)) {
-				val coords = query.split(',').map {it.trim()}
+				// this 7 is for cases like -xx.yyy, we want max 6 but 7th for accuracy
+				// need to clamp because gps gives way too many decimals
+				val coords = query.split(',').map {it.take(7).trim()}
 				repo.get(coords[0], coords[1])
 			} else {
 				repo.get(query.trim())

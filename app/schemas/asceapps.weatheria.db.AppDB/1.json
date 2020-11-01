@@ -2,7 +2,7 @@
 	"formatVersion": 1,
 	"database": {
 		"version": 1,
-		"identityHash": "d88de6be1dfb6ea503f55bf00b4bb6c8",
+		"identityHash": "87794a67eb2e578d6b33d1775ddb3319",
 		"entities": [
 			{
 				"tableName": "locations",
@@ -60,11 +60,11 @@
 				"indices": [
 					{
 						"name": "index_locations_pos",
-						"unique": false,
+						"unique": true,
 						"columnNames": [
 							"pos"
 						],
-						"createSql": "CREATE INDEX IF NOT EXISTS `index_locations_pos` ON `${TABLE_NAME}` (`pos`)"
+						"createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_locations_pos` ON `${TABLE_NAME}` (`pos`)"
 					}
 				],
 				"foreignKeys": []
@@ -575,7 +575,7 @@
 		"views": [],
 		"setupQueries": [
 			"CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd88de6be1dfb6ea503f55bf00b4bb6c8')"
+			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '87794a67eb2e578d6b33d1775ddb3319')"
 		]
 	}
 }

@@ -29,10 +29,11 @@
 		tools:layout="@layout/fragment_map">
 		<!--https://developer.android.com/guide/navigation/navigation-deep-link#implicit-->
 		<!--https://developer.android.com/guide/components/intents-common#ViewMap-->
-		<deepLink
+		<!--todo code this-->
+		<!--<deepLink
 			android:id="@+id/deepLink"
 			app:action="android.intent.action.VIEW"
-			app:uri="geo"/>
+			app:uri="geo"/>-->
 		<action
 			android:id="@+id/action_ok_new_location"
 			app:destination="@id/homeFragment"

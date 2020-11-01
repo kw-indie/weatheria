@@ -1,5 +1,4 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceCategory app:title="@string/cat_header_general">
 		<ListPreference
 			app:key="@string/key_units"
@@ -8,15 +7,5 @@
 			app:entryValues="@array/units_entry_values"
 			app:defaultValue="0"
 			app:useSimpleSummaryProvider="true"/>
-		<!-- todo change to list -->
-		<SeekBarPreference
-			app:key="@string/key_auto_refresh"
-			app:title="@string/title_auto_refresh"
-			app:min="0"
-			android:max="60"
-			app:defaultValue="30"
-			app:seekBarIncrement="1"
-			app:showSeekBarValue="true"
-			app:summary="@string/summary_auto_refresh"/>
 	</PreferenceCategory>
 </PreferenceScreen>

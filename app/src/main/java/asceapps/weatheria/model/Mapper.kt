@@ -138,7 +138,7 @@ object Mapper {
 
 	fun extractConditionIds(info: WeatherInfoEntity): List<Int> {
 		return with(info) {
-			mutableListOf(current.conditionId) +
+			listOf(current.conditionId) +
 				hourly.map {it.conditionId} +
 				daily.map {it.conditionId}
 		}

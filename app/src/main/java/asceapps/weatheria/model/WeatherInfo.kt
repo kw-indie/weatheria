@@ -1,17 +1,9 @@
 package asceapps.weatheria.model
 
-import android.content.Context
-import asceapps.weatheria.R
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalAccessor
-
-private val dtFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 class WeatherInfo(
 	val location: Location,
@@ -50,12 +42,4 @@ class WeatherInfo(
 			location.id == other.location.id &&
 			updateTime == other.updateTime
 	}
-
-	fun dtString(temporal: TemporalAccessor): String = dtFormatter.format(temporal)
-
-	fun tString(temporal: TemporalAccessor): String = tFormatter.format(temporal)
-
-	fun windString(c: Context) = current.windSpeed.format +
-		c.getString(R.string.comma) + " " +
-		c.resources.getStringArray(R.array.dir_letters)[current.windDir.eighth]
 }

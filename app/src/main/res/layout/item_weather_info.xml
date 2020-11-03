@@ -4,6 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	tools:context=".ui.home.HomePagerFragment">
 	<data>
+		<import type="asceapps.weatheria.model.Utils"/>
 		<variable
 			name="info"
 			type="asceapps.weatheria.model.WeatherInfo"/>
@@ -41,7 +42,7 @@
 				android:alpha="0.5"
 				android:gravity="center_horizontal"
 				android:textSize="@dimen/_12ssp"
-				android:text="@{info.dtString(info.now)}"
+				android:text="@{Utils.dtString(info.now)}"
 				app:layout_constraintEnd_toEndOf="@+id/tv_location"
 				app:layout_constraintStart_toStartOf="@+id/tv_location"
 				app:layout_constraintTop_toBottomOf="@id/tv_location"
@@ -116,7 +117,7 @@
 				android:contentDescription="@string/cd_wind_speed_dir"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{info.windString(context)}"
+				android:text="@{Utils.windString(context, info.current)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableTint="?attr/colorOnSurface"
 				app:drawableStartCompat="@drawable/ic_wind"
@@ -150,7 +151,7 @@
 				android:contentDescription="@string/cd_sunrise"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{info.tString(info.today.sunrise)}"
+				android:text="@{Utils.tString(info.today.sunrise)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableStartCompat="@drawable/anim_sunrise"
 				app:drawableTint="?attr/colorOnSurface"
@@ -167,7 +168,7 @@
 				android:contentDescription="@string/cd_sunset"
 				android:drawablePadding="@dimen/_4sdp"
 				android:gravity="center_vertical|end"
-				android:text="@{info.tString(info.today.sunset)}"
+				android:text="@{Utils.tString(info.today.sunset)}"
 				android:textSize="@dimen/_12ssp"
 				app:drawableStartCompat="@drawable/anim_sunset"
 				app:drawableTint="?attr/colorOnSurface"

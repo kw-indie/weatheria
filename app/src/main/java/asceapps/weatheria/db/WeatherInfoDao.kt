@@ -22,11 +22,11 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " DESC")
 	abstract fun getAllInfo(): Flow<List<WeatherInfoEntity>>
 
-	@Query("SELECT " + Column.LOC_ID + " FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " ASC")
-	abstract suspend fun getLocationIds(): List<Int>
-
 	@Query("SELECT * FROM " + Table.CONDITIONS + " WHERE " + Column.CONDITION_ID + " IN (:ids)")
 	abstract suspend fun getConditions(ids: List<Int>): List<WeatherConditionEntity>
+
+	@Query("SELECT " + Column.LOC_ID + " FROM " + Table.LOCATIONS + " ORDER BY " + Column.POS + " DESC")
+	abstract suspend fun getLocationIds(): List<Int>
 
 	@Transaction
 	@Query("SELECT * FROM " + Table.LOCATIONS + " WHERE " + Column.LOC_ID + " = :locationId")

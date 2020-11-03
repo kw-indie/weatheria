@@ -1,10 +1,16 @@
+@file:JvmName("Utils")
 package asceapps.weatheria.model
 
+import android.content.Context
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import asceapps.weatheria.R
 import asceapps.weatheria.api.WeatherService
 import coil.load
 import java.text.DecimalFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.TemporalAccessor
 
 var metric = true
 	private set
@@ -15,6 +21,8 @@ fun setMetric(b: Boolean, speedUnit: String) {
 }
 // prints at least 1 digit, sep each 3 digits, 0 to 2 decimal digits, rounds to nearest
 private val decimalFormat = DecimalFormat(",##0.##")
+private val dtFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 class Temp(kelvin: Int) {
 
@@ -46,16 +54,6 @@ class Icon(icon: String) {
 	val url get() = WeatherService.iconUrlFor(v)
 }
 
-@BindingAdapter("icon")
-fun loadIconFromUrl(view: ImageView, url: String) {
-	view.load(url) {
-		// placeholder(res_id)
-		// error(res_id)
-		// transformations(CircleCropTransformation())
-		crossfade(true)
-	}
-}
-
 class Direction(degree: Int) {
 
 	val v = degree
@@ -74,3 +72,21 @@ class Direction(degree: Int) {
 			else -> 7
 		}
 }
+
+@BindingAdapter("icon")
+fun loadIconFromUrl(view: ImageView, url: String) {
+	view.load(url) {
+		// placeholder(res_id)
+		// error(res_id)
+		// transformations(CircleCropTransformation())
+		crossfade(true)
+	}
+}
+
+fun dtString(temporal: TemporalAccessor): String = dtFormatter.format(temporal)
+
+fun tString(temporal: TemporalAccessor): String = tFormatter.format(temporal)
+
+fun windString(c: Context, current: Current) = current.windSpeed.format +
+	c.getString(R.string.comma) + " " +
+	c.resources.getStringArray(R.array.dir_letters)[current.windDir.eighth]

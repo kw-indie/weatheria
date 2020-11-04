@@ -1,25 +1,33 @@
 package asceapps.weatheria.ui.home
 
-import android.os.Bundle
-import androidx.lifecycle.*
-import androidx.savedstate.SavedStateRegistryOwner
-import asceapps.weatheria.model.Location
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.model.WeatherInfoRepo
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
+private fun isCoordinate(str: String) = str.matches(Regex(
+	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
+))
+
 class HomeViewModel(
-	private val repo: WeatherInfoRepo,
-	private val savedStateHandle: SavedStateHandle
+	private val repo: WeatherInfoRepo
 ): ViewModel() {
 
-	val infoList = repo.getAll().asLiveData()
+	val infoList = repo.getAll()
+		.onStart {_refreshing.value = true}
+		.onEach {_refreshing.value = false}
+		.asLiveData()
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 	private val _refreshing = MutableLiveData<Boolean>()
 	val refreshing: LiveData<Boolean> get() = _refreshing
-	var selected: Int?
-		get() = savedStateHandle[SELECTED_PAGE_KEY]
-		set(value) = savedStateHandle.set(SELECTED_PAGE_KEY, value)
+	var selected: Int? = null
 
 	/**
 	 * If successful, the result is auto inserted in the database.
@@ -44,46 +52,44 @@ class HomeViewModel(
 		}
 	}
 
-	fun update(l: Location) = viewModelScope.launch {
-		_refreshing.value = true
-		try {
-			repo.getUpdate(l)
-		} catch(e: Exception) {
-			e.printStackTrace()
-			_error.value = e
-		} finally {
-			_refreshing.value = false
+	fun updateSelected() {
+		selected?.let {selected ->
+			infoList.value?.get(selected)?.location
+		}?.let {location ->
+			viewModelScope.launch {
+				_refreshing.value = true
+				try {
+					repo.getUpdate(location)
+				} catch(e: Exception) {
+					e.printStackTrace()
+					_error.value = e
+				} finally {
+					_refreshing.value = false
+				}
+			}
 		}
 	}
 
-	fun delete(l: Location) = viewModelScope.launch {
-		repo.delete(l)
+	fun deleteSelected() {
+		selected?.let {selected ->
+			infoList.value?.get(selected)?.location
+		}?.let {location ->
+			viewModelScope.launch {
+				repo.delete(location)
+			}
+		}
 	}
 
 	fun deleteAll() = viewModelScope.launch {
 		repo.deleteAll()
 	}
 
-	companion object {
-
-		private const val SELECTED_PAGE_KEY = "SP"
-
-		private fun isCoordinate(str: String) = str.matches(Regex(
-			"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
-		))
-	}
-
 	class Factory(
-		private val weatherInfoRepo: WeatherInfoRepo,
-		owner: SavedStateRegistryOwner,
-		defaultArgs: Bundle? = null
-	): AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+		private val weatherInfoRepo: WeatherInfoRepo
+	): ViewModelProvider.Factory {
 
 		@Suppress("unchecked_cast")
-		override fun <T: ViewModel?> create(
-			key: String,
-			modelClass: Class<T>,
-			handle: SavedStateHandle
-		) = HomeViewModel(weatherInfoRepo, handle) as T
+		override fun <T: ViewModel?> create(modelClass: Class<T>): T =
+			HomeViewModel(weatherInfoRepo) as T
 	}
 }

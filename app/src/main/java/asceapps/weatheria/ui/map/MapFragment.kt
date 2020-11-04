@@ -8,17 +8,15 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
@@ -47,8 +45,24 @@ class MapFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
-		setHasOptionsMenu(true)
 		val root = inflater.inflate(R.layout.fragment_map, container, false)
+
+		root.findViewById<Toolbar>(R.id.toolbar).apply {
+			setNavigationOnClickListener {
+				findNavController().navigateUp()
+			}
+			setOnMenuItemClickListener {item ->
+				when(item.itemId) {
+					R.id.action_ok -> findNavController().navigate(
+						MapFragmentDirections.actionOkNewLocation(marker.position)
+					)
+					R.id.action_give_permission -> beforeLocationPermission()
+					else -> return@setOnMenuItemClickListener false
+				}
+				true
+			}
+		}
+
 		mapView = root.findViewById(R.id.map_view)
 		mapView.apply {
 			onCreate(savedInstanceState)
@@ -56,26 +70,6 @@ class MapFragment: Fragment() {
 		}
 
 		return root
-	}
-
-	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) =
-		inflater.inflate(R.menu.map_menu, menu)
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		return when(item.itemId) {
-			R.id.action_ok -> {
-				val direction = MapFragmentDirections.actionOkNewLocation(marker.position)
-				NavHostFragment.findNavController(this)
-					.navigate(direction)
-				true
-			}
-			R.id.action_give_permission -> {
-				// fixme doesn't seem to work
-				beforeLocationPermission()
-				true
-			}
-			else -> super.onOptionsItemSelected(item)
-		}
 	}
 
 	override fun onStart() {

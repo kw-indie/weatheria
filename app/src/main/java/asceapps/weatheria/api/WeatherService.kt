@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit
 
 interface WeatherService {
 
-	@GET("$ONE_CALL$EXCLUDE")
+	@GET(ONE_CALL)
 	suspend fun oneCall(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
-	@GET("$ONE_CALL$EXCLUDE,$HOURLY,$DAILY")
+	@GET("$ONE_CALL,$HOURLY,$DAILY")
 	suspend fun current(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
-	@GET("$ONE_CALL$EXCLUDE,$CURRENT,$DAILY")
+	@GET("$ONE_CALL,$CURRENT,$DAILY")
 	suspend fun hourly(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
-	@GET("$ONE_CALL$EXCLUDE,$CURRENT,$HOURLY")
+	@GET("$ONE_CALL,$CURRENT,$HOURLY")
 	suspend fun daily(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
 
 	@GET(FIND)
@@ -38,8 +38,7 @@ interface WeatherService {
 		private const val LAT = "lat"
 		private const val LON = "lon"
 		// oneCall?lat=xx&lon=yy&exclude=minutely,hourly,daily,alerts
-		private const val ONE_CALL = "onecall"
-		private const val EXCLUDE = "?exclude=minutely"
+		private const val ONE_CALL = "onecall?exclude=minutely"
 		private const val CURRENT = "current"
 		private const val HOURLY = "hourly"
 		private const val DAILY = "daily"

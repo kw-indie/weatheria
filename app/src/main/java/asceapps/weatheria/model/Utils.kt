@@ -21,7 +21,7 @@ fun setMetric(b: Boolean, speedUnit: String) {
 }
 // prints at least 1 digit, sep each 3 digits, 0 to 2 decimal digits, rounds to nearest
 private val decimalFormat = DecimalFormat(",##0.##")
-private val dtFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+private val dtFormatter = DateTimeFormatter.ofPattern("EEE, MMMM d, h:m a (xxx)")
 private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 class Temp(kelvin: Int) {

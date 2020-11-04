@@ -20,7 +20,7 @@ class WeatherInfo(
 			daily.find {it.date == today}
 		}
 
-	val todayMinMaxString get() = today?.let {"${it.min.format}\t\t|\t\t${it.max.format}"} ?: ""
+	val todayMinMaxString get() = today?.run {"${min.format.padEnd(5)}|${max.format.padStart(5)}"} ?: ""
 
 	val thisHour
 		get() = now.toLocalTime().truncatedTo(ChronoUnit.HOURS).let {thisHour ->

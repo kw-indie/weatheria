@@ -9,6 +9,7 @@ import asceapps.weatheria.BuildConfig
 @Database(
 	entities = [
 		LocationEntity::class,
+		SavedLocationEntity::class,
 		CurrentEntity::class,
 		HourlyEntity::class,
 		DailyEntity::class,
@@ -24,8 +25,8 @@ abstract class AppDB: RoomDatabase() {
 	companion object {
 
 		fun build(context: Context) =
-			Room.databaseBuilder(context.applicationContext, AppDB::class.java, "weatheria-db")
-				.fallbackToDestructiveMigration()
+			Room.databaseBuilder(context.applicationContext, AppDB::class.java, "weatheria")
+				.createFromAsset("database/weatheria.db")
 				.build()
 	}
 }

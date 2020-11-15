@@ -2,26 +2,24 @@ package asceapps.weatheria.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 
 @Entity(
 	tableName = Table.HOURLY,
 	primaryKeys = [Column.LOC_ID, Column.DT],
 	foreignKeys = [
 		ForeignKey(
-			entity = LocationEntity::class,
-			parentColumns = [Column.LOC_ID],
+			entity = SavedLocationEntity::class,
+			parentColumns = [Column.ID],
 			childColumns = [Column.LOC_ID],
 			onDelete = ForeignKey.CASCADE
 		),
 		ForeignKey(
 			entity = WeatherConditionEntity::class,
-			parentColumns = [Column.CONDITION_ID],
+			parentColumns = [Column.ID],
 			childColumns = [Column.CONDITION_ID],
 			onDelete = ForeignKey.RESTRICT
 		)
-	],
-	indices = [Index(Column.CONDITION_ID)]
+	]
 )
 class HourlyEntity(
 	locationId: Int,

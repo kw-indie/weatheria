@@ -1,7 +1,7 @@
 package asceapps.weatheria.model
 
 class Current(
-	val main: String,
+	val dt: Int,
 	val desc: String,
 	icon: String,
 	temp: Int,

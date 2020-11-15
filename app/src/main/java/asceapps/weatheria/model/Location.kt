@@ -8,5 +8,6 @@ class Location(
 	val lng: Float,
 	val name: String,
 	val country: String,
-	val zoneOffset: ZoneOffset
+	val zoneOffset: ZoneOffset,
+	val order: Int
 )

@@ -108,17 +108,27 @@ class MapFragment: Fragment() {
 		mapView.onLowMemory()
 	}
 
-	private fun onMapReady(map: GoogleMap) {
-		map.apply {
-			this@MapFragment.map = this
+	private fun onMapReady(gm: GoogleMap) {
+		gm.apply {
+			map = this
+
+			uiSettings.apply {
+				isRotateGesturesEnabled = false
+				isTiltGesturesEnabled = false
+				isIndoorEnabled = false
+				isMapToolbarEnabled = false
+				isZoomControlsEnabled = true
+			}
+
 			val london = LatLng(51.5098, -0.1181)
 			marker = addMarker(MarkerOptions().position(london))
 
-			moveCamera(CameraUpdateFactory.newLatLngZoom(london, 12f))
-			setOnMapClickListener {moveCamera(CameraUpdateFactory.newLatLng(it))}
+			moveCamera(CameraUpdateFactory.newLatLngZoom(london, 8f))
+			setOnMapClickListener {
+				moveCamera(CameraUpdateFactory.newLatLng(it))
+				marker.position = it
+			}
 			setOnCameraIdleListener {marker.position = cameraPosition.target}
-
-			beforeLocationPermission()
 		}
 
 		beforeLocationPermission()
@@ -141,14 +151,15 @@ class MapFragment: Fragment() {
 		val context = requireContext()
 		map.apply {
 			if(granted) {
-				uiSettings.isMyLocationButtonEnabled = true
 				@SuppressLint("MissingPermission")
-				isMyLocationEnabled = true
+				isMyLocationEnabled = true // the blue dot
+
 				val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 				setOnMyLocationButtonClickListener {
 					// if location service is enabled
 					if(lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
 						lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+						// don't consume click event, let the map do its location finding
 						false
 					} else {
 						showMessage(R.string.error_location_disabled)
@@ -156,7 +167,6 @@ class MapFragment: Fragment() {
 					}
 				}
 			} else {
-				uiSettings.isMyLocationButtonEnabled = false
 				showMessage(R.string.error_location_denied)
 			}
 		}

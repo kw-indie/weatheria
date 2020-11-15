@@ -28,10 +28,9 @@
 		<item>S</item>
 		<item>SE</item>
 	</string-array>
-
 	<!-- map -->
 	<string name="action_give_permission">Give permission</string>
-
+	<string name="map_id">59fa2b52dfe5e82f</string>
 	<!-- errors -->
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Location service disabled</string>
@@ -40,8 +39,8 @@
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
 	<string name="error_parsing_resp">Response parsing error. Try a different location</string>
+	<string name="error_duplicate_location">This location is already available</string>
 	<string name="error_unknown">Unknown error</string>
-
 	<!-- preference -->
 	<string name="cat_header_general">General</string>
 	<string name="key_units" translatable="false">units</string>

@@ -14,48 +14,19 @@ import java.util.concurrent.TimeUnit
 
 interface WeatherService {
 
-	@GET(ONE_CALL)
-	suspend fun oneCall(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
-
-	@GET("$ONE_CALL,$HOURLY,$DAILY")
-	suspend fun current(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
-
-	@GET("$ONE_CALL,$CURRENT,$DAILY")
-	suspend fun hourly(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
-
-	@GET("$ONE_CALL,$CURRENT,$HOURLY")
-	suspend fun daily(@Query(LAT) lat: String, @Query(LON) lng: String): OneCallResponse
-
-	@GET(FIND)
-	suspend fun find(@Query(LAT) lat: String, @Query(LON) lng: String): FindResponse
-
-	@GET(FIND)
-	suspend fun find(@Query("q") query: String): FindResponse
+	@GET("onecall?exclude=minutely")
+	suspend fun oneCall(@Query("lat") lat: String, @Query("lon") lng: String): OneCallResponse
 
 	companion object {
-
-		private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
-		private const val LAT = "lat"
-		private const val LON = "lon"
-		// oneCall?lat=xx&lon=yy&exclude=minutely,hourly,daily,alerts
-		private const val ONE_CALL = "onecall?exclude=minutely"
-		private const val CURRENT = "current"
-		private const val HOURLY = "hourly"
-		private const val DAILY = "daily"
-		// find?q=york&type=like&sort=population&cnt=3
-		private const val FIND = "find"
-		// 5day/3hr forecast?q=york&cnt=16 (2days)
-		private const val FORECAST = "forecast"
 
 		/**
 		 * @param context to get cache dir
 		 */
 		fun create(context: Context): WeatherService {
-			val cache = Cache(context.cacheDir, 1 shl 20) // 1 Mb
+			val cache = Cache(context.cacheDir, 1 shl 16) // 64 Kb
 			val interceptor = Interceptor {chain ->
 				val cacheControl = CacheControl.Builder()
 					.maxAge(10, TimeUnit.MINUTES)
-					.maxStale(1, TimeUnit.HOURS)
 					.build()
 				val newUrl = chain.request().url.newBuilder()
 					.addQueryParameter("appId", BuildConfig.WEATHER_APP_ID)
@@ -71,7 +42,7 @@ interface WeatherService {
 				.addInterceptor(interceptor)
 				.build()
 			return Retrofit.Builder()
-				.baseUrl(BASE_URL)
+				.baseUrl("https://api.openweathermap.org/data/2.5/")
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(client)
 				.build()

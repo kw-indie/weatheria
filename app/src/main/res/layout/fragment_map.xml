@@ -17,5 +17,6 @@
 	<com.google.android.libraries.maps.MapView
 		android:id="@+id/map_view"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"/>
+		android:layout_height="match_parent"
+		app:mapId="@string/map_id"/>
 </LinearLayout>

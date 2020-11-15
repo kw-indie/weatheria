@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = Table.CONDITIONS)
 class WeatherConditionEntity(
-	@PrimaryKey @ColumnInfo(name = Column.CONDITION_ID) val id: Int,
-	val main: String,
-	val desc: String,
+	@PrimaryKey @ColumnInfo(name = Column.ID) val id: Int,
+	val descEn: String,
+	val descAr: String,
 	val icon: String
 )

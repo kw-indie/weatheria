@@ -1,5 +1,6 @@
 package asceapps.weatheria.ui.home
 
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -14,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
+import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.databinding.FragmentHomeBinding
+import asceapps.weatheria.db.AppDB
 import asceapps.weatheria.model.WeatherInfoRepo
 import asceapps.weatheria.model.setMetric
 import asceapps.weatheria.ui.MainActivity
@@ -22,7 +25,11 @@ import asceapps.weatheria.ui.MainActivity
 class HomeFragment: Fragment() {
 
 	private val viewModel: HomeViewModel by viewModels {
-		HomeViewModel.Factory(WeatherInfoRepo.getInstance(requireContext()))
+		HomeViewModel.Factory(
+			WeatherInfoRepo.getInstance(
+				WeatherService.create(requireContext()),
+				AppDB.build(requireContext()).weatherInfoDao()
+			))
 	}
 
 	override fun onCreateView(
@@ -89,7 +96,7 @@ class HomeFragment: Fragment() {
 					val info = adapter.getItem(pos)
 					tvLastUpdate.text = getString(
 						R.string.f_last_update,
-						DateUtils.getRelativeTimeSpanString(info.updateTime.toEpochMilli())
+						DateUtils.getRelativeTimeSpanString(info.current.dt * 1000L)
 					)
 					when(info.isDaytime) {
 						true -> bg.apply { // animate to day
@@ -151,6 +158,7 @@ class HomeFragment: Fragment() {
 						// failed to parse response string to json
 						//is ParseError -> R.string.error_parsing_resp
 						// there is AuthFailureError as well from volley
+						is SQLiteConstraintException -> R.string.error_duplicate_location
 						else -> R.string.error_unknown
 					},
 					Toast.LENGTH_LONG

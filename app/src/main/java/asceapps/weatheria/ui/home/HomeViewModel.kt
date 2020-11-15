@@ -15,9 +15,7 @@ private fun isCoordinate(str: String) = str.matches(Regex(
 	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
 ))
 
-class HomeViewModel(
-	private val repo: WeatherInfoRepo
-): ViewModel() {
+class HomeViewModel(private val repo: WeatherInfoRepo): ViewModel() {
 
 	val infoList = repo.getAll()
 		.onStart {_refreshing.value = true}

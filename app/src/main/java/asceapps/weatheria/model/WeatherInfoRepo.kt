@@ -5,9 +5,12 @@ import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.db.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.roundToInt
 
-class WeatherInfoRepo private constructor(
+@Singleton
+class WeatherInfoRepo @Inject constructor(
 	private val service: WeatherService,
 	private val dao: WeatherInfoDao
 ) {
@@ -159,16 +162,5 @@ class WeatherInfoRepo private constructor(
 				snow
 			)
 		}
-	}
-
-	companion object {
-
-		@Volatile
-		private var instance: WeatherInfoRepo? = null
-
-		fun getInstance(service: WeatherService, dao: WeatherInfoDao) =
-			instance ?: synchronized(this) {
-				instance ?: WeatherInfoRepo(service, dao).also {instance = it}
-			}
 	}
 }

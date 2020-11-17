@@ -1,21 +1,20 @@
 package asceapps.weatheria.ui.home
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.model.WeatherInfoRepo
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 private fun isCoordinate(str: String) = str.matches(Regex(
 	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
 ))
 
-class HomeViewModel(private val repo: WeatherInfoRepo): ViewModel() {
+class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRepo): ViewModel() {
 
 	val infoList = repo.getAll()
 		.onStart {_refreshing.value = true}
@@ -23,7 +22,7 @@ class HomeViewModel(private val repo: WeatherInfoRepo): ViewModel() {
 		.asLiveData()
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
-	private val _refreshing = MutableLiveData<Boolean>()
+	private val _refreshing = MutableLiveData(true)
 	val refreshing: LiveData<Boolean> get() = _refreshing
 	var selected: Int? = null
 
@@ -80,14 +79,5 @@ class HomeViewModel(private val repo: WeatherInfoRepo): ViewModel() {
 
 	fun deleteAll() = viewModelScope.launch {
 		repo.deleteAll()
-	}
-
-	class Factory(
-		private val weatherInfoRepo: WeatherInfoRepo
-	): ViewModelProvider.Factory {
-
-		@Suppress("unchecked_cast")
-		override fun <T: ViewModel?> create(modelClass: Class<T>): T =
-			HomeViewModel(weatherInfoRepo) as T
 	}
 }

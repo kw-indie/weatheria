@@ -24,8 +24,8 @@ abstract class AppDB: RoomDatabase() {
 
 	companion object {
 
-		fun build(context: Context) =
-			Room.databaseBuilder(context.applicationContext, AppDB::class.java, "weatheria")
+		fun build(appContext: Context) =
+			Room.databaseBuilder(appContext, AppDB::class.java, "weatheria")
 				.createFromAsset("database/weatheria.db")
 				.build()
 	}

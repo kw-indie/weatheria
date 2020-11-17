@@ -11,33 +11,26 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
-import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.databinding.FragmentHomeBinding
-import asceapps.weatheria.db.AppDB
-import asceapps.weatheria.model.WeatherInfoRepo
 import asceapps.weatheria.model.setMetric
-import asceapps.weatheria.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment: Fragment() {
 
-	private val viewModel: HomeViewModel by viewModels {
-		HomeViewModel.Factory(
-			WeatherInfoRepo.getInstance(
-				WeatherService.create(requireContext()),
-				AppDB.build(requireContext()).weatherInfoDao()
-			))
-	}
+	private val viewModel: HomeViewModel by viewModels()
 
 	override fun onCreateView(
 		inflater: LayoutInflater, root: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
 		// setup prefs
-		val prefs = (requireActivity() as MainActivity).prefs
+		val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 		val unitsKey = getString(R.string.key_units)
 		val units = prefs.getString(unitsKey, "0")
 		val isMetric = units == "0"

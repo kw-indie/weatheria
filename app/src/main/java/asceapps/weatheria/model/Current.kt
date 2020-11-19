@@ -1,9 +1,8 @@
 package asceapps.weatheria.model
 
 class Current(
-	val dt: Int,
-	val desc: String,
-	icon: String,
+	val conditionId: Int,
+	val icon: String,
 	temp: Int,
 	feelsLike: Int,
 	val pressure: Int,
@@ -15,7 +14,6 @@ class Current(
 	windDir: Int
 ) {
 
-	val icon = Icon(icon)
 	val temp = Temp(temp)
 	val feelsLike = Temp(feelsLike)
 	val humidity = Percent(humidity)

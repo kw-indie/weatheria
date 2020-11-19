@@ -2,7 +2,6 @@ package asceapps.weatheria.ui.home
 
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -87,11 +86,7 @@ class HomeFragment: Fragment() {
 					if(adapter.itemCount == 0) return
 					viewModel.selected = pos
 					val info = adapter.getItem(pos)
-					tvLastUpdate.text = getString(
-						R.string.f_last_update,
-						DateUtils.getRelativeTimeSpanString(info.current.dt * 1000L)
-					)
-					when(info.isDaytime) {
+					when(info.isNowDaytime) {
 						true -> bg.apply { // animate to day
 							if(currentPlayTime in 1..999) { // it's playing and going to night
 								// let it play & smoothly jump forward after night
@@ -121,11 +116,9 @@ class HomeFragment: Fragment() {
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
 					swipeRefresh.visibility = View.GONE // to prevent swipe
-					tvLastUpdate.visibility = View.GONE
 				} else {
 					tvEmptyPager.visibility = View.GONE
 					swipeRefresh.visibility = View.VISIBLE
-					tvLastUpdate.visibility = View.VISIBLE
 				}
 			}
 

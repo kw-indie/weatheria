@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class WeatherInfoDao {
 
 	// our use case forgives us for:
+	// todo remove if we add pagination
 	// 1- no pagination, since query result is expected to be small
 	// 2- no separate calls for each table since all available info is almost always required
 	// also, live data is retrieved async, no need for suspend
@@ -22,18 +23,8 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM " + Table.SAVED_LOCATIONS + " ORDER BY " + Column.POS + " DESC")
 	abstract fun getAllInfo(): Flow<List<WeatherInfoEntity>>
 
-	@Query("SELECT * FROM " + Table.CONDITIONS)
-	abstract suspend fun getAllConditions(): List<WeatherConditionEntity>
-
-	@Query("SELECT * FROM " + Table.CONDITIONS + " WHERE " + Column.ID + " IN (" +
-		"SELECT " + Column.CONDITION_ID + " FROM " + Table.CURRENT + " WHERE " + Column.LOC_ID + " = :locationId UNION " +
-		"SELECT " + Column.CONDITION_ID + " FROM " + Table.HOURLY + " WHERE " + Column.LOC_ID + " = :locationId UNION " +
-		"SELECT " + Column.CONDITION_ID + " FROM " + Table.DAILY + " WHERE " + Column.LOC_ID + " = :locationId)"
-	)
-	abstract suspend fun getConditions(locationId: Int): List<WeatherConditionEntity>
-
-	@Query("SELECT " + Column.ID + " FROM " + Table.SAVED_LOCATIONS + " ORDER BY " + Column.POS + " DESC")
-	abstract fun getLocationIds(): Flow<List<Int>>
+	@Query("SELECT * FROM " + Table.SAVED_LOCATIONS + " ORDER BY " + Column.POS + " DESC")
+	abstract fun getSavedLocations(): Flow<List<SavedLocationEntity>>
 
 	@Transaction
 	@Query("SELECT * FROM " + Table.SAVED_LOCATIONS + " WHERE " + Column.ID + " = :locationId")

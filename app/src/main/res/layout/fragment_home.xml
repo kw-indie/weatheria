@@ -38,14 +38,5 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"/>
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-		<TextView
-			android:id="@+id/tv_last_update"
-			android:layout_width="@dimen/_140sdp"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/_4sdp"
-			android:textSize="@dimen/_9ssp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			tools:text="Last update: 0 min ago"/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

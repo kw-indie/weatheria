@@ -12,8 +12,7 @@ import asceapps.weatheria.BuildConfig
 		SavedLocationEntity::class,
 		CurrentEntity::class,
 		HourlyEntity::class,
-		DailyEntity::class,
-		WeatherConditionEntity::class
+		DailyEntity::class
 	],
 	version = 1,
 	exportSchema = BuildConfig.BUILD_TYPE == "debug"

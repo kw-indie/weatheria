@@ -19,6 +19,8 @@ interface WeatherService {
 
 	companion object {
 
+		const val ICON_URL_PATTERN = "https://openweathermap.org/img/wn/%s@2x.png"
+
 		/**
 		 * @param context to get cache dir
 		 */
@@ -48,7 +50,5 @@ interface WeatherService {
 				.build()
 				.create(WeatherService::class.java)
 		}
-
-		fun iconUrlFor(icon: String) = "https://openweathermap.org/img/wn/$icon@2x.png"
 	}
 }

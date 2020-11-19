@@ -7,7 +7,6 @@ object Table {
 	const val CURRENT = "current"
 	const val HOURLY = "hourly"
 	const val DAILY = "daily"
-	const val CONDITIONS = "conditions"
 }
 
 object Column {
@@ -19,6 +18,5 @@ object Column {
 	const val POS = "pos"
 	const val DT = "dt"
 	const val LOC_ID = "locationId"
-	const val CONDITION_ID = "conditionId"
 }
 

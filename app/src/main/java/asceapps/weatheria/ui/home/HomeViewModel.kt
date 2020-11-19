@@ -16,8 +16,7 @@ private fun isCoordinate(str: String) = str.matches(Regex(
 
 class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRepo): ViewModel() {
 
-	val infoList = repo.getAll()
-		.onStart {_refreshing.value = true}
+	val infoList = repo.getAllInfo()
 		.onEach {_refreshing.value = false}
 		.asLiveData()
 	private val _error = MutableLiveData<Throwable>()

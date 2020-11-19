@@ -12,12 +12,6 @@ import androidx.room.ForeignKey
 			parentColumns = [Column.ID],
 			childColumns = [Column.LOC_ID],
 			onDelete = ForeignKey.CASCADE
-		),
-		ForeignKey(
-			entity = WeatherConditionEntity::class,
-			parentColumns = [Column.ID],
-			childColumns = [Column.CONDITION_ID],
-			onDelete = ForeignKey.RESTRICT
 		)
 	]
 )

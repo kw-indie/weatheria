@@ -2,7 +2,7 @@
 	"formatVersion": 1,
 	"database": {
 		"version": 1,
-		"identityHash": "22bf1c4a4f08ba539387f8a9ee3b3f9b",
+		"identityHash": "cec6d003c0a7e705f2063eca671d42d5",
 		"entities": [
 			{
 				"tableName": "locations",
@@ -50,20 +50,8 @@
 			},
 			{
 				"tableName": "saved_locations",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`zoneOffset` INTEGER NOT NULL, `pos` INTEGER NOT NULL, `id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, PRIMARY KEY(`id`))",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, `zoneOffset` INTEGER NOT NULL, `pos` INTEGER NOT NULL, PRIMARY KEY(`id`))",
 				"fields": [
-					{
-						"fieldPath": "zoneOffset",
-						"columnName": "zoneOffset",
-						"affinity": "INTEGER",
-						"notNull": true
-					},
-					{
-						"fieldPath": "pos",
-						"columnName": "pos",
-						"affinity": "INTEGER",
-						"notNull": true
-					},
 					{
 						"fieldPath": "id",
 						"columnName": "id",
@@ -93,6 +81,18 @@
 						"columnName": "country",
 						"affinity": "TEXT",
 						"notNull": true
+					},
+					{
+						"fieldPath": "zoneOffset",
+						"columnName": "zoneOffset",
+						"affinity": "INTEGER",
+						"notNull": true
+					},
+					{
+						"fieldPath": "pos",
+						"columnName": "pos",
+						"affinity": "INTEGER",
+						"notNull": true
 					}
 				],
 				"primaryKey": {
@@ -106,7 +106,7 @@
 			},
 			{
 				"tableName": "current",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`conditionId`) REFERENCES `conditions`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
 				"fields": [
 					{
 						"fieldPath": "temp",
@@ -211,23 +211,12 @@
 						"referencedColumns": [
 							"id"
 						]
-					},
-					{
-						"table": "conditions",
-						"onDelete": "RESTRICT",
-						"onUpdate": "NO ACTION",
-						"columns": [
-							"conditionId"
-						],
-						"referencedColumns": [
-							"id"
-						]
 					}
 				]
 			},
 			{
 				"tableName": "hourly",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`conditionId`) REFERENCES `conditions`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
 				"fields": [
 					{
 						"fieldPath": "temp",
@@ -339,23 +328,12 @@
 						"referencedColumns": [
 							"id"
 						]
-					},
-					{
-						"table": "conditions",
-						"onDelete": "RESTRICT",
-						"onUpdate": "NO ACTION",
-						"columns": [
-							"conditionId"
-						],
-						"referencedColumns": [
-							"id"
-						]
 					}
 				]
 			},
 			{
 				"tableName": "daily",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `mornTemp` INTEGER NOT NULL, `dayTemp` INTEGER NOT NULL, `eveTemp` INTEGER NOT NULL, `nightTemp` INTEGER NOT NULL, `mornFeel` INTEGER NOT NULL, `dayFeel` INTEGER NOT NULL, `eveFeel` INTEGER NOT NULL, `nightFeel` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `uvi` REAL NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`conditionId`) REFERENCES `conditions`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `mornTemp` INTEGER NOT NULL, `dayTemp` INTEGER NOT NULL, `eveTemp` INTEGER NOT NULL, `nightTemp` INTEGER NOT NULL, `mornFeel` INTEGER NOT NULL, `dayFeel` INTEGER NOT NULL, `eveFeel` INTEGER NOT NULL, `nightFeel` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `uvi` REAL NOT NULL, `rain` REAL, `snow` REAL, `locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `conditionId` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `saved_locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
 				"fields": [
 					{
 						"fieldPath": "minTemp",
@@ -527,63 +505,14 @@
 						"referencedColumns": [
 							"id"
 						]
-					},
-					{
-						"table": "conditions",
-						"onDelete": "RESTRICT",
-						"onUpdate": "NO ACTION",
-						"columns": [
-							"conditionId"
-						],
-						"referencedColumns": [
-							"id"
-						]
 					}
 				]
-			},
-			{
-				"tableName": "conditions",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `descEn` TEXT NOT NULL, `descAr` TEXT NOT NULL, `icon` TEXT NOT NULL, PRIMARY KEY(`id`))",
-				"fields": [
-					{
-						"fieldPath": "id",
-						"columnName": "id",
-						"affinity": "INTEGER",
-						"notNull": true
-					},
-					{
-						"fieldPath": "descEn",
-						"columnName": "descEn",
-						"affinity": "TEXT",
-						"notNull": true
-					},
-					{
-						"fieldPath": "descAr",
-						"columnName": "descAr",
-						"affinity": "TEXT",
-						"notNull": true
-					},
-					{
-						"fieldPath": "icon",
-						"columnName": "icon",
-						"affinity": "TEXT",
-						"notNull": true
-					}
-				],
-				"primaryKey": {
-					"columnNames": [
-						"id"
-					],
-					"autoGenerate": false
-				},
-				"indices": [],
-				"foreignKeys": []
 			}
 		],
 		"views": [],
 		"setupQueries": [
 			"CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22bf1c4a4f08ba539387f8a9ee3b3f9b')"
+			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cec6d003c0a7e705f2063eca671d42d5')"
 		]
 	}
 }

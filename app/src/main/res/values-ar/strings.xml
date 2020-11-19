@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!--home-->
+	<string name="action_add_location">أضف موقعًا</string>
+	<string name="action_delete">احذف الموقع</string>
+	<string name="action_delete_all">احذف جميع المواقع</string>
+	<string name="action_settings">الإعدادات</string>
+	<string name="empty_pager">لا توجد مواقع لعرض توقعات الطقس. لم لا تضيف موقعًا؟</string>
+	<string name="f_last_update">آخر تحديث: %s</string>
+	<string name="f_comma_sep">%1$s، %2$s</string>
+	<string name="f_feels_like">تشعر وكأنها %s</string>
+	<string name="metric_speed">م/ث</string>
+	<string name="imp_speed">ميل/ساعة</string>
+	<string name="comma">،</string>
+	<string name="cd_weather_icon">أيقونة حالة الطقس</string>
+	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
+	<string name="cd_humidity">الرطوبة</string>
+	<string name="cd_sunrise">وقت شروق الشمس</string>
+	<string name="cd_sunset">وقت غروب الشمس</string>
+	<string-array name="dir_letters">
+		<item>ق</item>
+		<item>شق</item>
+		<item>ش</item>
+		<item>شغ</item>
+		<item>غ</item>
+		<item>جغ</item>
+		<item>ج</item>
+		<item>جق</item>
+	</string-array>
+	<string-array name="weather_conditions">
+		<item>عاصفة رعدية وأمطار خفيفة</item>
+		<item>عاصفة رعدية وأمطار</item>
+		<item>عاصفة رعدية وأمطار غزيرة</item>
+		<item>عاصفة رعدية خفيفة</item>
+		<item>عاصفة رعدية</item>
+		<item>عاصفة رعدية شديدة</item>
+		<item>عاصفة رعدية متفرقة</item>
+		<item>عاصفة رعدية ورذاذ خفيف</item>
+		<item>عاصفة رعدية ورذاذ</item>
+		<item>عاصفة رعدية ورذاذ غزير</item>
+		<item>رذاذ خفيف</item>
+		<item>رذاذ</item>
+		<item>رذاذ شديد الكثافة</item>
+		<item>رذاذ ممطر خفيف</item>
+		<item>رذاذ ممطر</item>
+		<item>رذاذ ممطر غزير</item>
+		<item>أمطار متقطعة ورذاذ</item>
+		<item>مطر غزير ورذاذ</item>
+		<item>رذاذ متقطع</item>
+		<item>مطر خفيف</item>
+		<item>أمطار معتدلة</item>
+		<item>أمطار غزيرة</item>
+		<item>أمطار غزيرة جدا</item>
+		<item>أمطار شديدة الغزارة</item>
+		<item>مطر شديد البرودة</item>
+		<item>مطر خفيف متقطع</item>
+		<item>مطر متقطع</item>
+		<item>مطر متقطع شديد الغزارة</item>
+		<item>أمطار متقطعة ومتفرقة</item>
+		<item>ثلوج خفيفة</item>
+		<item>ثلج</item>
+		<item>ثلوج كثيفة</item>
+		<item>برَد</item>
+		<item>برَد متقطع خفيف</item>
+		<item>برَد متقطع</item>
+		<item>أمطار خفيفة وثلوج</item>
+		<item>أمطار وثلوج</item>
+		<item>ثلوج متقطعة خفيفة</item>
+		<item>ثلوج متقطعة</item>
+		<item>ثلوج متقطعة كثيفة</item>
+		<item>ضباب</item>
+		<item>دخان</item>
+		<item>سديم</item>
+		<item>رمال ودوامات غبار</item>
+		<item>ضباب كثيف</item>
+		<item>رمال</item>
+		<item>غبار</item>
+		<item>رماد بركاني</item>
+		<item>عواصف فجائية</item>
+		<item>إعصار</item>
+		<item>سماء صافية</item>
+		<item>سحب قليلة: 11–25٪</item>
+		<item>سحب متفرقة: 25–50٪</item>
+		<item>سحب متقطعة: 51–84٪</item>
+		<item>سماء ملبدة بالغيوم: 85–100٪</item>
+	</string-array>
+	<!--map-->
+	<string name="action_give_permission">أعط الإذن</string>
+	<!--errors-->
+	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
+	<string name="error_location_disabled">خدمة تحديد الموقع غير مفعلة</string>
+	<string name="error_get_location_failed">فشل تحديد الموقع. حاول مرة أخرى لاحقًا</string>
+	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
+	<string name="error_timed_out">انتهت مهلة الطلب</string>
+	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
+	<string name="error_parsing_resp">خطأ في قراءة الرد. حاول إدخال موقعٍ مختلف</string>
+	<string name="error_duplicate_location">هذا الموقع موجود بالفعل</string>
+	<string name="error_unknown">خطأ غير معروف</string>
+	<!--settings-->
+	<string name="cat_header_general">عام</string>
+	<string name="title_units">الوحدات</string>
+	<string name="title_auto_refresh">التحديث التلقائي</string>
+</resources>

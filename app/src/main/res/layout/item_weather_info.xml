@@ -40,13 +40,24 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:alpha="0.5"
-				android:gravity="center_horizontal"
 				android:textSize="@dimen/_10ssp"
 				android:text="@{Utils.dtString(info.now)}"
-				app:layout_constraintEnd_toEndOf="@+id/tv_location"
-				app:layout_constraintStart_toStartOf="@+id/tv_location"
+				app:layout_constraintEnd_toEndOf="@id/mid_v_guideline"
+				app:layout_constraintStart_toStartOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@id/tv_location"
 				tools:text="Mon, September 30, 12:59 PM (+11:00)"/>
+			<TextView
+				android:id="@+id/tv_last_update"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/_4sdp"
+				android:alpha="0.5"
+				android:textSize="@dimen/_9ssp"
+				android:text="@{@string/f_last_update(info.lastUpdate)}"
+				app:layout_constraintStart_toStartOf="@id/mid_v_guideline"
+				app:layout_constraintTop_toBottomOf="@id/tv_time"
+				app:layout_constraintEnd_toEndOf="@id/mid_v_guideline"
+				tools:text="Last update: 0 min ago"/>
 			<ImageView
 				android:id="@+id/iv_icon"
 				android:layout_width="@dimen/_72sdp"
@@ -55,11 +66,11 @@
 				android:layout_marginEnd="@dimen/_8sdp"
 				android:contentDescription="@string/cd_weather_icon"
 				android:scaleType="fitXY"
-				app:icon="@{info.current.icon.url}"
+				app:icon="@{info.current.icon}"
 				app:layout_constraintBottom_toTopOf="@id/tv_min_max"
 				app:layout_constraintDimensionRatio="1:1"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
-				app:layout_constraintTop_toBottomOf="@+id/tv_time"/>
+				app:layout_constraintTop_toBottomOf="@+id/tv_last_update"/>
 			<TextView
 				android:id="@+id/tv_min_max"
 				android:layout_width="wrap_content"
@@ -100,7 +111,7 @@
 				android:layout_height="@dimen/_72sdp"
 				android:gravity="center"
 				android:maxLines="2"
-				android:text="@{info.current.desc}"
+				android:text="@{@stringArray/weather_conditions[Utils.indexOf(info.current.conditionId)]}"
 				android:textSize="@dimen/_14ssp"
 				android:textStyle="bold"
 				app:layout_constrainedWidth="true"
@@ -108,7 +119,7 @@
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/tv_min_max"
-				app:layout_constraintWidth_max="@dimen/_128sdp"
+				app:layout_constraintWidth_max="@dimen/_140sdp"
 				tools:text="chance of fish rain and blood"/>
 			<TextView
 				android:id="@+id/tv_wind"

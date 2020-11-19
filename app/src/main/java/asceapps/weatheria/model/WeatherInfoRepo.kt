@@ -1,10 +1,17 @@
 package asceapps.weatheria.model
 
+import android.text.format.DateUtils
 import asceapps.weatheria.api.OneCallResponse
 import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.db.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.time.Instant.ofEpochSecond
+import java.time.OffsetDateTime
+import java.time.OffsetTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToInt
@@ -15,16 +22,11 @@ class WeatherInfoRepo @Inject constructor(
 	private val dao: WeatherInfoDao
 ) {
 
-	fun getAll() = dao.getAllInfo()
+	fun getAllInfo() = dao.getAllInfo()
 		.distinctUntilChanged()
-		.map {infoList ->
-			val conditions = dao.getAllConditions().associateBy {it.id}
-			infoList.map {info -> Mapper.entityToModel(conditions, info)}
-		}
+		.map {list -> list.map {entityToWeatherInfo(it)}}
 
-	fun getLocationIds() = dao.getLocationIds()
-
-	suspend fun getConditions(locationId: Int) = dao.getConditions(locationId)
+	fun getSavedLocations() = dao.getSavedLocations()
 
 	fun getInfo(locationId: Int) = dao.getInfo(locationId)
 
@@ -162,5 +164,71 @@ class WeatherInfoRepo @Inject constructor(
 				snow
 			)
 		}
+	}
+
+	private fun entityToWeatherInfo(info: WeatherInfoEntity): WeatherInfo {
+		val zoneOffset = ZoneOffset.ofTotalSeconds(info.location.zoneOffset)
+		val location = with(info.location) {
+			Location(id, lat, lng, name, country, zoneOffset, pos)
+		}
+		val daily = info.daily.map {
+			with(it) {
+				Daily(
+					OffsetDateTime.ofInstant(ofEpochSecond(dt.toLong()), zoneOffset).toLocalDate(),
+					OffsetTime.ofInstant(ofEpochSecond(sunrise.toLong()), zoneOffset).toLocalTime(),
+					OffsetTime.ofInstant(ofEpochSecond(sunset.toLong()), zoneOffset).toLocalTime(),
+					iconOf(conditionId), // no d or n, cuz we will prolly use both in ui
+					minTemp,
+					maxTemp,
+					pop,
+					uvi
+				)
+			}
+		}
+		val now = OffsetDateTime.now(ZoneId.from(location.zoneOffset))
+		val todayWeather = now.toLocalDate().let {nowDate ->
+			daily.find {it.date == nowDate}
+		}
+		val hourly = info.hourly.map {
+			with(it) {
+				val time = OffsetTime.ofInstant(ofEpochSecond(dt.toLong()), zoneOffset).toLocalTime()
+				val isThisHourDaytime = todayWeather?.run {time in sunrise..sunset}
+				Hourly(
+					time,
+					// this returns an accurate result for today, and a good approximation for tomorrow
+					// since max difference in sunset/rise won't exceed a few minutes
+					iconOf(conditionId, isThisHourDaytime),
+					temp,
+					pop
+				)
+			}
+		}
+		val lastUpdate = DateUtils.getRelativeTimeSpanString(info.current.dt * 1000L)
+		val thisHour = now.toLocalTime().truncatedTo(ChronoUnit.HOURS).let {nowHour ->
+			hourly.find {it.time == nowHour}
+		}
+		val isNowDaytime = now.toLocalTime().let {nowTime ->
+			todayWeather?.run {nowTime in sunrise..sunset}
+		}
+		// todo offer approximation when out of date
+		val current = with(info.current) {
+			Current(
+				conditionId,
+				iconOf(conditionId, isNowDaytime),
+				temp,
+				feelsLike,
+				pressure,
+				humidity,
+				dewPoint,
+				clouds,
+				visibility,
+				windSpeed,
+				windDir
+			)
+		}
+		return WeatherInfo(
+			location, current, hourly, daily,
+			lastUpdate, now, todayWeather, thisHour, isNowDaytime
+		)
 	}
 }

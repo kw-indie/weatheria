@@ -6,17 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import asceapps.weatheria.model.WeatherInfoRepo
+import asceapps.weatheria.data.WeatherInfoRepo
+import asceapps.weatheria.util.isCoordinate
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-private fun isCoordinate(str: String) = str.matches(Regex(
-	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
-))
-
 class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRepo): ViewModel() {
 
-	val infoList = repo.getAllInfo()
+	val infoList = repo.getAll()
 		.onEach {_refreshing.value = false}
 		.asLiveData()
 	private val _error = MutableLiveData<Throwable>()
@@ -29,22 +26,24 @@ class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRe
 	 * If successful, the result is auto inserted in the database.
 	 * @param query user input. a location name or comma separated coordinates
 	 */
-	fun addNewLocation(query: String) = viewModelScope.launch {
-		_refreshing.value = true
-		try {
-			if(isCoordinate(query)) {
-				// this 7 is for cases like -xx.yyy, we want max 6 but 7th for accuracy
-				// need to clamp because gps gives way too many decimals
-				val coords = query.split(',').map {it.take(7).trim()}
-				repo.get(coords[0], coords[1])
-			} else {
-				repo.get(query.trim())
+	fun addNewLocation(query: String) {
+		viewModelScope.launch {
+			_refreshing.value = true
+			try {
+				if(isCoordinate(query)) {
+					// this 7 is for cases like -xx.yyy, we want max 6 but 7th for accuracy
+					// need to clamp because gps gives way too many decimals
+					val coords = query.split(',').onEach {it.take(7).trim()}
+					repo.get(coords[0], coords[1])
+				} else {
+					repo.get(query.trim())
+				}
+			} catch(e: Exception) {
+				e.printStackTrace()
+				_error.value = e
+			} finally {
+				_refreshing.value = false
 			}
-		} catch(e: Exception) {
-			e.printStackTrace()
-			_error.value = e
-		} finally {
-			_refreshing.value = false
 		}
 	}
 
@@ -76,7 +75,9 @@ class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRe
 		}
 	}
 
-	fun deleteAll() = viewModelScope.launch {
-		repo.deleteAll()
+	fun deleteAll() {
+		viewModelScope.launch {
+			repo.deleteAll()
+		}
 	}
 }

@@ -16,7 +16,7 @@ import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentHomeBinding
-import asceapps.weatheria.model.setMetric
+import asceapps.weatheria.util.setMetric
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

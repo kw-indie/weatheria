@@ -1,7 +1,7 @@
 package asceapps.weatheria.di
 
 import android.content.Context
-import asceapps.weatheria.api.WeatherService
+import asceapps.weatheria.data.WeatherService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

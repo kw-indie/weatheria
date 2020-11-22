@@ -1,7 +1,7 @@
 package asceapps.weatheria.di
 
 import android.content.Context
-import asceapps.weatheria.db.AppDB
+import asceapps.weatheria.data.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,8 +15,8 @@ class DatabaseModule {
 
 	@Singleton
 	@Provides
-	fun provideAppDB(@ApplicationContext context: Context) = AppDB.build(context)
+	fun provideAppDB(@ApplicationContext context: Context) = AppDatabase.build(context)
 
 	@Provides
-	fun provideWeatherInfoDao(appDB: AppDB) = appDB.weatherInfoDao()
+	fun provideWeatherInfoDao(appDatabase: AppDatabase) = appDatabase.weatherInfoDao()
 }

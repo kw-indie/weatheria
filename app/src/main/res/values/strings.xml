@@ -11,7 +11,6 @@
 	<string name="f_feels_like">Feels like %s</string>
 	<string name="metric_speed">m/s</string>
 	<string name="imp_speed">mph</string>
-	<string name="comma">,</string>
 	<string name="cd_weather_icon">Weather icon</string>
 	<string name="cd_wind_speed_dir">Wind speed and direction</string>
 	<string name="cd_humidity">Humidity</string>

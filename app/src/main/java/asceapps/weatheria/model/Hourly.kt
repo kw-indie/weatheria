@@ -1,14 +1,10 @@
 package asceapps.weatheria.model
 
-import java.time.LocalTime
+import java.time.Instant
 
 class Hourly(
-	val time: LocalTime,
+	val hour: Instant,
 	val icon: String,
-	temp: Int,
-	pop: Int
-) {
-
-	val temp = Temp(temp)
-	val pop = Percent(pop)
-}
+	val temp: Int,
+	val pop: Int
+)

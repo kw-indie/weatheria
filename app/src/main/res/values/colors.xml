@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="ic_launcher_background">#0082FF</color>
-
-	<color name="primary">#5E35B1</color>
+	<color name="primary">#B388FF</color>
 	<color name="primaryVariant">#311B92</color>
 	<color name="onPrimary">#EDE7F6</color>
 	<color name="secondary">#E65100</color>
@@ -11,7 +10,6 @@
 	<!--<color name="surface">#000</color>-->
 	<!--<color name="onSurface">#000</color>-->
 	<!--<color name="background">#000</color>-->
-
 	<!--added alpha value to fix dither-->
 	<color name="sky_night">#311B92</color>
 	<color name="sky_mid">#3D5AFE</color>

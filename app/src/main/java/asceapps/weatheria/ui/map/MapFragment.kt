@@ -8,17 +8,15 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
@@ -47,8 +45,24 @@ class MapFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View? {
-		setHasOptionsMenu(true)
 		val root = inflater.inflate(R.layout.fragment_map, container, false)
+
+		root.findViewById<Toolbar>(R.id.toolbar).apply {
+			setNavigationOnClickListener {
+				findNavController().navigateUp()
+			}
+			setOnMenuItemClickListener {item ->
+				when(item.itemId) {
+					R.id.action_ok -> findNavController().navigate(
+						MapFragmentDirections.actionOkNewLocation(marker.position)
+					)
+					R.id.action_give_permission -> beforeLocationPermission()
+					else -> return@setOnMenuItemClickListener false
+				}
+				true
+			}
+		}
+
 		mapView = root.findViewById(R.id.map_view)
 		mapView.apply {
 			onCreate(savedInstanceState)
@@ -56,26 +70,6 @@ class MapFragment: Fragment() {
 		}
 
 		return root
-	}
-
-	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) =
-		inflater.inflate(R.menu.map_menu, menu)
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		return when(item.itemId) {
-			R.id.action_ok -> {
-				val direction = MapFragmentDirections.actionOkNewLocation(marker.position)
-				NavHostFragment.findNavController(this)
-					.navigate(direction)
-				true
-			}
-			R.id.action_give_permission -> {
-				// fixme doesn't seem to work
-				beforeLocationPermission()
-				true
-			}
-			else -> super.onOptionsItemSelected(item)
-		}
 	}
 
 	override fun onStart() {
@@ -114,17 +108,27 @@ class MapFragment: Fragment() {
 		mapView.onLowMemory()
 	}
 
-	private fun onMapReady(map: GoogleMap) {
-		map.apply {
-			this@MapFragment.map = this
+	private fun onMapReady(gm: GoogleMap) {
+		gm.apply {
+			map = this
+
+			uiSettings.apply {
+				isRotateGesturesEnabled = false
+				isTiltGesturesEnabled = false
+				isIndoorEnabled = false
+				isMapToolbarEnabled = false
+				isZoomControlsEnabled = true
+			}
+
 			val london = LatLng(51.5098, -0.1181)
 			marker = addMarker(MarkerOptions().position(london))
 
-			moveCamera(CameraUpdateFactory.newLatLngZoom(london, 12f))
-			setOnMapClickListener {moveCamera(CameraUpdateFactory.newLatLng(it))}
+			moveCamera(CameraUpdateFactory.newLatLngZoom(london, 8f))
+			setOnMapClickListener {
+				moveCamera(CameraUpdateFactory.newLatLng(it))
+				marker.position = it
+			}
 			setOnCameraIdleListener {marker.position = cameraPosition.target}
-
-			beforeLocationPermission()
 		}
 
 		beforeLocationPermission()
@@ -147,14 +151,15 @@ class MapFragment: Fragment() {
 		val context = requireContext()
 		map.apply {
 			if(granted) {
-				uiSettings.isMyLocationButtonEnabled = true
 				@SuppressLint("MissingPermission")
-				isMyLocationEnabled = true
+				isMyLocationEnabled = true // the blue dot
+
 				val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 				setOnMyLocationButtonClickListener {
 					// if location service is enabled
 					if(lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
 						lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+						// don't consume click event, let the map do its location finding
 						false
 					} else {
 						showMessage(R.string.error_location_disabled)
@@ -162,7 +167,6 @@ class MapFragment: Fragment() {
 					}
 				}
 			} else {
-				uiSettings.isMyLocationButtonEnabled = false
 				showMessage(R.string.error_location_denied)
 			}
 		}

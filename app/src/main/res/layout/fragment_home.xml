@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools">
-	<data>
-		<import type="android.text.format.DateUtils"/>
-		<variable
-			name="viewModel"
-			type="asceapps.weatheria.ui.home.HomeViewModel"/>
-	</data>
-	<androidx.constraintlayout.widget.ConstraintLayout
+<layout>
+	<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		android:id="@+id/cl_root"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:fitsSystemWindows="true"
 		android:theme="@style/Theme.MaterialComponents"
 		tools:context=".ui.home.HomeFragment">
+		<androidx.appcompat.widget.Toolbar
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="?attr/actionBarSize"
+			app:menu="@menu/home_menu"
+			app:layout_constraintTop_toTopOf="parent"/>
 		<TextView
 			android:id="@+id/tv_empty_pager"
 			android:layout_width="wrap_content"
@@ -27,25 +29,14 @@
 			app:layout_constraintTop_toTopOf="parent"/>
 		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 			android:id="@+id/swipe_refresh"
-			android:layout_width="0dp"
+			android:layout_width="match_parent"
 			android:layout_height="0dp"
-			app:layout_constraintBottom_toTopOf="@id/tv_last_update"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent">
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/toolbar">
 			<androidx.viewpager2.widget.ViewPager2
 				android:id="@+id/pager"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"/>
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-		<TextView
-			android:id="@+id/tv_last_update"
-			android:layout_width="@dimen/_140sdp"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/_4sdp"
-			android:textSize="@dimen/_9ssp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			tools:text="Last update: 0 min ago"/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

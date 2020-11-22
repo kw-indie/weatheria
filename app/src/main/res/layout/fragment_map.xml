@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	tools:context=".ui.map.MapFragment"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:fitsSystemWindows="true"
+	tools:context=".ui.map.MapFragment">
+	<androidx.appcompat.widget.Toolbar
+		android:id="@+id/toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		app:title="@string/action_add_location"
+		app:navigationIcon="@drawable/ic_navigate_up"
+		app:menu="@menu/map_menu"/>
 	<com.google.android.libraries.maps.MapView
 		android:id="@+id/map_view"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+		android:layout_height="match_parent"
+		app:mapId="@string/map_id"/>
+</LinearLayout>

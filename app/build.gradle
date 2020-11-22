@@ -3,11 +3,12 @@ apply plugin: 'kotlin-android' // for kotlin lang support
 apply plugin: 'kotlin-android-extensions' // for most features: coroutines, parcelize, etc.
 apply plugin: 'kotlin-kapt' // for annotations: data binding, etc
 apply plugin: 'androidx.navigation.safeargs.kotlin' // for navigation passed arguments
-//apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'dagger.hilt.android.plugin'
 
 android {
 	compileSdkVersion targetSdkVer
 	buildToolsVersion buildToolsVer
+	ndkVersion ndkVer
 
 	// these config apply to all build types
 	defaultConfig {
@@ -22,12 +23,13 @@ android {
 
 		// if i don't add the quotes separately, the generated var is typed in as a broken int
 		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty('weather_app_id') + "\"")
+		resValue "string", "maps_api_key", (project.findProperty("maps_api_key") ?: "")
 
 		resConfigs "en"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
 
 		javaCompileOptions {
 			annotationProcessorOptions {
-				arguments = [
+				arguments += [
 					"room.schemaLocation": "$projectDir/schemas".toString(),
 					"room.incremental"   : "true"
 				]
@@ -40,12 +42,13 @@ android {
 	}
 
 	buildTypes {
-		debug {
-			resValue "string", "maps_api_key", (project.findProperty("maps_api_key") ?: "")
-		}
+		debug {}
 		release {
 			minifyEnabled true
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+			ndk {
+				debugSymbolLevel 'full' // include android vitals debug file in app bundle
+			}
 		}
 	}
 
@@ -64,7 +67,7 @@ android {
 }
 
 dependencies {
-	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
+	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
 
 	// kotlin
 	implementation "androidx.core:core-ktx:$coreVer"
@@ -119,9 +122,11 @@ dependencies {
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
 
 	// hilt
-//	implementation "com.google.dagger:hilt-android:$hiltVer"
-//	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
-//	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltViewModelVer"
+	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
+	implementation "com.google.dagger:hilt-android:$hiltVer"
+	// hilt with jetpack (viewModel, workManager)
+	kapt "androidx.hilt:hilt-compiler:$hiltJetpackVer"
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltJetpackVer"
 
 	// coil
 	implementation "io.coil-kt:coil:$coilVer"

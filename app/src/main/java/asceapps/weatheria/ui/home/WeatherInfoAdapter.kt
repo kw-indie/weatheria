@@ -44,6 +44,6 @@ class WeatherInfoAdapter: ListAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder
 			oldItem.location.id == newItem.location.id
 
 		override fun areContentsTheSame(oldItem: WeatherInfo, newItem: WeatherInfo) =
-			oldItem.updateTime == newItem.updateTime
+			oldItem.lastUpdate == newItem.lastUpdate
 	}
 }

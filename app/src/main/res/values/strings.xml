@@ -1,7 +1,6 @@
 <resources>
-	<string name="app_name">Weatheria</string>
-
-	<!-- home -->
+	<string name="app_name" translatable="false">Weatheria</string>
+	<!--home-->
 	<string name="action_add_location">Add location</string>
 	<string name="action_delete">Delete location</string>
 	<string name="action_delete_all">Delete All locations</string>
@@ -12,7 +11,6 @@
 	<string name="f_feels_like">Feels like %s</string>
 	<string name="metric_speed">m/s</string>
 	<string name="imp_speed">mph</string>
-	<string name="comma">,</string>
 	<string name="cd_weather_icon">Weather icon</string>
 	<string name="cd_wind_speed_dir">Wind speed and direction</string>
 	<string name="cd_humidity">Humidity</string>
@@ -28,11 +26,67 @@
 		<item>S</item>
 		<item>SE</item>
 	</string-array>
-
-	<!-- map -->
+	<string-array name="weather_conditions">
+		<item>Thunderstorm with light rain</item>
+		<item>Thunderstorm with rain</item>
+		<item>Thunderstorm with heavy rain</item>
+		<item>Light thunderstorm</item>
+		<item>Thunderstorm</item>
+		<item>Heavy thunderstorm</item>
+		<item>Ragged thunderstorm</item>
+		<item>Thunderstorm with light drizzle</item>
+		<item>Thunderstorm with drizzle</item>
+		<item>Thunderstorm with heavy drizzle</item>
+		<item>Light intensity drizzle</item>
+		<item>Drizzle</item>
+		<item>Heavy intensity drizzle</item>
+		<item>Light intensity drizzle rain</item>
+		<item>Drizzle rain</item>
+		<item>Heavy intensity drizzle rain</item>
+		<item>Shower rain and drizzle</item>
+		<item>Heavy shower rain and drizzle</item>
+		<item>Shower drizzle</item>
+		<item>Light rain</item>
+		<item>Moderate rain</item>
+		<item>Heavy intensity rain</item>
+		<item>Very heavy rain</item>
+		<item>Extreme rain</item>
+		<item>Freezing rain</item>
+		<item>Light intensity shower rain</item>
+		<item>Shower rain</item>
+		<item>Heavy intensity shower rain</item>
+		<item>Ragged shower rain</item>
+		<item>Light snow</item>
+		<item>Snow</item>
+		<item>Heavy snow</item>
+		<item>Sleet</item>
+		<item>Light shower sleet</item>
+		<item>Shower sleet</item>
+		<item>Light rain and snow</item>
+		<item>Rain and snow</item>
+		<item>Light shower snow</item>
+		<item>Shower snow</item>
+		<item>Heavy shower snow</item>
+		<item>Mist</item>
+		<item>Smoke</item>
+		<item>Haze</item>
+		<item>Sand and dust whirls</item>
+		<item>Fog</item>
+		<item>Sand</item>
+		<item>Dust</item>
+		<item>Volcanic ash</item>
+		<item>Squalls</item>
+		<item>Tornado</item>
+		<item>Clear sky</item>
+		<item>Few clouds: 11–25%</item>
+		<item>Scattered clouds: 25–50%</item>
+		<item>Broken clouds: 51–84%</item>
+		<item>Overcast clouds: 85–100%</item>
+	</string-array>
+	<!--map-->
 	<string name="action_give_permission">Give permission</string>
-
-	<!-- errors -->
+	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
+	<!--errors-->
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Location service disabled</string>
 	<string name="error_get_location_failed">Failed to get location. Try again later</string>
@@ -40,9 +94,9 @@
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
 	<string name="error_parsing_resp">Response parsing error. Try a different location</string>
+	<string name="error_duplicate_location">This location is already available</string>
 	<string name="error_unknown">Unknown error</string>
-
-	<!-- preference -->
+	<!--settings-->
 	<string name="cat_header_general">General</string>
 	<string name="key_units" translatable="false">units</string>
 	<string name="title_units">Units</string>
@@ -55,6 +109,5 @@
 		<item>1</item>
 	</string-array>
 	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
-	<string name="title_auto_refresh">Auto refresh (min)</string>
-	<string name="summary_auto_refresh">0 = Never</string>
+	<string name="title_auto_refresh">Auto refresh</string>
 </resources>

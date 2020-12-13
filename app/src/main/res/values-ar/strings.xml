@@ -9,8 +9,6 @@
 	<string name="f_last_update">آخر تحديث: %s</string>
 	<string name="f_comma_sep">%1$s، %2$s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
-	<string name="metric_speed">م/ث</string>
-	<string name="imp_speed">ميل/ساعة</string>
 	<string name="cd_weather_icon">أيقونة حالة الطقس</string>
 	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
 	<string name="cd_humidity">الرطوبة</string>
@@ -78,10 +76,20 @@
 		<item>عواصف فجائية</item>
 		<item>إعصار</item>
 		<item>سماء صافية</item>
-		<item>سحب قليلة: 11–25٪</item>
-		<item>سحب متفرقة: 25–50٪</item>
-		<item>سحب متقطعة: 51–84٪</item>
-		<item>سماء ملبدة بالغيوم: 85–100٪</item>
+		<item>سحب قليلة: ١١–٢٥٪</item>
+		<item>سحب متفرقة: ٢٥–٥٠٪</item>
+		<item>سحب متقطعة: ٥٠–٨٥٪</item>
+		<item>سماء ملبدة بالغيوم: ٨٥–١٠٠٪</item>
+	</string-array>
+	<string-array name="moon_phases">
+		<item>هلال متزايد</item>
+		<item>التربيع الأول</item>
+		<item>أحدب متزايد</item>
+		<item>بدر</item>
+		<item>أحدب متناقص</item>
+		<item>التربيع الأخير</item>
+		<item>هلال متناقص</item>
+		<item>محاق</item>
 	</string-array>
 	<!--map-->
 	<string name="action_give_permission">أعط الإذن</string>
@@ -97,6 +105,32 @@
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--settings-->
 	<string name="cat_header_general">عام</string>
-	<string name="title_units">الوحدات</string>
+	<string name="title_units">نظام الوحدات</string>
+	<string-array name="units_entries">
+		<item>متري</item>
+		<item>إنجليزي</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>م/ث</item>
+		<item>ميل/ساعة</item>
+	</string-array>
+	<string name="title_reorder">تغيير الترتيب</string>
+	<string name="summary_reorder">قم بإعادة ترتيب المواقع</string>
+	<string name="cat_header_display">العرض</string>
+	<string name="title_theme">المظهر</string>
+	<string-array name="theme_entries">
+		<item>حسب النظام</item>
+		<item>داكن</item>
+		<item>فاتح</item>
+	</string-array>
+	<string name="cat_header_sync">المزامنة</string>
 	<string name="title_auto_refresh">التحديث التلقائي</string>
+	<string-array name="auto_refresh_entries">
+		<item>متوقف</item>
+		<item>كل ٦ ساعات</item>
+		<item>كل ١٢ ساعة</item>
+		<item>كل يوم</item>
+	</string-array>
+	<string name="cat_header_help">مساعدة</string>
+	<string name="title_about">حول</string>
 </resources>

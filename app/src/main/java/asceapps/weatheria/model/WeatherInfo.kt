@@ -1,6 +1,8 @@
 package asceapps.weatheria.model
 
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class WeatherInfo(
 	val location: Location,
@@ -11,9 +13,17 @@ class WeatherInfo(
 ) {
 
 	// if daily includes today, get it, else, get last day
-	val today get() = Instant.now().let {daily.last {day -> day.date < it}}
+	val today get() = Instant.now().let {daily.lastOrNull {day -> day.date < it}} ?: daily[0]
 	// if hourly includes this hour, get it, else get last hour
-	val thisHour get() = Instant.now().let {hourly.last {hour -> hour.hour < it}}
-	// if today is available, check 'now' against its daytime
-	val isNowDaytime get() = today.run {Instant.now() in sunrise..sunset}
+	val thisHour get() = Instant.now().let {hourly.lastOrNull {hour -> hour.hour < it}} ?: hourly[0]
+
+	val secondOfToday get() = LocalTime.now(location.zoneOffset).toSecondOfDay()
+	val secondOfSunriseToday
+		get() = LocalDateTime.ofInstant(today.sunrise, location.zoneOffset)
+			.toLocalTime()
+			.toSecondOfDay()
+	val secondOfSunsetToday
+		get() = LocalDateTime.ofInstant(today.sunset, location.zoneOffset)
+			.toLocalTime()
+			.toSecondOfDay()
 }

@@ -54,7 +54,9 @@ class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRe
 			viewModelScope.launch {
 				_refreshing.value = true
 				try {
-					repo.getUpdate(location)
+					with(location) {
+						repo.refresh(id, lat, lng)
+					}
 				} catch(e: Exception) {
 					e.printStackTrace()
 					_error.value = e

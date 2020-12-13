@@ -11,6 +11,7 @@ import java.time.format.FormatStyle
 var metric = true
 	private set
 private var speedUnit = ""
+// todo instead of asking to be set, go and read it from setting repo
 fun setMetric(b: Boolean, speedUnit: String) {
 	metric = b
 	asceapps.weatheria.util.speedUnit = speedUnit
@@ -23,15 +24,14 @@ private val nFormat = NumberFormat.getInstance().apply {
 }
 // adds localized percent char
 private val pFormat = NumberFormat.getPercentInstance()
-// bugged for numbers
 private val dtFormatter = DateTimeFormatter.ofPattern("EEE, MMMM d, h:m a (xxx)")
 private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-
-fun relativeTime(instant: Instant) = DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
-fun nowDt(offset: ZoneOffset) = dtFormatter.format(OffsetDateTime.now(offset))
-fun time(instant: Instant, offset: ZoneOffset) = tFormatter.format(instant.atOffset(offset))
+// todo use 'ar-u-nu-arab' tag for arabic numbering locale
+fun relativeTime(instant: Instant): CharSequence = DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
+fun nowDt(offset: ZoneOffset): String = dtFormatter.format(OffsetDateTime.now(offset))
+fun time(instant: Instant, offset: ZoneOffset): String = tFormatter.format(instant.atOffset(offset))
 fun temp(deg: Int) = nFormat.format((if(metric) deg - 273.15f else deg * 1.8f - 459.67f).toInt()) + '°'
 fun minMax(min: Int, max: Int) = temp(min).padEnd(5) + '|' + temp(max).padStart(5)
 fun speed(mps: Float) = nFormat.format(if(metric) mps else mps * 2.237f) + ' ' + speedUnit
-// our rations are already from 0-100, this formatter expects fractions from 0-1
-fun percent(ratio: Int) = pFormat.format(ratio / 100f)
+// our ratios are already from 0-100, this formatter expects fractions from 0-1
+fun percent(ratio: Int): String = pFormat.format(ratio / 100f)

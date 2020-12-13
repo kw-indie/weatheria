@@ -5,7 +5,32 @@
 			app:title="@string/title_units"
 			app:entries="@array/units_entries"
 			app:entryValues="@array/units_entry_values"
-			app:defaultValue="0"
+			app:defaultValue="@string/def_value"
 			app:useSimpleSummaryProvider="true"/>
+		<Preference
+			app:title="@string/title_reorder"
+			app:summary="@string/summary_reorder"/>
+		<!-- https://stackoverflow.com/a/63277602/3438172 -->
+	</PreferenceCategory>
+	<PreferenceCategory app:title="@string/cat_header_display">
+		<ListPreference
+			app:key="@string/key_theme"
+			app:title="@string/title_theme"
+			app:entries="@array/theme_entries"
+			app:entryValues="@array/theme_values"
+			app:defaultValue="@string/def_value"
+			app:useSimpleSummaryProvider="true"/>
+	</PreferenceCategory>
+	<PreferenceCategory app:title="@string/cat_header_sync">
+		<ListPreference
+			app:key="@string/key_auto_refresh"
+			app:title="@string/title_auto_refresh"
+			app:entries="@array/auto_refresh_entries"
+			app:entryValues="@array/auto_refresh_values"
+			app:defaultValue="@string/def_value"
+			app:useSimpleSummaryProvider="true"/>
+	</PreferenceCategory>
+	<PreferenceCategory app:title="@string/cat_header_help">
+		<Preference app:title="@string/title_about"/>
 	</PreferenceCategory>
 </PreferenceScreen>

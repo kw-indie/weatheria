@@ -27,8 +27,7 @@ class WeatherInfoAdapter: ListAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder
 
 	public override fun getItem(position: Int): WeatherInfo = super.getItem(position)
 
-	class ViewHolder(private val binding: ItemWeatherInfoBinding):
-		RecyclerView.ViewHolder(binding.root) {
+	class ViewHolder(private val binding: ItemWeatherInfoBinding): RecyclerView.ViewHolder(binding.root) {
 
 		fun bind(wi: WeatherInfo) {
 			with(binding) {

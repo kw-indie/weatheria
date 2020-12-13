@@ -7,11 +7,13 @@ apply plugin: 'dagger.hilt.android.plugin'
 
 android {
 	compileSdkVersion targetSdkVer
+	// if not specified, latest + whatever external libs use will be used = a mess
 	buildToolsVersion buildToolsVer
 	ndkVersion ndkVer
 
 	// these config apply to all build types
 	defaultConfig {
+		// if not specified, package name from manifest will be used, will change when that one changes
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
@@ -25,7 +27,8 @@ android {
 		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty('weather_app_id') + "\"")
 		resValue "string", "maps_api_key", (project.findProperty("maps_api_key") ?: "")
 
-		resConfigs "en"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
+		// removes unused i18n in libs like AppCompat/play services/maps?
+		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
 
 		javaCompileOptions {
 			annotationProcessorOptions {
@@ -42,7 +45,9 @@ android {
 	}
 
 	buildTypes {
-		debug {}
+		debug {
+			applicationIdSuffix ".debug"
+		}
 		release {
 			minifyEnabled true
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -121,12 +126,17 @@ dependencies {
 	// maps
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
 
+	// work manager
+	implementation "androidx.work:work-runtime-ktx:$workVer"
+
 	// hilt
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
+
 	// hilt with jetpack (viewModel, workManager)
 	kapt "androidx.hilt:hilt-compiler:$hiltJetpackVer"
 	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltJetpackVer"
+	implementation "androidx.hilt:hilt-work:$hiltJetpackVer"
 
 	// coil
 	implementation "io.coil-kt:coil:$coilVer"

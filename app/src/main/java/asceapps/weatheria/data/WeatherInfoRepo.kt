@@ -74,11 +74,11 @@ class WeatherInfoRepo @Inject constructor(
 		fetch(foundLocations[0])
 	}
 
-	suspend fun getUpdate(l: Location) {
-		val oneCallResp = service.oneCall(l.lat.toString(), l.lng.toString())
-		val current = extractCurrentEntity(l.id, oneCallResp)
-		val hourly = extractHourlyEntity(l.id, oneCallResp)
-		val daily = extractDailyEntity(l.id, oneCallResp)
+	suspend fun refresh(id: Int, lat: Float, lng: Float) {
+		val oneCallResp = service.oneCall(lat.toString(), lng.toString())
+		val current = extractCurrentEntity(id, oneCallResp)
+		val hourly = extractHourlyEntity(id, oneCallResp)
+		val daily = extractDailyEntity(id, oneCallResp)
 		dao.update(current, hourly, daily)
 	}
 
@@ -195,7 +195,7 @@ class WeatherInfoRepo @Inject constructor(
 				)
 			}
 		}
-		val first3DaysDaytime = listOf(
+		val first3DaysDaytime = arrayListOf(
 			with(daily[0]) {sunrise..sunset},
 			with(daily[1]) {sunrise..sunset},
 			with(daily[2]) {sunrise..sunset}

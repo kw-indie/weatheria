@@ -21,7 +21,7 @@ buildscript {
 		lifecycleVer = "2.3.0-beta01"
 		navVer = "2.3.2"
 		animatorVer = "1.0.0-alpha02"
-		vectorDrawableSeekableVer = "1.0.0-alpha02"
+		vectorDrawableVer = "1.1.0"
 		preferenceVer = "1.1.1"
 		roomVer = "2.2.5"
 		retrofitVer = "2.9.0"

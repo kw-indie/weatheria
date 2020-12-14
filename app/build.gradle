@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android' // for kotlin lang support
-apply plugin: 'kotlin-android-extensions' // for most features: coroutines, parcelize, etc.
 apply plugin: 'kotlin-kapt' // for annotations: data binding, etc
 apply plugin: 'androidx.navigation.safeargs.kotlin' // for navigation passed arguments
 apply plugin: 'dagger.hilt.android.plugin'
@@ -103,10 +102,10 @@ dependencies {
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
-	// seekable anim vector drawable
+	// anim vector drawable
 	// core offers listeners, interpolators, etc
 	implementation "androidx.core:core-animation:$animatorVer"
-	implementation "androidx.vectordrawable:vectordrawable-seekable:$vectorDrawableSeekableVer"
+	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableVer"
 
 	// preferences fragment
 	implementation "androidx.preference:preference-ktx:$preferenceVer"

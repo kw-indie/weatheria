@@ -1,5 +1,6 @@
 package asceapps.weatheria.ui.settings
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -23,10 +24,17 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
 
 	@Inject
 	lateinit var repo: SettingsRepo
-	private val unitsKey = requireContext().getString(R.string.key_units)
-	private val themeKey = requireContext().getString(R.string.key_theme)
-	private val autoRefreshKey = requireContext().getString(R.string.key_auto_refresh)
+	private lateinit var unitsKey: String
+	private lateinit var themeKey: String
+	private lateinit var autoRefreshKey: String
 	private val autoRefreshWorkName = "autoRefreshWork"
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		unitsKey = requireContext().getString(R.string.key_units)
+		themeKey = requireContext().getString(R.string.key_theme)
+		autoRefreshKey = requireContext().getString(R.string.key_auto_refresh)
+	}
 
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -34,7 +42,6 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-
 		view.findViewById<Toolbar>(R.id.toolbar).setNavigationOnClickListener {
 			findNavController().navigateUp()
 		}
@@ -42,13 +49,11 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
 
 	override fun onResume() {
 		super.onResume()
-
 		repo.prefs.registerOnSharedPreferenceChangeListener(this)
 	}
 
 	override fun onPause() {
 		super.onPause()
-
 		repo.prefs.unregisterOnSharedPreferenceChangeListener(this)
 	}
 

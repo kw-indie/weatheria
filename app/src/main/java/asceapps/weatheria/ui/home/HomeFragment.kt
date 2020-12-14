@@ -26,9 +26,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
 
+	private val TAG = "--------"
 	private val viewModel: HomeViewModel by viewModels()
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
+	lateinit var binding: FragmentHomeBinding
 
 	override fun onCreateView(
 		inflater: LayoutInflater, root: ViewGroup?,
@@ -39,7 +41,7 @@ class HomeFragment: Fragment() {
 		val speedUnit = resources.getStringArray(R.array.units_speed)[units]
 		setMetric(units == 0, speedUnit)
 
-		val binding = FragmentHomeBinding.inflate(inflater, root, false).apply {
+		binding = FragmentHomeBinding.inflate(inflater, root, false).apply {
 			//region setup bg
 			val (dawn, day, dusk, night) = with(resources) {
 				arrayOf(
@@ -85,14 +87,14 @@ class HomeFragment: Fragment() {
 			val adapterDataObserver = object: RecyclerView.AdapterDataObserver() {
 				override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
 					if(itemCount == 1) {
-						viewModel.selected = positionStart
 						// move to newly added item
 						pager.post {
 							pager.currentItem = positionStart
 						}
-					} else if(viewModel.selected != null) { // else, we are prolly reloading fragment or sth
+					} else {
+						// fragment reload or sth
 						pager.post {
-							pager.currentItem = viewModel.selected!!
+							pager.setCurrentItem(settingsRepo.selectedLocation, false)
 						}
 					}
 				}
@@ -100,8 +102,6 @@ class HomeFragment: Fragment() {
 			adapter.registerAdapterDataObserver(adapterDataObserver)
 			val onPageChangeCallback = object: OnPageChangeCallback() {
 				override fun onPageSelected(pos: Int) {
-					if(adapter.itemCount == 0) return
-					viewModel.selected = pos
 					val info = adapter.getItem(pos)
 					val daySeconds = 24 * 60 * 60f
 					// fraction of now in real today at this location
@@ -162,7 +162,7 @@ class HomeFragment: Fragment() {
 
 			// setup swipeRefresh
 			swipeRefresh.setOnRefreshListener {
-				viewModel.updateSelected()
+				viewModel.update(adapter.getItem(pager.currentItem).location)
 			}
 			viewModel.refreshing.observe(viewLifecycleOwner) {
 				swipeRefresh.isRefreshing = it
@@ -193,7 +193,7 @@ class HomeFragment: Fragment() {
 			toolbar.setOnMenuItemClickListener {item ->
 				when(item.itemId) {
 					R.id.action_add_location -> findNavController().navigate(R.id.action_open_map)
-					R.id.action_delete -> viewModel.deleteSelected()
+					R.id.action_delete -> viewModel.delete(adapter.getItem(pager.currentItem).location)
 					R.id.action_delete_all -> viewModel.deleteAll()
 					R.id.action_settings -> findNavController().navigate(R.id.action_settings)
 					else -> return@setOnMenuItemClickListener false
@@ -212,5 +212,10 @@ class HomeFragment: Fragment() {
 			viewModel.addNewLocation("${latitude},${longitude}")
 		}
 		arguments?.clear() // fixes stupid re-reading of the args
+	}
+
+	override fun onPause() {
+		super.onPause()
+		settingsRepo.selectedLocation = binding.pager.currentItem
 	}
 }

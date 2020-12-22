@@ -1,5 +1,6 @@
 package asceapps.weatheria.data
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -11,6 +12,7 @@ import com.google.gson.annotations.SerializedName
  * @param hourly forecast of 48 hours, starting this hour
  * @param daily forecast of 8 days, starting next hour? (not midnight)
  * */
+@Keep
 class OneCallResponse(
 	val timezone_offset: Int,
 	val current: BaseData.Current,
@@ -27,6 +29,7 @@ class OneCallResponse(
 	 * @param clouds cloudiness in % (0-100)
 	 * @param weather condition
 	 */
+	@Keep
 	sealed class BaseData(
 		val dt: Int,
 		val wind_speed: Float,
@@ -42,6 +45,7 @@ class OneCallResponse(
 		 * @param dt time when this data was collected
 		 * @param visibility avg, in meters
 		 */
+		@Keep
 		class Current(
 			dt: Int,
 			pressure: Int,
@@ -62,6 +66,7 @@ class OneCallResponse(
 		 * @param dt beginning of forecast data hour
 		 * @param pop probability of precipitation (0-1)
 		 */
+		@Keep
 		class Hourly(
 			dt: Int,
 			pressure: Int,
@@ -85,6 +90,7 @@ class OneCallResponse(
 		 * @param rain precipitation volume in mm
 		 * @param snow same
 		 */
+		@Keep
 		class Daily(
 			dt: Int,
 			pressure: Int,
@@ -104,6 +110,7 @@ class OneCallResponse(
 			val snow: Float? = null
 		): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather) {
 
+			@Keep
 			class Temp(
 				val morn: Float,
 				val day: Float,
@@ -113,6 +120,7 @@ class OneCallResponse(
 				val max: Float
 			)
 
+			@Keep
 			class Feel(val morn: Float, val day: Float, val eve: Float, val night: Float)
 		}
 	}
@@ -120,10 +128,12 @@ class OneCallResponse(
 	/**
 	 * @param id condition id
 	 */
+	@Keep
 	class Weather(val id: Int)
 
 	/**
 	 * @param _1h precipitation volume in last hour, in mm
 	 */
+	@Keep
 	class Precipitation(@SerializedName("1h") val _1h: Float)
 }

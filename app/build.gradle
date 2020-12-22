@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android' // for kotlin lang support
-apply plugin: 'kotlin-android-extensions' // for most features: coroutines, parcelize, etc.
 apply plugin: 'kotlin-kapt' // for annotations: data binding, etc
 apply plugin: 'androidx.navigation.safeargs.kotlin' // for navigation passed arguments
 apply plugin: 'dagger.hilt.android.plugin'
@@ -17,8 +16,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 1
-		versionName "0.1"
+		versionCode 3
+		versionName "0.2.1"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables.useSupportLibrary = true
@@ -47,6 +46,12 @@ android {
 	buildTypes {
 		debug {
 			applicationIdSuffix ".debug"
+		}
+		prerelease {
+			debuggable true
+			minifyEnabled true
+			applicationIdSuffix '.prerelease'
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-prerelease-rules.pro'
 		}
 		release {
 			minifyEnabled true
@@ -103,10 +108,10 @@ dependencies {
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
-	// seekable anim vector drawable
+	// anim vector drawable
 	// core offers listeners, interpolators, etc
 	implementation "androidx.core:core-animation:$animatorVer"
-	implementation "androidx.vectordrawable:vectordrawable-seekable:$vectorDrawableSeekableVer"
+	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableVer"
 
 	// preferences fragment
 	implementation "androidx.preference:preference-ktx:$preferenceVer"

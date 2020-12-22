@@ -16,8 +16,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 1
-		versionName "0.1"
+		versionCode 3
+		versionName "0.2.1"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables.useSupportLibrary = true
@@ -46,6 +46,12 @@ android {
 	buildTypes {
 		debug {
 			applicationIdSuffix ".debug"
+		}
+		prerelease {
+			debuggable true
+			minifyEnabled true
+			applicationIdSuffix '.prerelease'
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-prerelease-rules.pro'
 		}
 		release {
 			minifyEnabled true

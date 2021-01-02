@@ -94,6 +94,10 @@
 	<!--map-->
 	<string name="action_give_permission">Give permission</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
+	<!--search-->
+	<string name="action_search">Search</string>
+	<string name="search_hint">Enter Location name or coordinates</string>
+	<string name="no_results">No results!\nEnter a location\'s name or coordinates in the search bar above to show results</string>
 	<!--errors-->
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Location service disabled</string>

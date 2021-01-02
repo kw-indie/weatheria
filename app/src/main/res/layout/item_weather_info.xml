@@ -27,15 +27,17 @@
 				app:layout_constraintGuide_percent="0.5"/>
 			<TextView
 				android:id="@+id/tv_location"
-				android:layout_width="wrap_content"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_24sdp"
+				android:gravity="center_horizontal"
 				android:text="@{@string/f_comma_sep(info.location.name, info.location.country)}"
 				android:textSize="@dimen/_14ssp"
 				android:textStyle="bold"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toTopOf="parent"
+				app:layout_constraintWidth_percent="0.6"
 				tools:text="@tools:sample/cities"/>
 			<TextView
 				android:id="@+id/tv_time"

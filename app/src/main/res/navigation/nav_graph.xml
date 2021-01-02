@@ -11,16 +11,16 @@
 		tools:layout="@layout/fragment_home">
 		<action
 			android:id="@+id/action_open_map"
-			app:destination="@id/mapFragment"/>
+			app:destination="@id/mapFragment"
+			app:launchSingleTop="true"/>
 		<action
-			android:id="@+id/action_settings"
+			android:id="@+id/action_open_search"
+			app:destination="@id/searchFragment"
+			app:launchSingleTop="true"/>
+		<action
+			android:id="@+id/action_open_settings"
 			app:destination="@id/settingsFragment"
 			app:launchSingleTop="true"/>
-		<argument
-			android:name="latLng"
-			app:argType="com.google.android.libraries.maps.model.LatLng"
-			app:nullable="true"
-			android:defaultValue="@null"/>
 	</fragment>
 	<fragment
 		android:id="@+id/mapFragment"
@@ -36,14 +36,25 @@
 			app:uri="geo"/>-->
 		<action
 			android:id="@+id/action_ok_new_location"
-			app:destination="@id/homeFragment"
+			app:destination="@id/searchFragment"
 			app:launchSingleTop="true"
-			app:popUpTo="@id/homeFragment"
+			app:popUpTo="@id/searchFragment"
 			app:popUpToInclusive="true">
 			<argument
 				android:name="latLng"
 				app:argType="com.google.android.libraries.maps.model.LatLng"/>
 		</action>
+	</fragment>
+	<fragment
+		android:id="@+id/searchFragment"
+		android:name="asceapps.weatheria.ui.search.SearchFragment"
+		android:label=""
+		tools:layout="@layout/fragment_search">
+		<argument
+			android:name="latLng"
+			app:argType="com.google.android.libraries.maps.model.LatLng"
+			app:nullable="true"
+			android:defaultValue="@null"/>
 	</fragment>
 	<fragment
 		android:id="@+id/settingsFragment"

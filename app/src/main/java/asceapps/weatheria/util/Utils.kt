@@ -1,8 +1,11 @@
 package asceapps.weatheria.util
 
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import asceapps.weatheria.data.WeatherService
+import asceapps.weatheria.api.WeatherService
 import coil.load
 import java.time.Instant
 import java.time.LocalDateTime
@@ -11,6 +14,11 @@ import java.time.ZoneOffset
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+
+fun hideKeyboard(view: View) {
+	ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
+		?.hideSoftInputFromWindow(view.windowToken, 0)
+}
 
 private val conditionIds = intArrayOf(200, 201, 202, 210, 211, 212, 221, 230, 231, 232,
 	300, 301, 302, 310, 311, 312, 313, 314, 321, 500, 501, 502, 503, 504, 511, 520, 521, 522, 531,

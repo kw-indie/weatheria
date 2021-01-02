@@ -93,6 +93,10 @@
 	</string-array>
 	<!--map-->
 	<string name="action_give_permission">أعط الإذن</string>
+	<!--search-->
+	<string name="action_search">بحث</string>
+	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>
+	<string name="no_results">لا توجد نتائج!\nأدخل اسم أو إحداثيات الموقع في شريط البحث أعلاه لإظهار النتائج</string>
 	<!--errors-->
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
 	<string name="error_location_disabled">خدمة تحديد الموقع غير مفعلة</string>

@@ -13,7 +13,6 @@ import androidx.core.animation.TypeEvaluator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
@@ -26,7 +25,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
 
-	private val TAG = "--------"
 	private val viewModel: HomeViewModel by viewModels()
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
@@ -75,7 +73,7 @@ class HomeFragment: Fragment() {
 				}
 				newColors
 			}
-			val bg = clRoot.background as GradientDrawable
+			val bg = getRoot().background as GradientDrawable
 			val animator = ObjectAnimator.ofObject(bg, "colors", evaluator, night).apply {
 				duration = 1000L
 			}
@@ -154,9 +152,17 @@ class HomeFragment: Fragment() {
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
 					swipeRefresh.visibility = View.GONE // to prevent swipe
+					with(toolbar.menu) {
+						findItem(R.id.action_delete).isEnabled = false
+						findItem(R.id.action_delete_all).isEnabled = false
+					}
 				} else {
 					tvEmptyPager.visibility = View.GONE
 					swipeRefresh.visibility = View.VISIBLE
+					with(toolbar.menu) {
+						findItem(R.id.action_delete).isEnabled = true
+						findItem(R.id.action_delete_all).isEnabled = true
+					}
 				}
 			}
 
@@ -193,25 +199,16 @@ class HomeFragment: Fragment() {
 			toolbar.setOnMenuItemClickListener {item ->
 				when(item.itemId) {
 					R.id.action_add_location -> findNavController().navigate(R.id.action_open_map)
+					R.id.action_search_location -> findNavController().navigate(R.id.action_open_search)
 					R.id.action_delete -> viewModel.delete(adapter.getItem(pager.currentItem).location)
 					R.id.action_delete_all -> viewModel.deleteAll()
-					R.id.action_settings -> findNavController().navigate(R.id.action_settings)
+					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
 					else -> return@setOnMenuItemClickListener false
 				}
 				true
 			}
 		}
 		return binding.root
-	}
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-
-		val args: HomeFragmentArgs by navArgs()
-		args.latLng?.apply {
-			viewModel.addNewLocation("${latitude},${longitude}")
-		}
-		arguments?.clear() // fixes stupid re-reading of the args
 	}
 
 	override fun onPause() {

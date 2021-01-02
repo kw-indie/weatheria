@@ -30,15 +30,6 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM saved_locations WHERE id = :locationId")
 	abstract fun load(locationId: Int): Flow<WeatherInfoEntity>
 
-	@Query("SELECT * FROM locations WHERE name LIKE :locationName || '%' LIMIT 5")
-	abstract suspend fun find(locationName: String): List<LocationEntity>
-
-	@Query(
-		"SELECT * FROM locations WHERE lat BETWEEN :latB AND :latT AND lng BETWEEN :lngL AND :lngR ORDER BY (lat-:lat)*(lat-:lat)+(lng-:lng)*(lng-:lng) LIMIT 5")
-	abstract suspend fun find(
-		lat: Float, lng: Float, latB: Float, latT: Float, lngL: Float, lngR: Float
-	): List<LocationEntity>
-
 	@Transaction
 	open suspend fun insert(
 		l: SavedLocationEntity,

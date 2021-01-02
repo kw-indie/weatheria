@@ -44,10 +44,9 @@ class MapFragment: Fragment() {
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
-	): View? {
-		val root = inflater.inflate(R.layout.fragment_map, container, false)
+	): View = inflater.inflate(R.layout.fragment_map, container, false).apply {
 
-		root.findViewById<Toolbar>(R.id.toolbar).apply {
+		findViewById<Toolbar>(R.id.toolbar).apply {
 			setNavigationOnClickListener {
 				findNavController().navigateUp()
 			}
@@ -63,14 +62,12 @@ class MapFragment: Fragment() {
 			}
 		}
 
-		mapView = root.findViewById(R.id.map_view)
-		mapView.apply {
+		mapView = findViewById<MapView>(R.id.map_view).apply {
 			onCreate(savedInstanceState)
 			getMapAsync(::onMapReady)
 		}
-
-		return root
 	}
+
 
 	override fun onStart() {
 		super.onStart()
@@ -120,7 +117,7 @@ class MapFragment: Fragment() {
 				isZoomControlsEnabled = true
 			}
 
-			val london = LatLng(51.5098, -0.1181)
+			val london = LatLng(51.51, -0.118)
 			marker = addMarker(MarkerOptions().position(london))
 
 			moveCamera(CameraUpdateFactory.newLatLngZoom(london, 8f))

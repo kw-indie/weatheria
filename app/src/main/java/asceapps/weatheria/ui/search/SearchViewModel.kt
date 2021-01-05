@@ -1,21 +1,16 @@
 package asceapps.weatheria.ui.search
 
+import android.annotation.SuppressLint
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import asceapps.weatheria.data.LocationDao
 import asceapps.weatheria.data.LocationEntity
 import asceapps.weatheria.data.WeatherInfoRepo
+import asceapps.weatheria.util.cleanCoordinates
+import asceapps.weatheria.util.debounce
+import asceapps.weatheria.util.getFreshLocation
 import asceapps.weatheria.util.isCoordinate
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.launch
 
 class SearchViewModel @ViewModelInject constructor(
@@ -23,21 +18,19 @@ class SearchViewModel @ViewModelInject constructor(
 	private val repo: WeatherInfoRepo
 ): ViewModel() {
 
-	val query = MutableStateFlow("")
-	val searchResult = query
-		.debounce(300)
+	val q = MutableLiveData<String>()
+	val result = q
+		.debounce(300, viewModelScope)
 		.map {it.trim()}
 		.distinctUntilChanged()
-		.flatMapLatest {query ->
+		.switchMap {q ->
 			when {
-				query.isEmpty() -> {
-					flowOf(emptyList())
+				q.isEmpty() -> {
+					liveData {emit(emptyList<LocationEntity>())}
 				}
-				isCoordinate(query) -> {
-					val (lat, lng) = query.split(',')
-						// this 7 is for cases like -xx.yyy, we want max 6 but 7th for accuracy
-						// need to clamp because gps gives way too many decimals
-						.map {it.trim().take(7).toFloat()}
+				isCoordinate(q) -> {
+					val (lat, lng) = cleanCoordinates(q).split(',')
+						.map {it.toFloat()}
 
 					val radius = 1
 
@@ -50,11 +43,11 @@ class SearchViewModel @ViewModelInject constructor(
 					)
 				}
 				else -> {
-					locationDao.find(query)
+					locationDao.find(q)
 				}
 			}
 		}
-		.asLiveData()
+
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 
@@ -63,7 +56,20 @@ class SearchViewModel @ViewModelInject constructor(
 			try {
 				repo.fetch(l)
 				// todo give positive feedback when successful
-			} catch(e: Throwable) {
+			} catch(e: Exception) {
+				e.printStackTrace()
+				_error.value = e
+			}
+		}
+	}
+
+	fun getCurrentLocation(client: FusedLocationProviderClient) {
+		viewModelScope.launch {
+			try {
+				@SuppressLint("MissingPermission")
+				val location = client.getFreshLocation()
+				q.value = with(location) {"$latitude,$longitude"}
+			} catch(e: Exception) {
 				e.printStackTrace()
 				_error.value = e
 			}

@@ -5,8 +5,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import asceapps.weatheria.api.WeatherService
 import coil.load
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -18,6 +24,17 @@ import java.time.temporal.ChronoUnit
 fun hideKeyboard(view: View) {
 	ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
 		?.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope) = MediatorLiveData<T>().also {mld ->
+	var job: Job? = null
+	mld.addSource(this) {
+		job?.cancel()
+		job = scope.launch {
+			delay(timeoutMillis)
+			mld.value = value
+		}
+	}
 }
 
 private val conditionIds = intArrayOf(200, 201, 202, 210, 211, 212, 221, 230, 231, 232,
@@ -48,9 +65,17 @@ fun conditionIcon(conditionId: Int, isDay: Boolean? = null) =
 
 fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)
 fun Int.toInstant(): Instant = Instant.ofEpochSecond(this.toLong())
+
 fun isCoordinate(str: String) = str.matches(Regex(
 	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
 ))
+
+fun cleanCoordinates(str: String) = str.replace(" ", "")
+	.split(',')
+	.map {it.toFloat()}
+	.let {
+		"%1$.3f,%2$.3f".format(it[0], it[1])
+	}
 
 fun dirIndex(deg: Int) = when((deg + 22) % 360) {
 	in 0..44 -> 0 // E

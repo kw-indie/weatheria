@@ -130,6 +130,7 @@ dependencies {
 
 	// maps
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
+	implementation "com.google.android.gms:play-services-location:$locationVer"
 
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"

@@ -97,11 +97,11 @@
 	<!--search-->
 	<string name="action_search">Search</string>
 	<string name="search_hint">Enter Location name or coordinates</string>
-	<string name="no_results">No results!\nEnter a location\'s name or coordinates in the search bar above to show results</string>
+	<string name="get_current_location">Get current location</string>
+	<string name="getting_location">Getting location. If this takes long, try moving the phone a bit, or take a moment outside</string>
 	<!--errors-->
 	<string name="error_location_denied">Location permission not granted</string>
-	<string name="error_location_disabled">Location service disabled</string>
-	<string name="error_get_location_failed">Failed to get location. Try again later</string>
+	<string name="error_location_disabled">Please enable location service, then try again</string>
 	<string name="error_no_internet">No Internet connection</string>
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>

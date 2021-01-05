@@ -27,16 +27,24 @@ import com.google.android.libraries.maps.model.MarkerOptions
 
 class MapFragment: Fragment() {
 
+	companion object {
+
+		private val PERMISSIONS = arrayOf(
+			permission.ACCESS_COARSE_LOCATION,
+			permission.ACCESS_FINE_LOCATION
+		)
+	}
+
 	private lateinit var mapView: MapView
 	private lateinit var map: GoogleMap
 	private lateinit var marker: Marker
-	private lateinit var locationPermissionRequester: ActivityResultLauncher<Array<String>>
+	private lateinit var permissionRequester: ActivityResultLauncher<Array<String>>
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		@SuppressLint("MissingPermission")
-		locationPermissionRequester = registerForActivityResult(
+		// this needs to be called in onCreate()
+		permissionRequester = registerForActivityResult(
 			ActivityResultContracts.RequestMultiplePermissions()
 		) {afterLocationPermission(it.containsValue(true))}
 	}
@@ -92,7 +100,7 @@ class MapFragment: Fragment() {
 	override fun onDestroy() {
 		super.onDestroy()
 		mapView.onDestroy()
-		locationPermissionRequester.unregister()
+		permissionRequester.unregister()
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
@@ -138,7 +146,7 @@ class MapFragment: Fragment() {
 			ActivityCompat.checkSelfPermission(activity, PERMISSIONS[1]) == PERMISSION_GRANTED) {
 			afterLocationPermission(true)
 		} else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			locationPermissionRequester.launch(PERMISSIONS)
+			permissionRequester.launch(PERMISSIONS)
 		} else {
 			showMessage(R.string.error_location_denied)
 		}
@@ -172,13 +180,5 @@ class MapFragment: Fragment() {
 	// todo share this method?
 	private fun showMessage(strResId: Int) {
 		Toast.makeText(requireContext(), strResId, Toast.LENGTH_LONG).show()
-	}
-
-	companion object {
-
-		private val PERMISSIONS: Array<String> = arrayOf(
-			permission.ACCESS_COARSE_LOCATION,
-			permission.ACCESS_FINE_LOCATION
-		)
 	}
 }

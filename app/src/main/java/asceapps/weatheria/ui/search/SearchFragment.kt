@@ -14,20 +14,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentSearchBinding
-import asceapps.weatheria.util.cleanCoordinates
 import asceapps.weatheria.util.hideKeyboard
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SearchFragment: Fragment() {
+
+	companion object {
+
+		const val LOCATION_KEY = "location_key"
+	}
 
 	private val viewModel: SearchViewModel by viewModels()
 	private val locationPermissions = arrayOf(
@@ -38,6 +43,14 @@ class SearchFragment: Fragment() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		// listen for selected locations from MapFragment (auto clears after read)
+		setFragmentResultListener(LOCATION_KEY) {_, bundle ->
+			val location = bundle[LOCATION_KEY] as? LatLng
+			location?.apply {
+				viewModel.query.value = "$latitude,$longitude"
+			}
+		}
 
 		// need to register these in onCreate
 		locationPermissionRequester = registerForActivityResult(
@@ -53,20 +66,21 @@ class SearchFragment: Fragment() {
 	override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?,
 		savedInstanceState: Bundle?): View {
 		return FragmentSearchBinding.inflate(inflater, root, false).apply {
-			// data binding
+			// binding vm to view
 			vm = viewModel
 
-			toolbar.setNavigationOnClickListener {
+			searchLayout.setStartIconOnClickListener {
 				findNavController().navigateUp()
 			}
-
-			searchLayout.setStartIconOnClickListener {
-				onGetCurrentLocationClick()
+			myLocation.setOnClickListener {
+				onGetMyLocationClick()
+			}
+			openMap.setOnClickListener {
+				findNavController().navigate(R.id.mapFragment)
 			}
 
 			val adapter = SearchResultAdapter {
 				viewModel.addNewLocation(it)
-				// todo give feedback after success
 			}
 			rvResults.apply {
 				val layoutManager = LinearLayoutManager(context)
@@ -76,6 +90,13 @@ class SearchFragment: Fragment() {
 			}
 
 			viewModel.result.observe(viewLifecycleOwner) {
+				if(it.isNullOrEmpty()) {
+					myLocation.visibility = View.VISIBLE
+					openMap.visibility = View.VISIBLE
+				} else {
+					myLocation.visibility = View.GONE
+					openMap.visibility = View.GONE
+				}
 				adapter.submitList(it)
 			}
 			viewModel.error.observe(viewLifecycleOwner) {error ->
@@ -87,23 +108,19 @@ class SearchFragment: Fragment() {
 					Toast.LENGTH_LONG
 				).show()
 			}
+			var first = true
+			viewModel.savedLocations.observe(viewLifecycleOwner) {
+				if(first) {
+					first = false
+				} else {
+					findNavController().navigateUp()
+				}
+			}
 		}.root
-	}
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-
-		// needs to be called after view created
-		val args: SearchFragmentArgs by navArgs()
-		args.latLng?.apply {
-			viewModel.q.value = cleanCoordinates("$latitude,$longitude")
-		}
-		arguments?.clear() // fixes stupid re-reading of the args
 	}
 
 	override fun onDestroy() {
 		super.onDestroy()
-
 		locationPermissionRequester.unregister()
 	}
 
@@ -112,7 +129,7 @@ class SearchFragment: Fragment() {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
 	}
 
-	private fun onGetCurrentLocationClick() {
+	private fun onGetMyLocationClick() {
 		hideKeyboard(requireView())
 		// todo disable button when already in progress
 		when {
@@ -135,7 +152,7 @@ class SearchFragment: Fragment() {
 		if(lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
 			lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			showMessage(R.string.getting_location)
-			viewModel.getCurrentLocation(
+			viewModel.getMyLocation(
 				LocationServices.getFusedLocationProviderClient(requireContext())
 			)
 		} else {

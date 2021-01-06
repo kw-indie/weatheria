@@ -42,7 +42,6 @@ buildscript {
 	dependencies {
 		classpath "com.android.tools.build:gradle:$gradleVer"
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer"
-		classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navVer"
 		classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVer"
 	}
 }

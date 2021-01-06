@@ -4,18 +4,19 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.WeatherInfoRepo
 import asceapps.weatheria.model.Location
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRepo): ViewModel() {
 
 	val infoList = repo.getAll()
-		.onEach {_refreshing.value = false}
-		.asLiveData()
+		.map {
+			_refreshing.value = false
+			it
+		}
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 	private val _refreshing = MutableLiveData(true)
@@ -40,6 +41,12 @@ class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRe
 	fun delete(l: Location) {
 		viewModelScope.launch {
 			repo.delete(l)
+		}
+	}
+
+	fun retain(l: Location) {
+		viewModelScope.launch {
+			repo.retain(l)
 		}
 	}
 

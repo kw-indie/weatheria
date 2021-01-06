@@ -6,35 +6,11 @@
 		<variable
 			name="location"
 			type="asceapps.weatheria.data.LocationEntity"/>
-		<variable
-			name="clickListener"
-			type="asceapps.weatheria.ui.search.OnLocationClickListener"/>
 	</data>
-	<androidx.constraintlayout.widget.ConstraintLayout
+	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="@dimen/_42sdp"
-		android:padding="@dimen/_8sdp"
-		android:onClick="@{() -> clickListener.onLocationClick(location)}"
-		android:background="?attr/selectableItemBackground">
-		<ImageView
-			android:id="@+id/icon"
-			android:layout_width="0dp"
-			android:layout_height="match_parent"
-			android:padding="@dimen/_4sdp"
-			android:src="@drawable/ic_add_location"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintDimensionRatio="1"/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="@dimen/_8sdp"
-			android:text="@{@string/f_comma_sep(location.name, location.country)}"
-			android:textSize="@dimen/_14ssp"
-			tools:text="@tools:sample/cities"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintStart_toEndOf="@id/icon"
-			app:layout_constraintTop_toTopOf="parent"/>
-	</androidx.constraintlayout.widget.ConstraintLayout>
+		android:text="@{@string/f_comma_sep(location.name, location.country)}"
+		app:drawableStartCompat="@drawable/ic_add_location"
+		tools:text="@tools:sample/cities"/>
 </layout>

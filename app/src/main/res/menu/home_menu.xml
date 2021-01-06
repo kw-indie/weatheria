@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
-		android:id="@+id/action_add_location"
-		android:icon="@drawable/ic_add_location"
-		android:title="@string/action_add_location"
-		app:showAsAction="ifRoom"/>
-	<item
 		android:id="@+id/action_search_location"
 		android:icon="@drawable/ic_search"
 		android:title="@string/action_search"
@@ -14,6 +9,10 @@
 	<item
 		android:id="@+id/action_delete"
 		android:title="@string/action_delete"
+		app:showAsAction="never"/>
+	<item
+		android:id="@+id/action_retain"
+		android:title="@string/action_retain"
 		app:showAsAction="never"/>
 	<item
 		android:id="@+id/action_delete_all"

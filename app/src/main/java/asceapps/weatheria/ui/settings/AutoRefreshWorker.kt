@@ -7,7 +7,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import asceapps.weatheria.data.WeatherInfoRepo
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.first
 
 class AutoRefreshWorker @WorkerInject constructor(
 	@Assisted context: Context,
@@ -18,8 +17,8 @@ class AutoRefreshWorker @WorkerInject constructor(
 	override suspend fun doWork(): Result = coroutineScope {
 		try {
 			repo.getSavedLocations()
-				.first()
-				.forEach {
+				.value
+				?.forEach {
 					with(it) {
 						repo.refresh(id, lat, lng)
 					}

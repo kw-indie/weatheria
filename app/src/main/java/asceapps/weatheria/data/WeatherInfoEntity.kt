@@ -15,7 +15,7 @@ class WeatherInfoEntity(
 
 	override fun hashCode() = location.id + current.dt
 
-	// for flow.distinctUntilChanged
+	// for distinctUntilChanged
 	override fun equals(other: Any?): Boolean {
 		return other != null &&
 			other is WeatherInfoEntity &&

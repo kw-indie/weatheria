@@ -1,5 +1,7 @@
 package asceapps.weatheria.data
 
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import asceapps.weatheria.api.OneCallResponse
 import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.model.Current
@@ -11,8 +13,6 @@ import asceapps.weatheria.util.conditionIcon
 import asceapps.weatheria.util.conditionIndex
 import asceapps.weatheria.util.dirIndex
 import asceapps.weatheria.util.toInstant
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -57,6 +57,8 @@ class WeatherInfoRepo @Inject constructor(
 	}
 
 	suspend fun delete(l: Location) = dao.delete(l.id, l.order)
+
+	suspend fun retain(l: Location) = dao.retain(l.id)
 
 	suspend fun deleteAll() = dao.deleteAll()
 

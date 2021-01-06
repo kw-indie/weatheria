@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!--home-->
-	<string name="action_add_location">أضف موقعًا</string>
 	<string name="action_delete">احذف الموقع</string>
+	<string name="action_retain">احذف المواقع الأخرى</string>
 	<string name="action_delete_all">احذف جميع المواقع</string>
 	<string name="action_settings">الإعدادات</string>
 	<string name="empty_pager">لا توجد مواقع لعرض توقعات الطقس. لم لا تضيف موقعًا؟</string>
@@ -92,7 +92,7 @@
 		<item>محاق</item>
 	</string-array>
 	<!--map-->
-	<string name="action_give_permission">أعط الإذن</string>
+	<string name="select_on_map">حدد على الخريطة</string>
 	<!--search-->
 	<string name="action_search">بحث</string>
 	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>

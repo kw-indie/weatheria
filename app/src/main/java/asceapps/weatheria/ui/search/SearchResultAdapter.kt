@@ -9,7 +9,7 @@ import asceapps.weatheria.data.LocationEntity
 import asceapps.weatheria.databinding.ItemSearchResultBinding
 
 class SearchResultAdapter(
-	private var mClickListener: OnLocationClickListener
+	private var clickListener: (l: LocationEntity) -> Unit
 ): ListAdapter<LocationEntity, SearchResultAdapter.ViewHolder>(DiffCallback()) {
 
 	init {
@@ -20,7 +20,11 @@ class SearchResultAdapter(
 		return ViewHolder(ItemSearchResultBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent, false
-		).apply {clickListener = mClickListener})
+		).apply {
+			root.setOnClickListener {
+				clickListener(location!!)
+			}
+		})
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {

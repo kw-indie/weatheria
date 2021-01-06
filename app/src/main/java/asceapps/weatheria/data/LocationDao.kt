@@ -8,11 +8,11 @@ import androidx.room.Query
 interface LocationDao {
 
 	@Query("SELECT * FROM locations WHERE name LIKE :locationName || '%' ORDER BY name LIMIT :limit")
-	fun find(locationName: String, limit: Int = 100): LiveData<List<LocationEntity>>
+	fun find(locationName: String, limit: Int): LiveData<List<LocationEntity>>
 
 	@Query(
-		"SELECT * FROM locations WHERE lat BETWEEN :latB AND :latT AND lng BETWEEN :lngL AND :lngR ORDER BY (lat-:lat)*(lat-:lat)+(lng-:lng)*(lng-:lng) LIMIT :limit")
+		"SELECT * FROM locations WHERE lat BETWEEN :bot AND :top AND lng BETWEEN :left AND :right ORDER BY (lat-:lat)*(lat-:lat)+(lng-:lng)*(lng-:lng) LIMIT :limit")
 	fun find(
-		lat: Float, lng: Float, latB: Float, latT: Float, lngL: Float, lngR: Float, limit: Int = 100
+		lat: Float, lng: Float, bot: Float, top: Float, left: Float, right: Float, limit: Int
 	): LiveData<List<LocationEntity>>
 }

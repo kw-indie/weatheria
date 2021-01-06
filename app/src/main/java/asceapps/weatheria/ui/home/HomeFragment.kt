@@ -145,7 +145,7 @@ class HomeFragment: Fragment() {
 			pager.apply {
 				this.adapter = adapter
 				registerOnPageChangeCallback(onPageChangeCallback)
-				offscreenPageLimit = 4
+				offscreenPageLimit = 3
 			}
 			viewModel.infoList.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
@@ -154,6 +154,7 @@ class HomeFragment: Fragment() {
 					swipeRefresh.visibility = View.GONE // to prevent swipe
 					with(toolbar.menu) {
 						findItem(R.id.action_delete).isEnabled = false
+						findItem(R.id.action_retain).isEnabled = false
 						findItem(R.id.action_delete_all).isEnabled = false
 					}
 				} else {
@@ -161,6 +162,7 @@ class HomeFragment: Fragment() {
 					swipeRefresh.visibility = View.VISIBLE
 					with(toolbar.menu) {
 						findItem(R.id.action_delete).isEnabled = true
+						findItem(R.id.action_retain).isEnabled = true
 						findItem(R.id.action_delete_all).isEnabled = true
 					}
 				}
@@ -198,9 +200,9 @@ class HomeFragment: Fragment() {
 			// setup toolbar
 			toolbar.setOnMenuItemClickListener {item ->
 				when(item.itemId) {
-					R.id.action_add_location -> findNavController().navigate(R.id.action_open_map)
 					R.id.action_search_location -> findNavController().navigate(R.id.action_open_search)
 					R.id.action_delete -> viewModel.delete(adapter.getItem(pager.currentItem).location)
+					R.id.action_retain -> viewModel.retain(adapter.getItem(pager.currentItem).location)
 					R.id.action_delete_all -> viewModel.deleteAll()
 					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
 					else -> return@setOnMenuItemClickListener false

@@ -1,9 +1,8 @@
 package asceapps.weatheria.util
 
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
-import asceapps.weatheria.data.WeatherService
-import coil.load
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -11,6 +10,11 @@ import java.time.ZoneOffset
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+
+fun hideKeyboard(view: View) {
+	ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
+		?.hideSoftInputFromWindow(view.windowToken, 0)
+}
 
 private val conditionIds = intArrayOf(200, 201, 202, 210, 211, 212, 221, 230, 231, 232,
 	300, 301, 302, 310, 311, 312, 313, 314, 321, 500, 501, 502, 503, 504, 511, 520, 521, 522, 531,
@@ -39,10 +43,6 @@ fun conditionIcon(conditionId: Int, isDay: Boolean? = null) =
 	}
 
 fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)
-fun Int.toInstant(): Instant = Instant.ofEpochSecond(this.toLong())
-fun isCoordinate(str: String) = str.matches(Regex(
-	"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
-))
 
 fun dirIndex(deg: Int) = when((deg + 22) % 360) {
 	in 0..44 -> 0 // E
@@ -93,15 +93,5 @@ fun moonPhase2(instant: Instant, offset: ZoneOffset): Int {
 		in 21.148..23.148 -> 5 //"Last Quarter Moon"
 		in 23.148..28.53 -> 6 //"Waning Crescent Moon"
 		else -> 7 //"New Moon" includes 28.53-29.5 and 0-1
-	}
-}
-
-@BindingAdapter("icon")
-fun loadIconFromUrl(view: ImageView, icon: String) {
-	view.load(WeatherService.ICON_URL_PATTERN.format(icon)) {
-		// placeholder(res_id)
-		// error(res_id)
-		// transformations(CircleCropTransformation())
-		crossfade(true)
 	}
 }

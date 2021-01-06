@@ -27,4 +27,5 @@
 	<color name="night_1">#0E2D88</color>
 	<color name="night_2">#032163</color>
 	<color name="night_3">#050121</color>
+	<color name="map_marker">#F44336</color>
 </resources>

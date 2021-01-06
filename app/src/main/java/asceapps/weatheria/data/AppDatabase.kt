@@ -19,6 +19,7 @@ import asceapps.weatheria.BuildConfig
 )
 abstract class AppDatabase: RoomDatabase() {
 
+	abstract fun locationDao(): LocationDao
 	abstract fun weatherInfoDao(): WeatherInfoDao
 
 	companion object {

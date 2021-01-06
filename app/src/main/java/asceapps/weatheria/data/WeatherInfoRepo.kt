@@ -1,5 +1,9 @@
 package asceapps.weatheria.data
 
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
+import asceapps.weatheria.api.OneCallResponse
+import asceapps.weatheria.api.WeatherService
 import asceapps.weatheria.model.Current
 import asceapps.weatheria.model.Daily
 import asceapps.weatheria.model.Hourly
@@ -9,10 +13,6 @@ import asceapps.weatheria.util.conditionIcon
 import asceapps.weatheria.util.conditionIndex
 import asceapps.weatheria.util.dirIndex
 import asceapps.weatheria.util.toInstant
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -30,24 +30,12 @@ class WeatherInfoRepo @Inject constructor(
 	fun getAll() = dao.loadAll()
 		.distinctUntilChanged()
 		.map {list -> list.map {entityToModel(it)}}
-		.flowOn(Dispatchers.IO)
 
 	fun getSavedLocations() = dao.loadSavedLocations()
-		.flowOn(Dispatchers.IO)
+		.distinctUntilChanged()
 
 	fun get(locationId: Int) = dao.load(locationId)
 		.distinctUntilChanged()
-		.flowOn(Dispatchers.IO)
-
-	suspend fun find(lat: Float, lng: Float, accuracy: Int = 1) = dao.find(
-		lat, lng,
-		lat - accuracy,
-		lat + accuracy,
-		lng - accuracy,
-		lng + accuracy
-	)
-
-	suspend fun find(locationName: String) = dao.find(locationName)
 
 	suspend fun fetch(l: LocationEntity) {
 		// todo see if we have a hit in db, if we do, show error/update
@@ -60,20 +48,6 @@ class WeatherInfoRepo @Inject constructor(
 		// no need to return as updating db will trigger live data
 	}
 
-	suspend fun get(lat: String, lng: String) {
-		// todo search locally first
-		val foundLocations = find(lat.toFloat(), lng.toFloat())
-		// todo let user choose a location
-		fetch(foundLocations[0])
-	}
-
-	suspend fun get(query: String) {
-		// todo search locally first
-		val foundLocations = find(query)
-		// todo let user choose a location
-		fetch(foundLocations[0])
-	}
-
 	suspend fun refresh(id: Int, lat: Float, lng: Float) {
 		val oneCallResp = service.oneCall(lat.toString(), lng.toString())
 		val current = extractCurrentEntity(id, oneCallResp)
@@ -83,6 +57,8 @@ class WeatherInfoRepo @Inject constructor(
 	}
 
 	suspend fun delete(l: Location) = dao.delete(l.id, l.order)
+
+	suspend fun retain(l: Location) = dao.retain(l.id)
 
 	suspend fun deleteAll() = dao.deleteAll()
 

@@ -24,7 +24,7 @@ private val nFormat = NumberFormat.getInstance().apply {
 }
 // adds localized percent char
 private val pFormat = NumberFormat.getPercentInstance()
-private val dtFormatter = DateTimeFormatter.ofPattern("EEE, MMMM d, h:m a (xxx)")
+private val dtFormatter = DateTimeFormatter.ofPattern("EEE, d MMMM, h:mm a (xxx)")
 private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 // todo use 'ar-u-nu-arab' tag for arabic numbering locale
 fun relativeTime(instant: Instant): CharSequence = DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())

@@ -29,7 +29,7 @@ Used Libraries
   * [Fragment][13] - A basic unit of composable UI.
   * [Layout][14] - Lay out widgets using different algorithms.
 * Third party and miscellaneous libraries
-  * [Glide][15] for image loading
+  * [Coil][15] for image loading
   * [Hilt][16] for [dependency injection][17]
   * [Kotlin Coroutines][18] for managing background threads with simplified code and reducing needs for callbacks
   * [intuit-ssp][19] for scalable font sizes
@@ -50,7 +50,7 @@ Used Libraries
 [12]: https://developer.android.com/training/animation/
 [13]: https://developer.android.com/guide/components/fragments
 [14]: https://developer.android.com/guide/topics/ui/declaring-layout
-[15]: https://bumptech.github.io/glide/
+[15]: https://coil-kt.github.io/coil/
 [16]: https://developer.android.com/training/dependency-injection/hilt-android
 [17]: https://developer.android.com/training/dependency-injection
 [18]: https://kotlinlang.org/docs/reference/coroutines-overview.html

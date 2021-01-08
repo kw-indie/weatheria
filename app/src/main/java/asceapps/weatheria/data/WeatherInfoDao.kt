@@ -24,6 +24,9 @@ abstract class WeatherInfoDao {
 	abstract fun loadAll(): LiveData<List<WeatherInfoEntity>>
 
 	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
+	abstract suspend fun savedLocations(): List<SavedLocationEntity>
+
+	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
 	abstract fun loadSavedLocations(): LiveData<List<SavedLocationEntity>>
 
 	@Transaction

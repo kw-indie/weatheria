@@ -16,13 +16,7 @@ class AutoRefreshWorker @WorkerInject constructor(
 
 	override suspend fun doWork(): Result = coroutineScope {
 		try {
-			repo.getSavedLocations()
-				.value
-				?.forEach {
-					with(it) {
-						repo.refresh(id, lat, lng)
-					}
-				}
+			repo.refreshAll()
 			Result.success()
 		} catch(e: Exception) {
 			Result.failure()

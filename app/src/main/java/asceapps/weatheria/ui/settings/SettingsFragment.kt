@@ -16,7 +16,7 @@ import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.SettingsRepo
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.Duration
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -81,25 +81,24 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
 
 	private fun updateAutoRefresh() {
 		val workManager = WorkManager.getInstance(requireContext())
-		val duration = when(repo.autoRefresh) {
-			0 -> Duration.ZERO // never
-			1 -> Duration.ofHours(6)
-			2 -> Duration.ofHours(12)
-			else -> Duration.ofDays(1)
+		val duration: Long = when(repo.autoRefresh) {
+			0 -> 0 // never
+			1 -> 6
+			2 -> 12
+			else -> 24
 		}
-		if(duration.isZero) {
+		if(duration == 0L) {
 			workManager.cancelUniqueWork(autoRefreshWorkName)
 		} else {
 			// since this method is only called when a change happens to the setting
 			// we don't need to check if existing work is similar, always replace
-			val tag = duration.toString()
 			val constraints = Constraints.Builder()
 				.setRequiredNetworkType(NetworkType.UNMETERED)
 				.setRequiresBatteryNotLow(true)
 				.build()
-			val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(duration)
+			val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(duration, TimeUnit.HOURS)
 				.setConstraints(constraints)
-				.addTag(tag)
+				.setInitialDelay(duration, TimeUnit.HOURS)
 				.build()
 			workManager.enqueueUniquePeriodicWork(
 				autoRefreshWorkName,

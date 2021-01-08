@@ -56,6 +56,12 @@ class WeatherInfoRepo @Inject constructor(
 		dao.update(current, hourly, daily)
 	}
 
+	suspend fun refreshAll() {
+		dao.savedLocations().forEach {
+			with(it) {refresh(id, lat, lng)}
+		}
+	}
+
 	suspend fun delete(l: Location) = dao.delete(l.id, l.order)
 
 	suspend fun retain(l: Location) = dao.retain(l.id)

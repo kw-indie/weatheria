@@ -15,12 +15,15 @@ class HomeViewModel @ViewModelInject constructor(private val repo: WeatherInfoRe
 	val infoList = repo.getAll()
 		.map {
 			_refreshing.value = false
+			// todo clean up
 			it
 		}
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 	private val _refreshing = MutableLiveData(true)
 	val refreshing: LiveData<Boolean> get() = _refreshing
+
+	// todo bring addLocation here
 
 	fun update(l: Location) {
 		viewModelScope.launch {

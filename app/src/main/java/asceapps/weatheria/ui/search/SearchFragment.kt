@@ -63,9 +63,11 @@ class SearchFragment: Fragment() {
 		}
 	}
 
-	override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?,
-		savedInstanceState: Bundle?): View {
-		return FragmentSearchBinding.inflate(inflater, root, false).apply {
+	override fun onCreateView(
+		inflater: LayoutInflater, container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View {
+		return FragmentSearchBinding.inflate(inflater, container, false).apply {
 			// binding vm to view
 			vm = viewModel
 
@@ -83,10 +85,11 @@ class SearchFragment: Fragment() {
 				viewModel.addNewLocation(it)
 			}
 			rvResults.apply {
-				val layoutManager = LinearLayoutManager(context)
-				val dividers = DividerItemDecoration(context, layoutManager.orientation)
 				this.adapter = adapter
-				addItemDecoration(dividers)
+				val layoutManager = rvResults.layoutManager as LinearLayoutManager
+				val divider = DividerItemDecoration(context, layoutManager.orientation)
+				addItemDecoration(divider)
+				setHasFixedSize(true)
 			}
 
 			viewModel.result.observe(viewLifecycleOwner) {
@@ -133,6 +136,7 @@ class SearchFragment: Fragment() {
 		hideKeyboard(requireView())
 		// todo disable button when already in progress
 		when {
+			// todo coarse location is enough for us
 			locationPermissions.any {
 				ContextCompat.checkSelfPermission(requireContext(), it) == PERMISSION_GRANTED
 			} -> {

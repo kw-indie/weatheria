@@ -31,15 +31,17 @@ class HomeFragment: Fragment() {
 	lateinit var binding: FragmentHomeBinding
 
 	override fun onCreateView(
-		inflater: LayoutInflater, root: ViewGroup?,
+		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
 		// setup prefs
+		// todo clean up
+		// need to re-read this every time we are back to the fragment in case it changes
 		val units = settingsRepo.units
 		val speedUnit = resources.getStringArray(R.array.units_speed)[units]
 		setMetric(units == 0, speedUnit)
 
-		binding = FragmentHomeBinding.inflate(inflater, root, false).apply {
+		binding = FragmentHomeBinding.inflate(inflater, container, false).apply {
 			//region setup bg
 			val (dawn, day, dusk, night) = with(resources) {
 				arrayOf(
@@ -73,13 +75,13 @@ class HomeFragment: Fragment() {
 				}
 				newColors
 			}
-			val bg = getRoot().background as GradientDrawable
+			val bg = root.background as GradientDrawable
 			val animator = ObjectAnimator.ofObject(bg, "colors", evaluator, night).apply {
 				duration = 1000L
 			}
 			//endregion
 
-			// setup viewPager
+			// region setup viewPager
 			// todo read selected item from prefs, nullify/dec/inc it upon delete, save it in prefs in onDestroy
 			val adapter = WeatherInfoAdapter()
 			val adapterDataObserver = object: RecyclerView.AdapterDataObserver() {
@@ -172,9 +174,7 @@ class HomeFragment: Fragment() {
 			swipeRefresh.setOnRefreshListener {
 				viewModel.update(adapter.getItem(pager.currentItem).location)
 			}
-			viewModel.refreshing.observe(viewLifecycleOwner) {
-				swipeRefresh.isRefreshing = it
-			}
+			viewModel.refreshing.observe(viewLifecycleOwner, swipeRefresh::setRefreshing)
 
 			// setup error handling
 			viewModel.error.observe(viewLifecycleOwner) {error ->

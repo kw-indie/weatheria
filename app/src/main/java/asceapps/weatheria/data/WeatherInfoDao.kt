@@ -10,15 +10,6 @@ import androidx.room.Transaction
 @Dao
 abstract class WeatherInfoDao {
 
-	// our use case forgives us for:
-	// todo remove if we add pagination
-	// 1- no pagination, since query result is expected to be small
-	// 2- no separate calls for each table since all available info is almost always required
-	// also, live data is retrieved async, no need for suspend
-
-	// can make return type int[] to return ids of inserted rows, but  our api provides the ids as well.
-	// no update for location since it's static once retrieved from api and inserted into db.
-
 	@Transaction
 	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
 	abstract fun loadAll(): LiveData<List<WeatherInfoEntity>>

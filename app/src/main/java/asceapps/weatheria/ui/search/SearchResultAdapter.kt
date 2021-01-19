@@ -3,18 +3,14 @@ package asceapps.weatheria.ui.search
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.adapter.BaseListAdapter
 import asceapps.weatheria.data.LocationEntity
 import asceapps.weatheria.databinding.ItemSearchResultBinding
 
 class SearchResultAdapter(
-	private var clickListener: (l: LocationEntity) -> Unit
-): ListAdapter<LocationEntity, SearchResultAdapter.ViewHolder>(DiffCallback()) {
-
-	init {
-		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-	}
+	private var onClick: (LocationEntity) -> Unit
+): BaseListAdapter<LocationEntity, SearchResultAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemSearchResultBinding.inflate(
@@ -22,13 +18,17 @@ class SearchResultAdapter(
 			parent, false
 		).apply {
 			root.setOnClickListener {
-				clickListener(location!!)
+				onClick(location!!) // fixme had to add '!!' cuz of inferred type mismatch
 			}
 		})
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		holder.bind(getItem(position))
+	}
+
+	override fun getItemId(position: Int): Long {
+		return currentList[position].id.toLong()
 	}
 
 	class ViewHolder(private val binding: ItemSearchResultBinding): RecyclerView.ViewHolder(binding.root) {

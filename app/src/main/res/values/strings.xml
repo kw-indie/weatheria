@@ -1,6 +1,8 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
 	<!--home-->
+	<string name="action_locations">Locations</string>
+	<string name="action_search">Search</string>
 	<string name="action_delete">Delete location</string>
 	<string name="action_retain">Delete other locations</string>
 	<string name="action_delete_all">Delete all locations</string>
@@ -95,10 +97,11 @@
 	<string name="select_on_map">Select on map</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
 	<!--search-->
-	<string name="action_search">Search</string>
 	<string name="search_hint">Enter a location name or coordinates</string>
 	<string name="get_current_location">Get current location</string>
 	<string name="getting_location">Getting location. If this takes long, try moving the phone a bit, or take a moment outside</string>
+	<!--locations-->
+	<string name="cd_reorder">Reorder</string>
 	<!--errors-->
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Please enable location service, then try again</string>

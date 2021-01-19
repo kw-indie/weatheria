@@ -3,16 +3,12 @@ package asceapps.weatheria.ui.home
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.adapter.BaseListAdapter
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
 import asceapps.weatheria.model.WeatherInfo
 
-class WeatherInfoAdapter: ListAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder>(DiffCallback()) {
-
-	init {
-		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-	}
+class WeatherInfoAdapter: BaseListAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemWeatherInfoBinding.inflate(
@@ -25,7 +21,9 @@ class WeatherInfoAdapter: ListAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder
 		holder.bind(getItem(position))
 	}
 
-	public override fun getItem(position: Int): WeatherInfo = super.getItem(position)
+	override fun getItemId(position: Int): Long {
+		return currentList[position].location.id.toLong()
+	}
 
 	class ViewHolder(private val binding: ItemWeatherInfoBinding): RecyclerView.ViewHolder(binding.root) {
 

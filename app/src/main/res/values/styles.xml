@@ -18,19 +18,18 @@
 		<item name="preferenceTheme">@style/PrefsTheme</item>
 	</style>
 
-	<style name="SearchFragment" parent="AppTheme">
-		<item name="android:textViewStyle">@style/SearchFragment.TextView</item>
-	</style>
-
-	<style name="SearchFragment.TextView" parent="Widget.MaterialComponents.TextView">
-		<item name="android:paddingLeft">@dimen/_22sdp</item>
-		<item name="android:paddingRight">@dimen/_22sdp</item>
-		<item name="android:paddingTop">@dimen/_4sdp</item>
-		<item name="android:paddingBottom">@dimen/_4sdp</item>
-		<item name="android:textSize">@dimen/_14ssp</item>
-		<item name="android:background">?attr/selectableItemBackground</item>
+	<style name="ListItem" parent="Widget.MaterialComponents.TextView">
+		<item name="android:paddingLeft">@dimen/_8sdp</item>
+		<item name="android:paddingRight">@dimen/_8sdp</item>
+		<item name="android:paddingTop">@dimen/_8sdp</item>
+		<item name="android:paddingBottom">@dimen/_8sdp</item>
+		<item name="android:foreground">?attr/selectableItemBackground</item>
+		<item name="android:background">?attr/colorSurface</item>
 		<item name="android:gravity">center_vertical</item>
-		<item name="android:drawablePadding">@dimen/_12sdp</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">marquee</item>
+		<item name="android:drawablePadding">@dimen/_8sdp</item>
+		<item name="android:textAppearance">?attr/textAppearanceListItem</item>
 	</style>
 
 	<style name="PrefsTheme" parent="PreferenceThemeOverlay.v14.Material">

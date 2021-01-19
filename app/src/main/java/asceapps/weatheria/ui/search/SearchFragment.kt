@@ -14,8 +14,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +34,7 @@ class SearchFragment: Fragment() {
 		const val LOCATION_KEY = "location_key"
 	}
 
-	private val viewModel: SearchViewModel by viewModels()
+	private val viewModel: SearchViewModel by activityViewModels()
 	private val locationPermissions = arrayOf(
 		Manifest.permission.ACCESS_FINE_LOCATION,
 		Manifest.permission.ACCESS_COARSE_LOCATION

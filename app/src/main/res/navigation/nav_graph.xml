@@ -17,6 +17,9 @@
 			android:id="@+id/action_open_settings"
 			app:destination="@id/settingsFragment"
 			app:launchSingleTop="true"/>
+		<action
+			android:id="@+id/action_open_locations"
+			app:destination="@id/locationsFragment"/>
 	</fragment>
 	<fragment
 		android:id="@+id/searchFragment"
@@ -37,4 +40,8 @@
 		android:id="@+id/settingsFragment"
 		android:name="asceapps.weatheria.ui.settings.SettingsFragment"
 		android:label="@string/action_settings"/>
+	<fragment
+		android:id="@+id/locationsFragment"
+		android:name="asceapps.weatheria.ui.locations.LocationsFragment"
+		android:label="@string/action_locations"/>
 </navigation>

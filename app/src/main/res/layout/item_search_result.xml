@@ -8,8 +8,9 @@
 			type="asceapps.weatheria.data.LocationEntity"/>
 	</data>
 	<TextView
+		style="@style/ListItem"
 		android:layout_width="match_parent"
-		android:layout_height="@dimen/_42sdp"
+		android:layout_height="?attr/listPreferredItemHeight"
 		android:text="@{@string/f_comma_sep(location.name, location.country)}"
 		app:drawableStartCompat="@drawable/ic_add_location"
 		tools:text="@tools:sample/cities"/>

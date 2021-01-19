@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!--home-->
+	<string name="action_locations">المواقع</string>
+	<string name="action_search">بحث</string>
 	<string name="action_delete">احذف الموقع</string>
 	<string name="action_retain">احذف المواقع الأخرى</string>
 	<string name="action_delete_all">احذف جميع المواقع</string>
@@ -94,10 +96,11 @@
 	<!--map-->
 	<string name="select_on_map">حدد على الخريطة</string>
 	<!--search-->
-	<string name="action_search">بحث</string>
 	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>
 	<string name="get_current_location">تحديد موقعك الحالي</string>
 	<string name="getting_location">جاري الحصول على الموقع. إذا استغرق الأمر طويلًا، حاول تحريك الهاتف قليلُا، أو خذ لحظة في الخارج</string>
+	<!--locations-->
+	<string name="cd_reorder">إعادة ترتيب</string>
 	<!--errors-->
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
 	<string name="error_location_disabled">الرجاء تفعيل خدمة تحديد الموقع ثم المحاولة مجددًا</string>

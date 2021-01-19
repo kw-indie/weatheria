@@ -36,7 +36,7 @@
 		android:layout_width="@dimen/_36sdp"
 		android:layout_height="@dimen/_36sdp"
 		android:src="@drawable/ic_marker"
-		android:tint="@color/map_marker"
+		app:tint="@color/map_marker"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintBottom_toTopOf="@id/dot"/>

@@ -200,6 +200,7 @@ class HomeFragment: Fragment() {
 			// setup toolbar
 			toolbar.setOnMenuItemClickListener {item ->
 				when(item.itemId) {
+					R.id.action_locations -> findNavController().navigate(R.id.action_open_locations)
 					R.id.action_search_location -> findNavController().navigate(R.id.action_open_search)
 					R.id.action_delete -> viewModel.delete(adapter.getItem(pager.currentItem).location)
 					R.id.action_retain -> viewModel.retain(adapter.getItem(pager.currentItem).location)

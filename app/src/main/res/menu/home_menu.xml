@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
+		android:id="@+id/action_locations"
+		android:title="@string/action_locations"
+		app:showAsAction="ifRoom"/>
+	<item
 		android:id="@+id/action_search_location"
 		android:icon="@drawable/ic_search"
 		android:title="@string/action_search"

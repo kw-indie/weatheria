@@ -62,6 +62,10 @@ class WeatherInfoRepo @Inject constructor(
 		}
 	}
 
+	suspend fun reorder(l: SavedLocationEntity, toPos: Int) = dao.reorder(l, toPos)
+
+	suspend fun delete(l: SavedLocationEntity) = dao.delete(l.id, l.pos)
+
 	suspend fun delete(l: Location) = dao.delete(l.id, l.order)
 
 	suspend fun retain(l: Location) = dao.retain(l.id)

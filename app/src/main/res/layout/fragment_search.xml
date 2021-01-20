@@ -5,7 +5,7 @@
 	<data>
 		<variable
 			name="vm"
-			type="asceapps.weatheria.ui.search.SearchViewModel"/>
+			type="asceapps.weatheria.ui.viewmodel.SearchViewModel"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"

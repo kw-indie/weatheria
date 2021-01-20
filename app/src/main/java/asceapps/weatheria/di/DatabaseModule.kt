@@ -9,12 +9,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
-	@Singleton
 	@Provides
+	@Singleton
 	fun provideAppDB(@ApplicationContext context: Context) = AppDatabase.build(context)
 
 	@Provides

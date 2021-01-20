@@ -5,6 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.dao.LocationDao
+import asceapps.weatheria.data.dao.WeatherInfoDao
+import asceapps.weatheria.data.entity.CurrentEntity
+import asceapps.weatheria.data.entity.DailyEntity
+import asceapps.weatheria.data.entity.HourlyEntity
+import asceapps.weatheria.data.entity.LocationEntity
+import asceapps.weatheria.data.entity.SavedLocationEntity
 
 @Database(
 	entities = [

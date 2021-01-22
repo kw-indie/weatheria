@@ -6,14 +6,14 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.data.entity.SavedLocationEntity
 import asceapps.weatheria.databinding.ItemLocationBinding
+import asceapps.weatheria.model.Location
 
 class LocationsAdapter(
-	private val onDeleteClick: (SavedLocationEntity) -> Unit,
-	private val onItemClick: (SavedLocationEntity) -> Unit,
+	private val onDeleteClick: (Location) -> Unit,
+	private val onItemClick: (Location) -> Unit,
 	private val onHandleTouch: (ViewHolder) -> Unit
-): BaseListAdapter<SavedLocationEntity, LocationsAdapter.ViewHolder>(DiffCallback()) {
+): BaseListAdapter<Location, LocationsAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemLocationBinding.inflate(
@@ -33,8 +33,8 @@ class LocationsAdapter(
 	@SuppressLint("ClickableViewAccessibility")
 	class ViewHolder(
 		private val binding: ItemLocationBinding,
-		private val onDeleteClick: (SavedLocationEntity) -> Unit,
-		private val onItemClick: (SavedLocationEntity) -> Unit,
+		private val onDeleteClick: (Location) -> Unit,
+		private val onItemClick: (Location) -> Unit,
 		private val onHandleTouch: (ViewHolder) -> Unit
 	): RecyclerView.ViewHolder(binding.root) {
 
@@ -56,7 +56,7 @@ class LocationsAdapter(
 			}
 		}
 
-		fun bind(l: SavedLocationEntity) {
+		fun bind(l: Location) {
 			with(binding) {
 				location = l
 				executePendingBindings()
@@ -64,12 +64,12 @@ class LocationsAdapter(
 		}
 	}
 
-	private class DiffCallback: DiffUtil.ItemCallback<SavedLocationEntity>() {
+	private class DiffCallback: DiffUtil.ItemCallback<Location>() {
 
-		override fun areItemsTheSame(oldItem: SavedLocationEntity, newItem: SavedLocationEntity) =
+		override fun areItemsTheSame(oldItem: Location, newItem: Location) =
 			oldItem.id == newItem.id
 
-		override fun areContentsTheSame(oldItem: SavedLocationEntity, newItem: SavedLocationEntity) =
+		override fun areContentsTheSame(oldItem: Location, newItem: Location) =
 			oldItem.id == newItem.id
 	}
 }

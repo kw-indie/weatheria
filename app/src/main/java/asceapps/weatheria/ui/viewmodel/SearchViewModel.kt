@@ -1,22 +1,22 @@
 package asceapps.weatheria.ui.viewmodel
 
 import android.annotation.SuppressLint
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.data.repo.LocationRepo
-import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.util.debounce
 import asceapps.weatheria.util.getFreshLocation
 import com.google.android.gms.location.FusedLocationProviderClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel @ViewModelInject constructor(
-	private val locationRepo: LocationRepo,
-	private val infoRepo: WeatherInfoRepo
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+	private val locationRepo: LocationRepo
 ): ViewModel() {
 
-	val savedLocations = infoRepo.getSavedLocations()
+	// todo save query in saveStateHandler and build 'result' reacting to that live data
+	// see https://github.com/android/architecture-components-samples/blob/master/BasicSample/app/src/main/java/com/example/android/persistence/viewmodel/ProductListViewModel.java
 	val query = MutableLiveData<String>()
 	val result = query
 		.debounce(500, viewModelScope)
@@ -26,17 +26,6 @@ class SearchViewModel @ViewModelInject constructor(
 
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
-
-	fun addNewLocation(l: LocationEntity) {
-		viewModelScope.launch {
-			try {
-				infoRepo.fetch(l)
-			} catch(e: Exception) {
-				e.printStackTrace()
-				_error.value = e
-			}
-		}
-	}
 
 	fun getMyLocation(client: FusedLocationProviderClient) {
 		viewModelScope.launch {

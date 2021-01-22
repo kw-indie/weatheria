@@ -6,7 +6,7 @@
 	app:startDestination="@id/homeFragment">
 	<fragment
 		android:id="@+id/homeFragment"
-		android:name="asceapps.weatheria.ui.home.HomeFragment"
+		android:name="asceapps.weatheria.ui.fragment.HomeFragment"
 		android:label=""
 		tools:layout="@layout/fragment_home">
 		<action
@@ -22,8 +22,12 @@
 			app:destination="@id/locationsFragment"/>
 	</fragment>
 	<fragment
+		android:id="@+id/locationsFragment"
+		android:name="asceapps.weatheria.ui.fragment.LocationsFragment"
+		android:label="@string/action_locations"/>
+	<fragment
 		android:id="@+id/searchFragment"
-		android:name="asceapps.weatheria.ui.search.SearchFragment"
+		android:name="asceapps.weatheria.ui.fragment.SearchFragment"
 		android:label=""
 		tools:layout="@layout/fragment_search">
 		<action
@@ -33,15 +37,11 @@
 	</fragment>
 	<fragment
 		android:id="@+id/mapFragment"
-		android:name="asceapps.weatheria.ui.map.MapFragment"
+		android:name="asceapps.weatheria.ui.fragment.MapFragment"
 		android:label="@string/select_on_map"
 		tools:layout="@layout/fragment_map"/>
 	<fragment
 		android:id="@+id/settingsFragment"
-		android:name="asceapps.weatheria.ui.settings.SettingsFragment"
+		android:name="asceapps.weatheria.ui.fragment.SettingsFragment"
 		android:label="@string/action_settings"/>
-	<fragment
-		android:id="@+id/locationsFragment"
-		android:name="asceapps.weatheria.ui.locations.LocationsFragment"
-		android:label="@string/action_locations"/>
 </navigation>

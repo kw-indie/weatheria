@@ -13,5 +13,5 @@ class Current(
 	val visibility: Int,
 	val windSpeed: Float,
 	val windDirIndex: Int,
-	val approximate: Boolean = false
+	val accuracy: Int
 )

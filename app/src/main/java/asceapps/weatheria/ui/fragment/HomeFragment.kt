@@ -1,17 +1,15 @@
-package asceapps.weatheria.ui.home
+package asceapps.weatheria.ui.fragment
 
-import android.database.sqlite.SQLiteConstraintException
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.animation.TypeEvaluator
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -19,7 +17,7 @@ import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
-import asceapps.weatheria.ui.viewmodel.HomeViewModel
+import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.setMetric
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
 
-	private val viewModel: HomeViewModel by viewModels()
+	private val mainVM: MainViewModel by activityViewModels()
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
 	lateinit var binding: FragmentHomeBinding
@@ -151,7 +149,7 @@ class HomeFragment: Fragment() {
 				registerOnPageChangeCallback(onPageChangeCallback)
 				offscreenPageLimit = 3
 			}
-			viewModel.infoList.observe(viewLifecycleOwner) {
+			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
@@ -174,39 +172,18 @@ class HomeFragment: Fragment() {
 
 			// setup swipeRefresh
 			swipeRefresh.setOnRefreshListener {
-				viewModel.update(adapter.getItem(pager.currentItem).location)
+				mainVM.refresh(adapter.getItem(pager.currentItem).location)
 			}
-			viewModel.refreshing.observe(viewLifecycleOwner, swipeRefresh::setRefreshing)
-
-			// setup error handling
-			viewModel.error.observe(viewLifecycleOwner) {error ->
-				Toast.makeText(
-					requireContext(),
-					when(error) {
-						// obvious timeout (default 2.5 s)
-						//is TimeoutError -> R.string.error_timed_out
-						// no internet (in fact, no dns)
-						//is NoConnectionError -> R.string.error_no_internet
-						// server didn't like the request for some reason
-						//is ServerError -> R.string.error_server_error
-						// failed to parse response string to json
-						//is ParseError -> R.string.error_parsing_resp
-						// there is AuthFailureError as well from volley
-						is SQLiteConstraintException -> R.string.error_duplicate_location
-						else -> R.string.error_unknown
-					},
-					Toast.LENGTH_LONG
-				).show()
-			}
+			mainVM.loading.observe(viewLifecycleOwner, swipeRefresh::setRefreshing)
 
 			// setup toolbar
 			toolbar.setOnMenuItemClickListener {item ->
 				when(item.itemId) {
 					R.id.action_locations -> findNavController().navigate(R.id.action_open_locations)
 					R.id.action_search_location -> findNavController().navigate(R.id.action_open_search)
-					R.id.action_delete -> viewModel.delete(adapter.getItem(pager.currentItem).location)
-					R.id.action_retain -> viewModel.retain(adapter.getItem(pager.currentItem).location)
-					R.id.action_delete_all -> viewModel.deleteAll()
+					R.id.action_delete -> mainVM.delete(adapter.getItem(pager.currentItem).location)
+					R.id.action_retain -> mainVM.retain(adapter.getItem(pager.currentItem).location)
+					R.id.action_delete_all -> mainVM.deleteAll()
 					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
 					else -> return@setOnMenuItemClickListener false
 				}

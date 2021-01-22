@@ -53,20 +53,20 @@ abstract class WeatherInfoDao {
 	}
 
 	@Transaction
-	open suspend fun reorder(l: SavedLocationEntity, toPos: Int) {
-		if(l.pos == toPos) return
+	open suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
+		if(fromPos == toPos) return
 		//setPos(l.id, -1) // since pos column is not unique, we can skip this
-		if(l.pos > toPos) // move down to smaller pos
-			shiftPosUp(toPos, l.pos - 1) // shift up items in between
+		if(fromPos > toPos) // move down to smaller pos
+			shiftPosUp(toPos, fromPos - 1) // shift up items in between
 		else // move up to bigger pos
-			shiftPosDown(toPos, l.pos + 1) // shift down items in between
-		setPos(l.id, toPos)
+			shiftPosDown(toPos, fromPos + 1) // shift down items in between
+		setPos(id, toPos)
 	}
 
 	@Transaction
 	open suspend fun delete(locationId: Int, locationPos: Int) {
 		delete(locationId)
-		shiftPosDown(locationPos + 1) // shift down all rows with bigger pos
+		pullPosDown(locationPos + 1) // shift down all rows with bigger pos
 	}
 
 	@Query("DELETE FROM saved_locations WHERE id != :locationId")
@@ -97,6 +97,9 @@ abstract class WeatherInfoDao {
 	@Query("UPDATE saved_locations SET pos = :pos WHERE id = :locationId")
 	protected abstract suspend fun setPos(locationId: Int, pos: Int)
 
+	@Query("UPDATE saved_locations SET pos = pos+1 WHERE pos >= :fromPos")
+	protected abstract suspend fun pushPosUp(fromPos: Int)
+
 	@Query("UPDATE saved_locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun shiftPosUp(fromPos: Int, toPos: Int)
 
@@ -104,7 +107,7 @@ abstract class WeatherInfoDao {
 	protected abstract suspend fun shiftPosDown(fromPos: Int, toPos: Int)
 
 	@Query("UPDATE saved_locations SET pos = pos-1 WHERE pos >= :fromPos")
-	protected abstract suspend fun shiftPosDown(fromPos: Int)
+	protected abstract suspend fun pullPosDown(fromPos: Int)
 
 	@Query("DELETE FROM hourly WHERE locationId = :locationId")
 	protected abstract suspend fun deleteHourly(locationId: Int)

@@ -1,4 +1,4 @@
-package asceapps.weatheria.ui.locations
+package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -14,15 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.databinding.FragmentLocationsBinding
 import asceapps.weatheria.ui.adapter.LocationsAdapter
-import asceapps.weatheria.ui.viewmodel.LocationsViewModel
-import asceapps.weatheria.ui.viewmodel.SearchViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import asceapps.weatheria.ui.viewmodel.MainViewModel
 
-@AndroidEntryPoint
 class LocationsFragment: Fragment() {
 
-	private val searchViewModel: SearchViewModel by activityViewModels()
-	private val viewModel: LocationsViewModel by viewModels()
+	private val mainVM: MainViewModel by activityViewModels()
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +60,7 @@ class LocationsFragment: Fragment() {
 						val a = recyclerView.adapter as LocationsAdapter
 						val location = a.getItem(viewHolder.bindingAdapterPosition)
 						val toPos = target.bindingAdapterPosition
-						viewModel.reorder(location, toPos)
+						mainVM.reorder(location, toPos)
 						// todo i think returning true here will trigger 2 updates one direct, one from liveData update
 						return false
 					}
@@ -74,7 +70,7 @@ class LocationsFragment: Fragment() {
 			)
 			val adapter = LocationsAdapter(
 				onDeleteClick = {
-					viewModel.delete(it)
+					mainVM.delete(it)
 				},
 				onItemClick = {
 					// todo
@@ -91,9 +87,11 @@ class LocationsFragment: Fragment() {
 				addItemDecoration(divider)
 				setHasFixedSize(true)
 			}
-			searchViewModel.savedLocations.observe(viewLifecycleOwner) {
-				adapter.submitList(it)
-			}
+			mainVM.weatherInfoList
+				.map {list -> list.map {it.location}}
+				.observe(viewLifecycleOwner) {
+					adapter.submitList(it)
+				}
 		}.root
 	}
 }

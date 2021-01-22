@@ -9,5 +9,5 @@ class Location(
 	val name: String,
 	val country: String,
 	val zoneOffset: ZoneOffset,
-	val order: Int
+	val pos: Int
 )

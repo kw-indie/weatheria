@@ -69,13 +69,11 @@ class WeatherInfoRepo @Inject constructor(
 		}
 	}
 
-	suspend fun reorder(l: SavedLocationEntity, toPos: Int) = dao.reorder(l, toPos)
+	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) = dao.reorder(id, fromPos, toPos)
 
-	suspend fun delete(l: SavedLocationEntity) = dao.delete(l.id, l.pos)
+	suspend fun delete(id: Int, pos: Int) = dao.delete(id, pos)
 
-	suspend fun delete(l: Location) = dao.delete(l.id, l.order)
-
-	suspend fun retain(l: Location) = dao.retain(l.id)
+	suspend fun retain(id: Int) = dao.retain(id)
 
 	suspend fun deleteAll() = dao.deleteAll()
 
@@ -222,7 +220,8 @@ class WeatherInfoRepo @Inject constructor(
 						clouds,
 						visibility,
 						windSpeed,
-						dirIndex(windDir)
+						dirIndex(windDir),
+						0 // high
 					)
 				}
 			}
@@ -240,7 +239,7 @@ class WeatherInfoRepo @Inject constructor(
 						visibility,
 						windSpeed,
 						dirIndex(windDir),
-						true
+						1 // medium
 					)
 				}
 			}
@@ -274,7 +273,7 @@ class WeatherInfoRepo @Inject constructor(
 						info.hourly.last().visibility, // no visibility in daily, use last hour's
 						windSpeed,
 						dirIndex(windDir),
-						true
+						2 // low
 					)
 				}
 			}

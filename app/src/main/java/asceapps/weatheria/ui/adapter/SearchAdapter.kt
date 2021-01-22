@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.databinding.ItemSearchResultBinding
 
-class SearchResultAdapter(
+class SearchAdapter(
 	private var onClick: (LocationEntity) -> Unit
-): BaseListAdapter<LocationEntity, SearchResultAdapter.ViewHolder>(DiffCallback()) {
+): BaseListAdapter<LocationEntity, SearchAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemSearchResultBinding.inflate(

@@ -1,4 +1,4 @@
-package asceapps.weatheria.ui.search
+package asceapps.weatheria.ui.fragment
 
 import android.Manifest
 import android.content.Context
@@ -16,12 +16,14 @@ import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentSearchBinding
-import asceapps.weatheria.ui.adapter.SearchResultAdapter
+import asceapps.weatheria.ui.adapter.SearchAdapter
+import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.ui.viewmodel.SearchViewModel
 import asceapps.weatheria.util.hideKeyboard
 import com.google.android.gms.location.LocationServices
@@ -36,7 +38,9 @@ class SearchFragment: Fragment() {
 		const val LOCATION_KEY = "location_key"
 	}
 
-	private val viewModel: SearchViewModel by activityViewModels()
+	private val mainVM: MainViewModel by activityViewModels()
+	private val viewModel: SearchViewModel by viewModels()
+
 	private val locationPermissions = arrayOf(
 		Manifest.permission.ACCESS_FINE_LOCATION,
 		Manifest.permission.ACCESS_COARSE_LOCATION
@@ -80,11 +84,11 @@ class SearchFragment: Fragment() {
 				onGetMyLocationClick()
 			}
 			openMap.setOnClickListener {
-				findNavController().navigate(R.id.mapFragment)
+				findNavController().navigate(R.id.action_open_map)
 			}
 
-			val adapter = SearchResultAdapter {
-				viewModel.addNewLocation(it)
+			val adapter = SearchAdapter {
+				mainVM.addNewLocation(it)
 			}
 			rvResults.apply {
 				this.adapter = adapter
@@ -113,8 +117,9 @@ class SearchFragment: Fragment() {
 					Toast.LENGTH_LONG
 				).show()
 			}
+			// fixme find better way to go back on success
 			var first = true
-			viewModel.savedLocations.observe(viewLifecycleOwner) {
+			mainVM.savedLocationsList.observe(viewLifecycleOwner) {
 				if(first) {
 					first = false
 				} else {

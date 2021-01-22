@@ -1,4 +1,4 @@
-package asceapps.weatheria.ui.map
+package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
-import asceapps.weatheria.ui.search.SearchFragment
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView

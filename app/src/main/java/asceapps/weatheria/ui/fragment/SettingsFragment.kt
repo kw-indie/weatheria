@@ -1,4 +1,4 @@
-package asceapps.weatheria.ui.settings
+package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
 import android.view.View

@@ -15,6 +15,7 @@ class LocationRepo @Inject constructor(private val dao: LocationDao) {
 	private val coordinateRegex = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
 
 	fun search(query: String, limit: Int = 30) = when {
+		// todo remove below line when downstream converts to flow
 		query.isEmpty() -> liveData {emit(emptyList<LocationEntity>())}
 		query.matches(Regex(coordinateRegex)) -> {
 			val (lat, lng) = query.split(',')

@@ -1,7 +1,5 @@
 package asceapps.weatheria.data.repo
 
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.map
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherService
 import asceapps.weatheria.data.dao.WeatherInfoDao
@@ -20,6 +18,8 @@ import asceapps.weatheria.util.conditionIcon
 import asceapps.weatheria.util.conditionIndex
 import asceapps.weatheria.util.dirIndex
 import asceapps.weatheria.util.toInstant
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime

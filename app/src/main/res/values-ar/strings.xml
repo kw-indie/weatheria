@@ -121,8 +121,6 @@
 		<item>م/ث</item>
 		<item>ميل/ساعة</item>
 	</string-array>
-	<string name="title_reorder">تغيير الترتيب</string>
-	<string name="summary_reorder">قم بإعادة ترتيب المواقع</string>
 	<string name="cat_header_display">العرض</string>
 	<string name="title_theme">المظهر</string>
 	<string-array name="theme_entries">

@@ -1,6 +1,5 @@
 package asceapps.weatheria.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -11,23 +10,24 @@ import asceapps.weatheria.data.entity.DailyEntity
 import asceapps.weatheria.data.entity.HourlyEntity
 import asceapps.weatheria.data.entity.SavedLocationEntity
 import asceapps.weatheria.data.entity.WeatherInfoEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class WeatherInfoDao {
 
 	@Transaction
 	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
-	abstract fun loadAll(): LiveData<List<WeatherInfoEntity>>
+	abstract fun loadAll(): Flow<List<WeatherInfoEntity>>
 
 	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
 	abstract suspend fun savedLocations(): List<SavedLocationEntity>
 
 	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
-	abstract fun loadSavedLocations(): LiveData<List<SavedLocationEntity>>
+	abstract fun loadSavedLocations(): Flow<List<SavedLocationEntity>>
 
 	@Transaction
 	@Query("SELECT * FROM saved_locations WHERE id = :locationId")
-	abstract fun load(locationId: Int): LiveData<WeatherInfoEntity>
+	abstract fun load(locationId: Int): Flow<WeatherInfoEntity>
 
 	@Transaction
 	open suspend fun insert(

@@ -25,11 +25,7 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 
 	val changes = callbackFlow<String> {
 		val changeListener = SharedPreferences.OnSharedPreferenceChangeListener {_, key ->
-			try {
-				offer(key)
-			} catch(t: Throwable) {
-				t.printStackTrace() // offer() failed
-			}
+			offer(key)
 		}
 		prefs.registerOnSharedPreferenceChangeListener(changeListener)
 

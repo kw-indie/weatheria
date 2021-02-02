@@ -3,14 +3,13 @@ package asceapps.weatheria.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.entity.LocationEntity
-import asceapps.weatheria.data.entity.SavedLocationEntity
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.model.Location
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,25 +19,11 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.map {
+		.onEach {
 			_loading.value = false
-			// fixme when fkers introduce onEach to liveData
-			it
-		}
+		}.asLiveData()
 	val savedLocationsList = infoRepo.getSavedLocations()
-	val selectedLocation = MutableLiveData<SavedLocationEntity>(savedLocationsList.value?.get(0))
-	val selectedLocationWeatherInfo = selectedLocation
-		.map {
-			_loading.value = true
-			// fixme same as above
-			it
-		}
-		.switchMap {infoRepo.get(it.id)}
-		.map {
-			_loading.value = false
-			// fixme same as above
-			it
-		}
+		.asLiveData()
 	private val _loading = MutableLiveData(true)
 	val loading: LiveData<Boolean> get() = _loading
 	private val _error = MutableLiveData<Throwable>()

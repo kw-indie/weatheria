@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import asceapps.weatheria.data.entity.LocationEntity
-
+// todo change return type when downstream converts to flow
 @Dao
 interface LocationDao {
 

@@ -1,14 +1,16 @@
 package asceapps.weatheria.worker
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import asceapps.weatheria.data.repo.WeatherInfoRepo
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 
-class AutoRefreshWorker @WorkerInject constructor(
+@HiltWorker
+class AutoRefreshWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	private val repo: WeatherInfoRepo

@@ -7,10 +7,6 @@
 			app:entryValues="@array/units_entry_values"
 			app:defaultValue="@string/def_value"
 			app:useSimpleSummaryProvider="true"/>
-		<Preference
-			app:title="@string/title_reorder"
-			app:summary="@string/summary_reorder"/>
-		<!-- https://stackoverflow.com/a/63277602/3438172 -->
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_display">
 		<ListPreference

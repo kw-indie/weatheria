@@ -17,12 +17,18 @@ class SearchViewModel @Inject constructor(
 
 	// todo save query in saveStateHandler and build 'result' reacting to that live data
 	// see https://github.com/android/architecture-components-samples/blob/master/BasicSample/app/src/main/java/com/example/android/persistence/viewmodel/ProductListViewModel.java
-	val query = MutableLiveData<String>()
+	val query = MutableLiveData<String>() // todo convert to stateFlow in AS 4.3
 	val result = query
 		.debounce(500, viewModelScope)
 		.map {it.trim()}
 		.distinctUntilChanged()
 		.switchMap {q -> locationRepo.search(q)}
+	/*.asFlow()
+	.debounce(500)
+	.filterNot {it.isNullOrBlank()}
+	.distinctUntilChanged()
+	.flatMapLatest {q -> locationRepo.search(q)}
+	.asLiveData()*/
 
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error

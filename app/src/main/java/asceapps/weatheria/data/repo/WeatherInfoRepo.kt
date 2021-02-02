@@ -45,7 +45,6 @@ class WeatherInfoRepo @Inject constructor(
 		.distinctUntilChanged()
 
 	suspend fun fetch(l: LocationEntity) {
-		// todo see if we have a hit in db, if we do, show error/update
 		val oneCallResp = with(l) {
 			service.oneCall(lat.toString(), lng.toString())
 		}

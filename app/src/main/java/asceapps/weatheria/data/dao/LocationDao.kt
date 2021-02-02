@@ -8,11 +8,12 @@ import asceapps.weatheria.data.entity.LocationEntity
 @Dao
 interface LocationDao {
 
-	@Query("SELECT * FROM locations WHERE name LIKE :locationName || '%' ORDER BY name LIMIT :limit")
+	@Query(
+		"SELECT * FROM locations WHERE name LIKE :locationName || '%' AND id NOT IN (SELECT id FROM saved_locations) ORDER BY name LIMIT :limit")
 	fun find(locationName: String, limit: Int): LiveData<List<LocationEntity>>
 
 	@Query(
-		"SELECT * FROM locations WHERE lat BETWEEN :bot AND :top AND lng BETWEEN :left AND :right ORDER BY (lat-:lat)*(lat-:lat)+(lng-:lng)*(lng-:lng) LIMIT :limit")
+		"SELECT * FROM locations WHERE lat BETWEEN :bot AND :top AND lng BETWEEN :left AND :right AND id NOT IN (SELECT id FROM saved_locations) ORDER BY (lat-:lat)*(lat-:lat)+(lng-:lng)*(lng-:lng) LIMIT :limit")
 	fun find(
 		lat: Float, lng: Float, bot: Float, top: Float, left: Float, right: Float, limit: Int
 	): LiveData<List<LocationEntity>>

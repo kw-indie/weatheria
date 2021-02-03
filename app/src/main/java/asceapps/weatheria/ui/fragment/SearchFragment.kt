@@ -45,11 +45,7 @@ class SearchFragment: Fragment() {
 	private val mainVM: MainViewModel by activityViewModels()
 	private val viewModel: SearchViewModel by viewModels()
 
-	private val locationPermissions = arrayOf(
-		Manifest.permission.ACCESS_FINE_LOCATION,
-		Manifest.permission.ACCESS_COARSE_LOCATION
-	)
-	private lateinit var locationPermissionRequester: ActivityResultLauncher<Array<String>>
+	private lateinit var locationPermissionRequester: ActivityResultLauncher<String>
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -64,12 +60,12 @@ class SearchFragment: Fragment() {
 
 		// need to register these in onCreate
 		locationPermissionRequester = registerForActivityResult(
-			ActivityResultContracts.RequestMultiplePermissions()
+			ActivityResultContracts.RequestPermission()
 		) {
-			if(it.containsValue(true))
-				afterGettingLocationPermission()
-			else
-				showMessage(R.string.error_location_denied)
+			when(it) {
+				true -> afterGettingLocationPermission()
+				else -> showMessage(R.string.error_location_denied)
+			}
 		}
 	}
 
@@ -112,12 +108,14 @@ class SearchFragment: Fragment() {
 				}
 				adapter.submitList(it)
 			}
-			viewModel.error.observe(viewLifecycleOwner) {error ->
+			viewModel.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
 					requireContext(),
-					when(error) {
+					/*// did we cover all reasons else where?
+					when(it) {
 						else -> R.string.error_unknown
-					},
+					}*/
+					R.string.error_unknown,
 					Toast.LENGTH_LONG
 				).show()
 			}
@@ -143,17 +141,12 @@ class SearchFragment: Fragment() {
 	private fun onGetMyLocationClick() {
 		hideKeyboard(requireView())
 		// todo disable button when already in progress
+		val permission = Manifest.permission.ACCESS_COARSE_LOCATION
 		when {
-			// todo coarse location is enough for us
-			locationPermissions.any {
-				ContextCompat.checkSelfPermission(requireContext(), it) == PERMISSION_GRANTED
-			} -> {
+			ContextCompat.checkSelfPermission(requireContext(), permission) == PERMISSION_GRANTED ->
 				afterGettingLocationPermission()
-			}
 			// todo case: showRationale
-			Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-				locationPermissionRequester.launch(locationPermissions)
-			}
+			Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> locationPermissionRequester.launch(permission)
 			else -> showMessage(R.string.error_location_denied)
 		}
 	}

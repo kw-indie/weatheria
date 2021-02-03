@@ -29,13 +29,16 @@ fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope) = Media
 	}
 }
 
-@RequiresPermission(anyOf = [
-	"android.permission.ACCESS_COARSE_LOCATION",
-	"android.permission.ACCESS_FINE_LOCATION"
-])
+@RequiresPermission(value = "android.permission.ACCESS_COARSE_LOCATION")
 suspend fun FusedLocationProviderClient.getFreshLocation() =
 	suspendCancellableCoroutine<Location> {
 		val cts = CancellationTokenSource()
+		// Setting priority to BALANCED may only work on a real device that is also connected to
+		// wifi, cellular, bluetooth, etc. anything lower will never get a fresh location
+		// when called on a device with no cached location.
+		// Having it at high guarantees that if GPS is enabled (device only, high accuracy settings),
+		// a fresh location will be fetched.
+		// Our permission does not force enabling GPS, thus, a device can just give a cached location.
 		getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cts.token)
 			.addOnSuccessListener {location ->
 				it.resume(location)

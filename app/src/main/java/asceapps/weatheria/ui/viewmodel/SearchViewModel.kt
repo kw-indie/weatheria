@@ -27,8 +27,7 @@ class SearchViewModel @Inject constructor(
 	.debounce(500)
 	.filterNot {it.isNullOrBlank()}
 	.distinctUntilChanged()
-	.flatMapLatest {q -> locationRepo.search(q)}
-	.asLiveData()*/
+	.flatMapLatest {q -> locationRepo.search(q)}*/
 
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error

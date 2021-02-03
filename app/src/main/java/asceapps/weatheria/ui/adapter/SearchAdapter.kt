@@ -8,18 +8,14 @@ import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.databinding.ItemSearchResultBinding
 
 class SearchAdapter(
-	private var onClick: (LocationEntity) -> Unit
+	private val onClick: (LocationEntity) -> Unit
 ): BaseListAdapter<LocationEntity, SearchAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemSearchResultBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent, false
-		).apply {
-			root.setOnClickListener {
-				onClick(location!!) // fixme had to add '!!' cuz of inferred type mismatch
-			}
-		})
+		), onClick)
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -30,7 +26,18 @@ class SearchAdapter(
 		return currentList[position].id.toLong()
 	}
 
-	class ViewHolder(private val binding: ItemSearchResultBinding): RecyclerView.ViewHolder(binding.root) {
+	class ViewHolder(
+		private val binding: ItemSearchResultBinding,
+		onClick: (LocationEntity) -> Unit
+	): RecyclerView.ViewHolder(binding.root) {
+
+		init {
+			with(binding) {
+				root.setOnClickListener {
+					onClick(location!!) // had to add '!!' cuz of inferred type mismatch
+				}
+			}
+		}
 
 		fun bind(l: LocationEntity) {
 			with(binding) {

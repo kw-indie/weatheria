@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +30,9 @@ import asceapps.weatheria.util.hideKeyboard
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class SearchFragment: Fragment() {
@@ -118,14 +122,11 @@ class SearchFragment: Fragment() {
 				).show()
 			}
 			// fixme find better way to go back on success
-			var first = true
-			mainVM.savedLocationsList.observe(viewLifecycleOwner) {
-				if(first) {
-					first = false
-				} else {
+			mainVM.savedLocationsList
+				.drop(1) // first time load
+				.onEach { // go back once new value is added successfully
 					findNavController().navigateUp()
-				}
-			}
+				}.launchIn(viewLifecycleOwner.lifecycleScope)
 		}.root
 	}
 

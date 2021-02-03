@@ -33,18 +33,20 @@ class LocationsAdapter(
 	@SuppressLint("ClickableViewAccessibility")
 	class ViewHolder(
 		private val binding: ItemLocationBinding,
-		private val onDeleteClick: (Location) -> Unit,
-		private val onItemClick: (Location) -> Unit,
-		private val onHandleTouch: (ViewHolder) -> Unit
+		onDeleteClick: (Location) -> Unit,
+		onItemClick: (Location) -> Unit,
+		onHandleTouch: (ViewHolder) -> Unit
 	): RecyclerView.ViewHolder(binding.root) {
 
 		init {
+			// had to init here cuz i need a reference to this vh
+			// and for consistency with other adapters
 			with(binding) {
 				ibDelete.setOnClickListener {
-					onDeleteClick(binding.location!!)
+					onDeleteClick(location!!)
 				}
 				tvName.setOnClickListener {
-					onItemClick(binding.location!!)
+					onItemClick(location!!)
 				}
 				ivDragHandle.setOnTouchListener {_, e ->
 					if(e.action == MotionEvent.ACTION_DOWN) {

@@ -23,7 +23,6 @@ class MainViewModel @Inject constructor(
 			_loading.value = false
 		}.asLiveData()
 	val savedLocationsList = infoRepo.getSavedLocations()
-		.asLiveData()
 	private val _loading = MutableLiveData(true)
 	val loading: LiveData<Boolean> get() = _loading
 	private val _error = MutableLiveData<Throwable>()

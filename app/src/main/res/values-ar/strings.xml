@@ -3,9 +3,6 @@
 	<!--home-->
 	<string name="action_locations">المواقع</string>
 	<string name="action_search">بحث</string>
-	<string name="action_delete">احذف الموقع</string>
-	<string name="action_retain">احذف المواقع الأخرى</string>
-	<string name="action_delete_all">احذف جميع المواقع</string>
 	<string name="action_settings">الإعدادات</string>
 	<string name="empty_pager">لا توجد مواقع لعرض توقعات الطقس. لم لا تضيف موقعًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
@@ -100,6 +97,8 @@
 	<string name="get_current_location">تحديد موقعك الحالي</string>
 	<string name="getting_location">جاري الحصول على الموقع. إذا استغرق الأمر طويلًا، حاول تحريك الهاتف قليلُا، أو خذ لحظة في الخارج</string>
 	<!--locations-->
+	<string name="action_delete_all">احذف جميع المواقع</string>
+	<string name="cd_delete_location">احذف الموقع</string>
 	<string name="cd_reorder">إعادة ترتيب</string>
 	<!--errors-->
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>

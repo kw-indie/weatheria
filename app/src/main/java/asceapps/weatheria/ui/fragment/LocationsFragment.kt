@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentLocationsBinding
 import asceapps.weatheria.ui.adapter.LocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
@@ -25,8 +26,17 @@ class LocationsFragment: Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		return FragmentLocationsBinding.inflate(inflater, container, false).apply {
-			toolbar.setNavigationOnClickListener {
-				findNavController().navigateUp()
+			toolbar.apply {
+				setNavigationOnClickListener {
+					findNavController().navigateUp()
+				}
+				setOnMenuItemClickListener {item ->
+					when(item.itemId) {
+						R.id.action_delete_all -> mainVM.deleteAll()
+						else -> return@setOnMenuItemClickListener false
+					}
+					true
+				}
 			}
 
 			val touchHelper = ItemTouchHelper(
@@ -91,6 +101,7 @@ class LocationsFragment: Fragment() {
 				.map {list -> list.map {it.location}}
 				.observe(viewLifecycleOwner) {
 					adapter.submitList(it)
+					toolbar.menu.findItem(R.id.action_delete_all).isEnabled = it.isNotEmpty()
 				}
 		}.root
 	}

@@ -154,19 +154,9 @@ class HomeFragment: Fragment() {
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
 					swipeRefresh.visibility = View.GONE // to prevent swipe
-					with(toolbar.menu) {
-						findItem(R.id.action_delete).isEnabled = false
-						findItem(R.id.action_retain).isEnabled = false
-						findItem(R.id.action_delete_all).isEnabled = false
-					}
 				} else {
 					tvEmptyPager.visibility = View.GONE
 					swipeRefresh.visibility = View.VISIBLE
-					with(toolbar.menu) {
-						findItem(R.id.action_delete).isEnabled = true
-						findItem(R.id.action_retain).isEnabled = true
-						findItem(R.id.action_delete_all).isEnabled = true
-					}
 				}
 			}
 
@@ -181,9 +171,6 @@ class HomeFragment: Fragment() {
 				when(item.itemId) {
 					R.id.action_locations -> findNavController().navigate(R.id.action_open_locations)
 					R.id.action_search_location -> findNavController().navigate(R.id.action_open_search)
-					R.id.action_delete -> mainVM.delete(adapter.getItem(pager.currentItem).location)
-					R.id.action_retain -> mainVM.retain(adapter.getItem(pager.currentItem).location)
-					R.id.action_delete_all -> mainVM.deleteAll()
 					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
 					else -> return@setOnMenuItemClickListener false
 				}

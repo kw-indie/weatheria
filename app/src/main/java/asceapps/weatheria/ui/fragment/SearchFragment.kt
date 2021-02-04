@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -28,6 +27,9 @@ import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.ui.viewmodel.SearchViewModel
 import asceapps.weatheria.util.hideKeyboard
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.maps.CameraUpdateFactory
+import com.google.android.libraries.maps.GoogleMap
+import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
@@ -44,20 +46,15 @@ class SearchFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private val viewModel: SearchViewModel by viewModels()
+	private lateinit var mapView: MapView
+	private lateinit var googleMap: GoogleMap
 
 	private lateinit var locationPermissionRequester: ActivityResultLauncher<String>
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		// listen for selected locations from MapFragment (auto clears after read)
-		setFragmentResultListener(LOCATION_KEY) {_, bundle ->
-			val location = bundle[LOCATION_KEY] as? LatLng
-			location?.apply {
-				viewModel.query.value = "$latitude,$longitude"
-			}
-		}
-
+		// todo make this callbackFlow?
 		// need to register these in onCreate
 		locationPermissionRequester = registerForActivityResult(
 			ActivityResultContracts.RequestPermission()
@@ -67,6 +64,8 @@ class SearchFragment: Fragment() {
 				else -> showMessage(R.string.error_location_denied)
 			}
 		}
+
+		// todo request location permission cuz otherwise map won't show myLocation button
 	}
 
 	override fun onCreateView(
@@ -80,11 +79,33 @@ class SearchFragment: Fragment() {
 			searchLayout.setStartIconOnClickListener {
 				findNavController().navigateUp()
 			}
-			myLocation.setOnClickListener {
-				onGetMyLocationClick()
-			}
-			openMap.setOnClickListener {
-				findNavController().navigate(R.id.action_open_map)
+
+			val defaultZoom = 10f
+			mapView = map.apply {
+				onCreate(savedInstanceState)
+				getMapAsync {map ->
+					map.apply {
+						googleMap = map
+						try {
+							isMyLocationEnabled = true
+						} catch(ignore: SecurityException) {
+						}
+						uiSettings.apply {
+							isZoomControlsEnabled = true
+							isRotateGesturesEnabled = false
+							isTiltGesturesEnabled = false
+							isIndoorEnabled = false
+							isMapToolbarEnabled = false
+						}
+						setOnMyLocationButtonClickListener {
+							onGetMyLocationClick()
+							true
+						}
+						setOnMapClickListener {pos ->
+							animateCamera(CameraUpdateFactory.newLatLngZoom(pos, defaultZoom))
+						}
+					}
+				}
 			}
 
 			val adapter = SearchAdapter {
@@ -98,24 +119,21 @@ class SearchFragment: Fragment() {
 				setHasFixedSize(true)
 			}
 
-			viewModel.result.observe(viewLifecycleOwner) {
-				if(it.isNullOrEmpty()) {
-					myLocation.visibility = View.VISIBLE
-					openMap.visibility = View.VISIBLE
-				} else {
-					myLocation.visibility = View.GONE
-					openMap.visibility = View.GONE
-				}
-				adapter.submitList(it)
+			viewModel.myLocation.observe(viewLifecycleOwner) {
+				etSearch.setText("${it.latitude},${it.longitude}")
+				googleMap.animateCamera(CameraUpdateFactory
+					.newLatLngZoom(LatLng(it.latitude, it.longitude), defaultZoom)
+				)
 			}
+			viewModel.result.observe(viewLifecycleOwner, adapter::submitList)
 			viewModel.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
 					requireContext(),
-					/*// did we cover all reasons else where?
+					// todo did we cover other reasons?
 					when(it) {
+						is NullPointerException -> R.string.error_location_not_found
 						else -> R.string.error_unknown
-					}*/
-					R.string.error_unknown,
+					},
 					Toast.LENGTH_LONG
 				).show()
 			}
@@ -128,9 +146,39 @@ class SearchFragment: Fragment() {
 		}.root
 	}
 
+	override fun onStart() {
+		super.onStart()
+		mapView.onStart()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		mapView.onResume()
+	}
+
+	override fun onPause() {
+		super.onPause()
+		mapView.onPause()
+	}
+
+	override fun onStop() {
+		super.onStop()
+		mapView.onStop()
+	}
+
 	override fun onDestroy() {
 		super.onDestroy()
 		locationPermissionRequester.unregister()
+	}
+
+	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
+		mapView.onSaveInstanceState(outState)
+	}
+
+	override fun onLowMemory() {
+		super.onLowMemory()
+		mapView.onLowMemory()
 	}
 
 	// todo share

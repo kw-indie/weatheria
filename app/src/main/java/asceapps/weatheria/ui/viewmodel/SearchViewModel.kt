@@ -1,6 +1,7 @@
 package asceapps.weatheria.ui.viewmodel
 
 import android.annotation.SuppressLint
+import android.location.Location
 import androidx.lifecycle.*
 import asceapps.weatheria.data.repo.LocationRepo
 import asceapps.weatheria.util.debounce
@@ -17,6 +18,8 @@ class SearchViewModel @Inject constructor(
 
 	// todo save query in saveStateHandler and build 'result' reacting to that live data
 	// see https://github.com/android/architecture-components-samples/blob/master/BasicSample/app/src/main/java/com/example/android/persistence/viewmodel/ProductListViewModel.java
+	private val _mylocation = MutableLiveData<Location>()
+	val myLocation: LiveData<Location> = _mylocation
 	val query = MutableLiveData<String>() // todo convert to stateFlow in AS 4.3
 	val result = query
 		.debounce(500, viewModelScope)
@@ -36,8 +39,7 @@ class SearchViewModel @Inject constructor(
 		viewModelScope.launch {
 			try {
 				@SuppressLint("MissingPermission")
-				val location = client.getFreshLocation()
-				query.value = with(location) {"$latitude,$longitude"}
+				_mylocation.value = client.getFreshLocation()
 			} catch(e: Exception) {
 				e.printStackTrace()
 				_error.value = e

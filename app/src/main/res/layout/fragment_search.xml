@@ -37,29 +37,39 @@
 					android:inputType="textAutoCorrect"/>
 			</com.google.android.material.textfield.TextInputLayout>
 		</androidx.appcompat.widget.Toolbar>
-		<TextView
-			style="@style/ListItem"
-			android:id="@+id/my_location"
+		<com.google.android.libraries.maps.MapView
+			android:id="@+id/map"
 			android:layout_width="match_parent"
-			android:layout_height="?attr/listPreferredItemHeight"
-			android:text="@string/get_current_location"
-			app:drawableStartCompat="@drawable/ic_my_location"
-			app:layout_constraintTop_toBottomOf="@id/toolbar"/>
-		<TextView
-			style="@style/ListItem"
-			android:id="@+id/open_map"
-			android:layout_width="match_parent"
-			android:layout_height="?attr/listPreferredItemHeight"
-			android:text="@string/select_on_map"
-			app:drawableStartCompat="@drawable/ic_map"
-			app:layout_constraintTop_toBottomOf="@id/my_location"/>
+			android:layout_height="@dimen/_160sdp"
+			app:mapId="@string/map_id"
+			app:layout_constraintTop_toBottomOf="@id/toolbar"
+			app:layout_constraintBottom_toTopOf="@id/rv_results"/>
+		<View
+			android:id="@+id/midpoint"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			app:layout_constraintHeight_percent="0"
+			app:layout_constraintWidth_percent="0"
+			app:layout_constraintTop_toTopOf="@id/map"
+			app:layout_constraintBottom_toBottomOf="@id/map"
+			app:layout_constraintStart_toStartOf="@id/map"
+			app:layout_constraintEnd_toEndOf="@id/map"/>
+		<ImageView
+			android:id="@+id/marker"
+			android:layout_width="@dimen/_36sdp"
+			android:layout_height="@dimen/_36sdp"
+			android:src="@drawable/ic_marker"
+			app:tint="@color/map_marker"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintBottom_toTopOf="@id/midpoint"/>
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/rv_results"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
 			app:layoutManager="LinearLayoutManager"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/open_map"
+			app:layout_constraintTop_toBottomOf="@id/map"
 			tools:listitem="@layout/item_search_result"/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -17,6 +17,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="?attr/actionBarSize"
 			android:paddingEnd="@dimen/_10sdp"
+			app:menu="@menu/search_menu"
 			app:layout_constraintTop_toTopOf="parent">
 			<com.google.android.material.textfield.TextInputLayout
 				android:id="@+id/search_layout"
@@ -44,29 +45,11 @@
 			app:mapId="@string/map_id"
 			app:layout_constraintTop_toBottomOf="@id/toolbar"
 			app:layout_constraintBottom_toTopOf="@id/rv_results"/>
-		<View
-			android:id="@+id/midpoint"
-			android:layout_width="0dp"
-			android:layout_height="0dp"
-			app:layout_constraintHeight_percent="0"
-			app:layout_constraintWidth_percent="0"
-			app:layout_constraintTop_toTopOf="@id/map"
-			app:layout_constraintBottom_toBottomOf="@id/map"
-			app:layout_constraintStart_toStartOf="@id/map"
-			app:layout_constraintEnd_toEndOf="@id/map"/>
-		<ImageView
-			android:id="@+id/marker"
-			android:layout_width="@dimen/_36sdp"
-			android:layout_height="@dimen/_36sdp"
-			android:src="@drawable/ic_marker"
-			app:tint="@color/map_marker"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintBottom_toTopOf="@id/midpoint"/>
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/rv_results"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
+			android:scrollbars="vertical"
 			app:layoutManager="LinearLayoutManager"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/map"

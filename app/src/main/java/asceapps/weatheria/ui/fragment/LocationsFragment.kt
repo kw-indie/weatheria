@@ -33,6 +33,7 @@ class LocationsFragment: Fragment() {
 				setOnMenuItemClickListener {item ->
 					when(item.itemId) {
 						R.id.action_delete_all -> mainVM.deleteAll()
+						R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
 						else -> return@setOnMenuItemClickListener false
 					}
 					true

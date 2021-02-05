@@ -1,6 +1,5 @@
 package asceapps.weatheria.ui
 
-import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -34,7 +33,6 @@ class MainActivity: AppCompatActivity() {
 					//is ServerError -> R.string.error_server_error
 					// failed to parse response string to json
 					//is ParseError -> R.string.error_parsing_resp
-					is SQLiteConstraintException -> R.string.error_duplicate_location
 					else -> R.string.error_unknown
 				},
 				Toast.LENGTH_LONG

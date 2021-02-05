@@ -91,8 +91,12 @@
 		<item>محاق</item>
 	</string-array>
 	<!--search-->
+	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
+	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع التقريبي فقط، وذلك ليعمل زر <b>موقعي</b>. بإمكانك سحب الإذن بأمان عند الانتهاء.</string>
+	<string name="request_again">إعادة الطلب</string>
+	<string name="dismiss">رفض</string>
 	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>
-	<string name="getting_location">جاري الحصول على الموقع. إذا استغرق الأمر طويلًا، حاول تحريك الهاتف قليلُا، أو خذ لحظة في الخارج</string>
+	<string name="getting_location">جاري الحصول على الموقع.</string>
 	<!--locations-->
 	<string name="action_delete_all">احذف جميع المواقع</string>
 	<string name="cd_delete_location">احذف الموقع</string>
@@ -100,12 +104,11 @@
 	<!--errors-->
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
 	<string name="error_location_disabled">الرجاء تفعيل خدمة تحديد الموقع ثم المحاولة مجددًا</string>
-	<string name="error_location_not_found">لم نعثر على موقعك. حاول تفعيل GPS.</string>
+	<string name="error_location_not_found">لم نعثر على موقعك. حاول تفعيل GPS ثم تحريك الهاتف قليلًا.</string>
 	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
 	<string name="error_timed_out">انتهت مهلة الطلب</string>
 	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
 	<string name="error_parsing_resp">خطأ في قراءة الرد. حاول إدخال موقعٍ مختلف</string>
-	<string name="error_duplicate_location">هذا الموقع موجود بالفعل</string>
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--settings-->
 	<string name="cat_header_general">عام</string>

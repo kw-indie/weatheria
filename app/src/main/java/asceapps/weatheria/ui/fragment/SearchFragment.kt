@@ -1,6 +1,8 @@
 package asceapps.weatheria.ui.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.location.LocationManager
 import android.os.Build
@@ -9,8 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
@@ -25,7 +27,6 @@ import asceapps.weatheria.databinding.FragmentSearchBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.ui.viewmodel.SearchViewModel
-import asceapps.weatheria.util.hideKeyboard
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
@@ -39,34 +40,16 @@ import kotlinx.coroutines.flow.onEach
 @AndroidEntryPoint
 class SearchFragment: Fragment() {
 
-	companion object {
-
-		const val LOCATION_KEY = "location_key"
-	}
-
 	private val mainVM: MainViewModel by activityViewModels()
 	private val viewModel: SearchViewModel by viewModels()
+	private val permission = Manifest.permission.ACCESS_COARSE_LOCATION
 	private lateinit var mapView: MapView
 	private lateinit var googleMap: GoogleMap
 
-	private lateinit var locationPermissionRequester: ActivityResultLauncher<String>
-
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-
-		// todo make this callbackFlow?
-		// need to register these in onCreate
-		locationPermissionRequester = registerForActivityResult(
-			ActivityResultContracts.RequestPermission()
-		) {
-			when(it) {
-				true -> afterGettingLocationPermission()
-				else -> showMessage(R.string.error_location_denied)
-			}
-		}
-
-		// todo request location permission cuz otherwise map won't show myLocation button
-	}
+	// need to register this anywhere before onCreateView
+	private val locationPermissionRequester = registerForActivityResult(
+		ActivityResultContracts.RequestPermission()
+	) {checkLocationPermission(true, false)}
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -76,20 +59,27 @@ class SearchFragment: Fragment() {
 			// binding vm to view
 			vm = viewModel
 
+			toolbar.setOnMenuItemClickListener {item ->
+				when(item.itemId) {
+					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
+					else -> return@setOnMenuItemClickListener false
+				}
+				true
+			}
+
 			searchLayout.setStartIconOnClickListener {
 				findNavController().navigateUp()
 			}
 
-			val defaultZoom = 10f
+			val maxZoom = 13f
+			val searchZoom = 9f
 			mapView = map.apply {
 				onCreate(savedInstanceState)
 				getMapAsync {map ->
 					map.apply {
-						googleMap = map
-						try {
-							isMyLocationEnabled = true
-						} catch(ignore: SecurityException) {
-						}
+						googleMap = this
+						checkLocationPermission(false, true)
+						setMaxZoomPreference(maxZoom)
 						uiSettings.apply {
 							isZoomControlsEnabled = true
 							isRotateGesturesEnabled = false
@@ -98,11 +88,18 @@ class SearchFragment: Fragment() {
 							isMapToolbarEnabled = false
 						}
 						setOnMyLocationButtonClickListener {
-							onGetMyLocationClick()
+							// todo disable when already in progress
+							getLocation()
 							true
 						}
-						setOnMapClickListener {pos ->
-							animateCamera(CameraUpdateFactory.newLatLngZoom(pos, defaultZoom))
+						setOnMapClickListener {latLng ->
+							animateCamera(CameraUpdateFactory.newLatLng(latLng))
+						}
+						setOnCameraIdleListener {
+							with(cameraPosition.target) {
+								if(cameraPosition.zoom >= searchZoom && latitude != 0.0 && longitude != 0.0)
+									etSearch.setText("%1$.3f,%2$.3f".format(latitude, longitude))
+							}
 						}
 					}
 				}
@@ -120,9 +117,8 @@ class SearchFragment: Fragment() {
 			}
 
 			viewModel.myLocation.observe(viewLifecycleOwner) {
-				etSearch.setText("${it.latitude},${it.longitude}")
 				googleMap.animateCamera(CameraUpdateFactory
-					.newLatLngZoom(LatLng(it.latitude, it.longitude), defaultZoom)
+					.newLatLngZoom(LatLng(it.latitude, it.longitude), maxZoom)
 				)
 			}
 			viewModel.result.observe(viewLifecycleOwner, adapter::submitList)
@@ -186,24 +182,42 @@ class SearchFragment: Fragment() {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
 	}
 
-	private fun onGetMyLocationClick() {
-		hideKeyboard(requireView())
-		// todo disable button when already in progress
-		val permission = Manifest.permission.ACCESS_COARSE_LOCATION
+	private fun checkLocationPermission(showRationale: Boolean, request: Boolean) {
 		when {
-			ContextCompat.checkSelfPermission(requireContext(), permission) == PERMISSION_GRANTED ->
-				afterGettingLocationPermission()
-			// todo case: showRationale
-			Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> locationPermissionRequester.launch(permission)
-			else -> showMessage(R.string.error_location_denied)
+			ContextCompat.checkSelfPermission(requireContext(), permission) == PERMISSION_GRANTED -> {
+				// our method gets called from different contexts, some of them don't guarantee initialization
+				if(::googleMap.isInitialized) {
+					@SuppressLint("MissingPermission")
+					googleMap.isMyLocationEnabled = true
+				}
+			}
+			showRationale -> {
+				if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)) {
+					AlertDialog.Builder(requireContext())
+						.setTitle(R.string.request_rationale_title)
+						.setMessage(R.string.location_request_rationale)
+						.setPositiveButton(R.string.request_again) {_, _ ->
+							checkLocationPermission(false, true)
+						}
+						.setNegativeButton(R.string.dismiss, null)
+						.create()
+						.show()
+				}
+			}
+			request -> {
+				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					locationPermissionRequester.launch(permission)
+				} else {
+					showMessage(R.string.error_location_denied)
+				}
+			}
 		}
 	}
 
-	private fun afterGettingLocationPermission() {
+	private fun getLocation() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-		// if location service is enabled
-		if(lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
-			lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		val providers = arrayOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
+		if(providers.any {lm.isProviderEnabled(it)}) {
 			showMessage(R.string.getting_location)
 			viewModel.getMyLocation(
 				LocationServices.getFusedLocationProviderClient(requireContext())

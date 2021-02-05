@@ -92,8 +92,12 @@
 	</string-array>
 	<!--search-->
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
+	<string name="request_rationale_title">Why we need permission</string>
+	<string name="location_request_rationale">The app needs only the coarse (approximate) location permission, for the <b>My Location</b> button to work. You can safely revoke the permission once you are done.</string>
+	<string name="request_again">Request again</string>
+	<string name="dismiss">Dismiss</string>
 	<string name="search_hint">Enter a location name or coordinates</string>
-	<string name="getting_location">Getting location. If this takes long, try moving the phone a bit, or take a moment outside</string>
+	<string name="getting_location">Getting location.</string>
 	<!--locations-->
 	<string name="action_delete_all">Delete all locations</string>
 	<string name="cd_delete_location">Delete location</string>
@@ -101,12 +105,11 @@
 	<!--errors-->
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Please enable location service, then try again</string>
-	<string name="error_location_not_found">Location not found. Try enabling GPS.</string>
+	<string name="error_location_not_found">Location not found. Try enabling GPS then moving the phone a bit.</string>
 	<string name="error_no_internet">No Internet connection</string>
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
 	<string name="error_parsing_resp">Response parsing error. Try a different location</string>
-	<string name="error_duplicate_location">This location is already available</string>
 	<string name="error_unknown">Unknown error</string>
 	<!--settings-->
 	<string name="def_value" translatable="false">0</string>

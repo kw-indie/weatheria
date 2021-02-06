@@ -2,12 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools">
-	<data></data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:fitsSystemWindows="true"
-		tools:context=".ui.fragment.LocationsFragment">
+		tools:context=".ui.fragment.SavedLocationsFragment">
 		<androidx.appcompat.widget.Toolbar
 			android:id="@+id/toolbar"
 			android:layout_width="match_parent"
@@ -16,6 +15,18 @@
 			app:menu="@menu/locations_menu"
 			app:layout_constraintTop_toTopOf="parent"
 			app:navigationIcon="@drawable/ic_navigate_up"/>
+		<TextView
+			android:id="@+id/tv_no_locations"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:text="@string/no_saved_locations"
+			android:textSize="@dimen/_12ssp"
+			app:layout_constraintWidth_percent="0.6"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/rv_locations"
 			android:layout_width="match_parent"

@@ -4,7 +4,7 @@
 	<string name="action_locations">المواقع</string>
 	<string name="action_search">بحث</string>
 	<string name="action_settings">الإعدادات</string>
-	<string name="empty_pager">لا توجد مواقع لعرض توقعات الطقس. لم لا تضيف موقعًا؟</string>
+	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
 	<string name="f_comma_sep">%1$s، %2$s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
@@ -95,7 +95,8 @@
 	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع التقريبي فقط، وذلك ليعمل زر <b>موقعي</b>. بإمكانك سحب الإذن بأمان عند الانتهاء.</string>
 	<string name="request_again">إعادة الطلب</string>
 	<string name="dismiss">رفض</string>
-	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>
+	<string name="no_search_result">لا نتائج.\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بشكل كافٍ لتظهر الأماكن القريبة هنا.</string>
+	<string name="search_hint">ابحث بالاسم أو الإحداثيات</string>
 	<string name="getting_location">جاري الحصول على الموقع.</string>
 	<!--locations-->
 	<string name="action_delete_all">احذف جميع المواقع</string>

@@ -2,11 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools">
-	<data>
-		<variable
-			name="vm"
-			type="asceapps.weatheria.ui.viewmodel.SearchViewModel"/>
-	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
@@ -16,28 +11,10 @@
 			android:id="@+id/toolbar"
 			android:layout_width="match_parent"
 			android:layout_height="?attr/actionBarSize"
-			android:paddingEnd="@dimen/_10sdp"
+			app:title="@string/action_search"
 			app:menu="@menu/search_menu"
-			app:layout_constraintTop_toTopOf="parent">
-			<com.google.android.material.textfield.TextInputLayout
-				android:id="@+id/search_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:hint="@string/search_hint"
-				style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-				app:startIconDrawable="@drawable/ic_navigate_up"
-				app:startIconContentDescription="@string/nav_app_bar_navigate_up_description"
-				app:endIconMode="clear_text">
-				<com.google.android.material.textfield.TextInputEditText
-					android:id="@+id/et_search"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="@={vm.query}"
-					android:singleLine="true"
-					android:imeOptions="actionSearch"
-					android:inputType="textAutoCorrect"/>
-			</com.google.android.material.textfield.TextInputLayout>
-		</androidx.appcompat.widget.Toolbar>
+			app:layout_constraintTop_toTopOf="parent"
+			app:navigationIcon="@drawable/ic_navigate_up"/>
 		<com.google.android.libraries.maps.MapView
 			android:id="@+id/map"
 			android:layout_width="match_parent"
@@ -45,6 +22,18 @@
 			app:mapId="@string/map_id"
 			app:layout_constraintTop_toBottomOf="@id/toolbar"
 			app:layout_constraintBottom_toTopOf="@id/rv_results"/>
+		<TextView
+			android:id="@+id/tv_no_result"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:text="@string/no_search_result"
+			android:textSize="@dimen/_12ssp"
+			app:layout_constraintWidth_percent="0.6"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/map"/>
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/rv_results"
 			android:layout_width="match_parent"

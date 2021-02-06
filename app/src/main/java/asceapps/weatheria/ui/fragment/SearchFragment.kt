@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
@@ -56,23 +57,37 @@ class SearchFragment: Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		return FragmentSearchBinding.inflate(inflater, container, false).apply {
-			// binding vm to view
-			vm = viewModel
+			val searchMenuItem = toolbar.menu.findItem(R.id.action_search)
+			val searchView = searchMenuItem.actionView as SearchView
+			searchView.apply {
+				queryHint = getString(R.string.search_hint)
+				setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+					override fun onQueryTextSubmit(query: String?): Boolean {
+						clearFocus()
+						return true
+					}
 
-			toolbar.setOnMenuItemClickListener {item ->
-				when(item.itemId) {
-					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
-					else -> return@setOnMenuItemClickListener false
-				}
-				true
+					override fun onQueryTextChange(newText: String?): Boolean {
+						viewModel.query.value = newText
+						return true
+					}
+				})
 			}
-
-			searchLayout.setStartIconOnClickListener {
-				findNavController().navigateUp()
+			toolbar.apply {
+				setNavigationOnClickListener {
+					findNavController().navigateUp()
+				}
+				setOnMenuItemClickListener {item ->
+					when(item.itemId) {
+						R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
+						else -> return@setOnMenuItemClickListener false
+					}
+					true
+				}
 			}
 
 			val maxZoom = 13f
-			val searchZoom = 9f
+			val searchZoom = 11f
 			mapView = map.apply {
 				onCreate(savedInstanceState)
 				getMapAsync {map ->
@@ -96,10 +111,16 @@ class SearchFragment: Fragment() {
 							animateCamera(CameraUpdateFactory.newLatLng(latLng))
 						}
 						setOnCameraIdleListener {
-							with(cameraPosition.target) {
-								if(cameraPosition.zoom >= searchZoom && latitude != 0.0 && longitude != 0.0)
-									etSearch.setText("%1$.3f,%2$.3f".format(latitude, longitude))
+							val query = if(cameraPosition.zoom >= searchZoom) {
+								searchMenuItem.expandActionView()
+								with(cameraPosition.target) {
+									"%1$.3f,%2$.3f".format(latitude, longitude)
+								}
+							} else {
+								searchMenuItem.collapseActionView()
+								""
 							}
+							searchView.setQuery(query, true)
 						}
 					}
 				}
@@ -121,7 +142,17 @@ class SearchFragment: Fragment() {
 					.newLatLngZoom(LatLng(it.latitude, it.longitude), maxZoom)
 				)
 			}
-			viewModel.result.observe(viewLifecycleOwner, adapter::submitList)
+			viewModel.result.observe(viewLifecycleOwner) {
+				adapter.submitList(it)
+				if(it.isEmpty()) {
+					tvNoResult.visibility = View.VISIBLE
+					rvResults.visibility = View.INVISIBLE
+				} else {
+					tvNoResult.visibility = View.GONE
+					rvResults.visibility = View.VISIBLE
+					rvResults.smoothScrollToPosition(0)
+				}
+			}
 			viewModel.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
 					requireContext(),

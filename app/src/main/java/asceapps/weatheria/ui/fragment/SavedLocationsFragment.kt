@@ -13,11 +13,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.R
-import asceapps.weatheria.databinding.FragmentLocationsBinding
-import asceapps.weatheria.ui.adapter.LocationsAdapter
+import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
+import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 
-class LocationsFragment: Fragment() {
+class SavedLocationsFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 
@@ -25,7 +25,7 @@ class LocationsFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		return FragmentLocationsBinding.inflate(inflater, container, false).apply {
+		return FragmentSavedLocationsBinding.inflate(inflater, container, false).apply {
 			toolbar.apply {
 				setNavigationOnClickListener {
 					findNavController().navigateUp()
@@ -68,7 +68,7 @@ class LocationsFragment: Fragment() {
 
 					override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
 						target: RecyclerView.ViewHolder): Boolean {
-						val a = recyclerView.adapter as LocationsAdapter
+						val a = recyclerView.adapter as SavedLocationsAdapter
 						val location = a.getItem(viewHolder.bindingAdapterPosition)
 						val toPos = target.bindingAdapterPosition
 						mainVM.reorder(location, toPos)
@@ -79,7 +79,7 @@ class LocationsFragment: Fragment() {
 					override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 				}
 			)
-			val adapter = LocationsAdapter(
+			val adapter = SavedLocationsAdapter(
 				onDeleteClick = {
 					mainVM.delete(it)
 				},
@@ -102,6 +102,13 @@ class LocationsFragment: Fragment() {
 				.map {list -> list.map {it.location}}
 				.observe(viewLifecycleOwner) {
 					adapter.submitList(it)
+					if(it.isEmpty()) {
+						tvNoLocations.visibility = View.VISIBLE
+						rvLocations.visibility = View.GONE
+					} else {
+						tvNoLocations.visibility = View.GONE
+						rvLocations.visibility = View.VISIBLE
+					}
 					toolbar.menu.findItem(R.id.action_delete_all).isEnabled = it.isNotEmpty()
 				}
 		}.root

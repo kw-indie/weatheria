@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.databinding.ItemLocationBinding
 import asceapps.weatheria.model.Location
 
-class LocationsAdapter(
+class SavedLocationsAdapter(
 	private val onDeleteClick: (Location) -> Unit,
 	private val onItemClick: (Location) -> Unit,
 	private val onHandleTouch: (ViewHolder) -> Unit
-): BaseListAdapter<Location, LocationsAdapter.ViewHolder>(DiffCallback()) {
+): BaseListAdapter<Location, SavedLocationsAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemLocationBinding.inflate(

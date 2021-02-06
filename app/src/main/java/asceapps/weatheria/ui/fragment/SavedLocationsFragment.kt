@@ -2,12 +2,14 @@ package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.map
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,26 +22,18 @@ import asceapps.weatheria.ui.viewmodel.MainViewModel
 class SavedLocationsFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
+	private var emptyList = true
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
 		return FragmentSavedLocationsBinding.inflate(inflater, container, false).apply {
-			toolbar.apply {
-				setNavigationOnClickListener {
-					findNavController().navigateUp()
-				}
-				setOnMenuItemClickListener {item ->
-					when(item.itemId) {
-						R.id.action_delete_all -> mainVM.deleteAll()
-						R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
-						else -> return@setOnMenuItemClickListener false
-					}
-					true
-				}
-			}
-
 			val touchHelper = ItemTouchHelper(
 				object: ItemTouchHelper.SimpleCallback(
 					ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
@@ -102,15 +96,36 @@ class SavedLocationsFragment: Fragment() {
 				.map {list -> list.map {it.location}}
 				.observe(viewLifecycleOwner) {
 					adapter.submitList(it)
-					if(it.isEmpty()) {
+					val empty = it.isEmpty()
+					if(empty) {
 						tvNoLocations.visibility = View.VISIBLE
 						rvLocations.visibility = View.GONE
 					} else {
 						tvNoLocations.visibility = View.GONE
 						rvLocations.visibility = View.VISIBLE
 					}
-					toolbar.menu.findItem(R.id.action_delete_all).isEnabled = it.isNotEmpty()
+					if(emptyList != empty) {
+						emptyList = empty
+						requireActivity().invalidateOptionsMenu()
+					}
 				}
 		}.root
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+		inflater.inflate(R.menu.saved_locations_menu, menu)
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when(item.itemId) {
+			R.id.action_delete_all -> mainVM.deleteAll()
+			else -> return super.onOptionsItemSelected(item)
+		}
+		return true
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu) {
+		super.onPrepareOptionsMenu(menu)
+		menu.findItem(R.id.action_delete_all).isEnabled = !emptyList
 	}
 }

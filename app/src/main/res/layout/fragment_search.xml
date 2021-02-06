@@ -7,20 +7,12 @@
 		android:layout_height="match_parent"
 		android:fitsSystemWindows="true"
 		tools:context=".ui.fragment.SearchFragment">
-		<androidx.appcompat.widget.Toolbar
-			android:id="@+id/toolbar"
-			android:layout_width="match_parent"
-			android:layout_height="?attr/actionBarSize"
-			app:title="@string/action_search"
-			app:menu="@menu/search_menu"
-			app:layout_constraintTop_toTopOf="parent"
-			app:navigationIcon="@drawable/ic_navigate_up"/>
 		<com.google.android.libraries.maps.MapView
 			android:id="@+id/map"
 			android:layout_width="match_parent"
 			android:layout_height="@dimen/_160sdp"
 			app:mapId="@string/map_id"
-			app:layout_constraintTop_toBottomOf="@id/toolbar"
+			app:layout_constraintTop_toTopOf="parent"
 			app:layout_constraintBottom_toTopOf="@id/rv_results"/>
 		<TextView
 			android:id="@+id/tv_no_result"

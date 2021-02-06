@@ -3,8 +3,6 @@ package asceapps.weatheria.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -30,9 +28,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		view.findViewById<Toolbar>(R.id.toolbar).setNavigationOnClickListener {
-			findNavController().navigateUp()
-		}
+
 		val unitsKey = requireContext().getString(R.string.key_units)
 		val themeKey = requireContext().getString(R.string.key_theme)
 		val autoRefreshKey = requireContext().getString(R.string.key_auto_refresh)

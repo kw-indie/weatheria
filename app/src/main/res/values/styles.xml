@@ -15,7 +15,6 @@
 		<!--has no effect pre api 29-->
 		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
 		<!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-		<item name="preferenceTheme">@style/PrefsTheme</item>
 	</style>
 
 	<style name="ListItem" parent="Widget.MaterialComponents.TextView">
@@ -30,9 +29,5 @@
 		<item name="android:ellipsize">marquee</item>
 		<item name="android:drawablePadding">@dimen/_8sdp</item>
 		<item name="android:textAppearance">?attr/textAppearanceListItem</item>
-	</style>
-
-	<style name="PrefsTheme" parent="PreferenceThemeOverlay.v14.Material">
-		<item name="android:layout">@layout/fragment_settings</item>
 	</style>
 </resources>

@@ -45,6 +45,5 @@
 	<fragment
 		android:id="@+id/settingsFragment"
 		android:name="asceapps.weatheria.ui.fragment.SettingsFragment"
-		android:label="@string/action_settings"
-		tools:layout="@layout/fragment_settings"/>
+		android:label="@string/action_settings"/>
 </navigation>

@@ -8,6 +8,9 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -44,6 +47,8 @@ class SearchFragment: Fragment() {
 	private val mainVM: MainViewModel by activityViewModels()
 	private val viewModel: SearchViewModel by viewModels()
 	private val permission = Manifest.permission.ACCESS_COARSE_LOCATION
+	private lateinit var searchMenuItem: MenuItem
+	private lateinit var searchView: SearchView
 	private lateinit var mapView: MapView
 	private lateinit var googleMap: GoogleMap
 
@@ -52,40 +57,16 @@ class SearchFragment: Fragment() {
 		ActivityResultContracts.RequestPermission()
 	) {checkLocationPermission(true, false)}
 
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
+
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
 		return FragmentSearchBinding.inflate(inflater, container, false).apply {
-			val searchMenuItem = toolbar.menu.findItem(R.id.action_search)
-			val searchView = searchMenuItem.actionView as SearchView
-			searchView.apply {
-				queryHint = getString(R.string.search_hint)
-				setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-					override fun onQueryTextSubmit(query: String?): Boolean {
-						clearFocus()
-						return true
-					}
-
-					override fun onQueryTextChange(newText: String?): Boolean {
-						viewModel.query.value = newText
-						return true
-					}
-				})
-			}
-			toolbar.apply {
-				setNavigationOnClickListener {
-					findNavController().navigateUp()
-				}
-				setOnMenuItemClickListener {item ->
-					when(item.itemId) {
-						R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
-						else -> return@setOnMenuItemClickListener false
-					}
-					true
-				}
-			}
-
 			val maxZoom = 13f
 			val searchZoom = 11f
 			mapView = map.apply {
@@ -173,6 +154,27 @@ class SearchFragment: Fragment() {
 		}.root
 	}
 
+	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+		inflater.inflate(R.menu.search_menu, menu)
+		searchMenuItem = menu.findItem(R.id.action_search)
+		searchView = searchMenuItem.actionView as SearchView
+		searchView.apply {
+			setIconifiedByDefault(false)
+			queryHint = getString(R.string.search_hint)
+			setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+				override fun onQueryTextSubmit(query: String?): Boolean {
+					clearFocus()
+					return true
+				}
+
+				override fun onQueryTextChange(newText: String?): Boolean {
+					viewModel.query.value = newText
+					return true
+				}
+			})
+		}
+	}
+
 	override fun onStart() {
 		super.onStart()
 		mapView.onStart()
@@ -249,7 +251,6 @@ class SearchFragment: Fragment() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 		val providers = arrayOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
 		if(providers.any {lm.isProviderEnabled(it)}) {
-			showMessage(R.string.getting_location)
 			viewModel.getMyLocation(
 				LocationServices.getFusedLocationProviderClient(requireContext())
 			)

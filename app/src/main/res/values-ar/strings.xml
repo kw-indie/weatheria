@@ -97,7 +97,6 @@
 	<string name="dismiss">رفض</string>
 	<string name="no_search_result">لا نتائج.\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بشكل كافٍ لتظهر الأماكن القريبة هنا.</string>
 	<string name="search_hint">ابحث بالاسم أو الإحداثيات</string>
-	<string name="getting_location">جاري الحصول على الموقع.</string>
 	<!--locations-->
 	<string name="action_delete_all">احذف جميع المواقع</string>
 	<string name="cd_delete_location">احذف الموقع</string>

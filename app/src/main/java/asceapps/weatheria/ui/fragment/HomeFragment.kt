@@ -3,6 +3,9 @@ package asceapps.weatheria.ui.fragment
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.ArgbEvaluator
@@ -29,6 +32,11 @@ class HomeFragment: Fragment() {
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
 	lateinit var binding: FragmentHomeBinding
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -81,7 +89,6 @@ class HomeFragment: Fragment() {
 			}
 			//endregion
 
-			// region setup viewPager
 			// todo read selected item from prefs, nullify/dec/inc it upon delete, save it in prefs in onDestroy
 			val adapter = WeatherInfoAdapter()
 			val adapterDataObserver = object: RecyclerView.AdapterDataObserver() {
@@ -149,6 +156,11 @@ class HomeFragment: Fragment() {
 				registerOnPageChangeCallback(onPageChangeCallback)
 				offscreenPageLimit = 3
 			}
+
+			swipeRefresh.setOnRefreshListener {
+				mainVM.refresh(adapter.getItem(pager.currentItem).location)
+			}
+
 			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
 				if(it.isEmpty()) {
@@ -159,25 +171,22 @@ class HomeFragment: Fragment() {
 					swipeRefresh.visibility = View.VISIBLE
 				}
 			}
-
-			// setup swipeRefresh
-			swipeRefresh.setOnRefreshListener {
-				mainVM.refresh(adapter.getItem(pager.currentItem).location)
-			}
 			mainVM.loading.observe(viewLifecycleOwner, swipeRefresh::setRefreshing)
-
-			// setup toolbar
-			toolbar.setOnMenuItemClickListener {item ->
-				when(item.itemId) {
-					R.id.action_locations -> findNavController().navigate(R.id.action_open_saved_locations)
-					R.id.action_search -> findNavController().navigate(R.id.action_open_search)
-					R.id.action_settings -> findNavController().navigate(R.id.action_open_settings)
-					else -> return@setOnMenuItemClickListener false
-				}
-				true
-			}
 		}
 		return binding.root
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+		inflater.inflate(R.menu.home_menu, menu)
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when(item.itemId) {
+			R.id.action_locations -> findNavController().navigate(R.id.action_open_saved_locations)
+			R.id.action_search -> findNavController().navigate(R.id.action_open_search)
+			else -> return super.onOptionsItemSelected(item)
+		}
+		return true
 	}
 
 	override fun onPause() {

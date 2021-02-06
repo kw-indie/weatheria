@@ -68,12 +68,6 @@ class MainViewModel @Inject constructor(
 		}
 	}
 
-	fun retain(l: Location) {
-		viewModelScope.launch {
-			infoRepo.retain(l.id)
-		}
-	}
-
 	fun deleteAll() {
 		viewModelScope.launch {
 			infoRepo.deleteAll()

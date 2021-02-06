@@ -89,7 +89,6 @@ class HomeFragment: Fragment() {
 			}
 			//endregion
 
-			// todo read selected item from prefs, nullify/dec/inc it upon delete, save it in prefs in onDestroy
 			val adapter = WeatherInfoAdapter()
 			val adapterDataObserver = object: RecyclerView.AdapterDataObserver() {
 				override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {

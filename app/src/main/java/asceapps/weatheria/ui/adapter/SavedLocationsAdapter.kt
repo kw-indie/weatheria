@@ -3,23 +3,38 @@ package asceapps.weatheria.ui.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.databinding.ItemLocationBinding
 import asceapps.weatheria.model.Location
+import java.util.*
 
 class SavedLocationsAdapter(
 	private val onDeleteClick: (Location) -> Unit,
 	private val onItemClick: (Location) -> Unit,
-	private val onHandleTouch: (ViewHolder) -> Unit
+	private val onStartDrag: (View) -> Unit,
+	private val onEndDrag: (View) -> Unit,
+	private val onReorder: (Location, Int) -> Unit
 ): BaseListAdapter<Location, SavedLocationsAdapter.ViewHolder>(DiffCallback()) {
+
+	private val touchHelper = ItemTouchHelper(ReorderCallback())
+
+	override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+		touchHelper.attachToRecyclerView(recyclerView)
+	}
+
+	override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+		touchHelper.attachToRecyclerView(null)
+	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemLocationBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent, false
-		), onDeleteClick, onItemClick, onHandleTouch)
+		), onDeleteClick, onItemClick, {touchHelper.startDrag(it)})
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -28,6 +43,20 @@ class SavedLocationsAdapter(
 
 	override fun getItemId(position: Int): Long {
 		return currentList[position].id.toLong()
+	}
+
+	private fun reorder(fromPos: Int, toPos: Int) {
+		val newList = currentList.toMutableList()
+		if(fromPos < toPos) {
+			for(i in fromPos until toPos) {
+				Collections.swap(newList, i, i + 1)
+			}
+		} else {
+			for(i in fromPos downTo toPos + 1) {
+				Collections.swap(newList, i, i - 1)
+			}
+		}
+		submitList(newList)
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -73,5 +102,44 @@ class SavedLocationsAdapter(
 
 		override fun areContentsTheSame(oldItem: Location, newItem: Location) =
 			oldItem.id == newItem.id
+	}
+
+	private inner class ReorderCallback: ItemTouchHelper.SimpleCallback(
+		ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+	) {
+
+		private val noMove = 0 to 0
+		private val debounce = 500
+		private var lastMove = noMove
+		private var lastMoveMillis = 0L
+
+		override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+			super.onSelectedChanged(viewHolder, actionState)
+			if(viewHolder == null) return
+			if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) onStartDrag(viewHolder.itemView)
+		}
+
+		override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+			target: RecyclerView.ViewHolder): Boolean {
+			val newMove = viewHolder.bindingAdapterPosition to target.bindingAdapterPosition
+			if(lastMove != newMove && System.currentTimeMillis() > lastMoveMillis + debounce) {
+				lastMove = newMove
+				lastMoveMillis = System.currentTimeMillis()
+				reorder(lastMove.first, lastMove.second)
+				return true
+			}
+			return false
+		}
+
+		override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+			super.clearView(recyclerView, viewHolder)
+			onEndDrag(viewHolder.itemView)
+			val newPos = viewHolder.bindingAdapterPosition
+			val item = getItem(newPos)
+			onReorder(item, newPos)
+			lastMove = noMove
+		}
+
+		override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 	}
 }

@@ -72,8 +72,6 @@ class WeatherInfoRepo @Inject constructor(
 
 	suspend fun delete(id: Int, pos: Int) = dao.delete(id, pos)
 
-	suspend fun retain(id: Int) = dao.retain(id)
-
 	suspend fun deleteAll() = dao.deleteAll()
 
 	private fun oneCallToWeatherInfoEntity(l: LocationEntity, resp: OneCallResponse): WeatherInfoEntity {

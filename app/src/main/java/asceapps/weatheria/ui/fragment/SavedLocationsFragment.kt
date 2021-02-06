@@ -11,9 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
 import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
@@ -34,45 +32,6 @@ class SavedLocationsFragment: Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		return FragmentSavedLocationsBinding.inflate(inflater, container, false).apply {
-			val touchHelper = ItemTouchHelper(
-				object: ItemTouchHelper.SimpleCallback(
-					ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-				) {
-					override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-						super.onSelectedChanged(viewHolder, actionState)
-						// called when item is being dragged
-						if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-							viewHolder?.apply {
-								val scale = 1.05f
-								itemView.animate()
-									.scaleX(scale)
-									.scaleY(scale)
-							}
-						}
-					}
-
-					// called when item is dropped
-					override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-						super.clearView(recyclerView, viewHolder)
-						val scale = 1f
-						viewHolder.itemView.animate()
-							.scaleX(scale)
-							.scaleY(scale)
-					}
-
-					override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-						target: RecyclerView.ViewHolder): Boolean {
-						val a = recyclerView.adapter as SavedLocationsAdapter
-						val location = a.getItem(viewHolder.bindingAdapterPosition)
-						val toPos = target.bindingAdapterPosition
-						mainVM.reorder(location, toPos)
-						// todo i think returning true here will trigger 2 updates one direct, one from liveData update
-						return false
-					}
-
-					override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-				}
-			)
 			val adapter = SavedLocationsAdapter(
 				onDeleteClick = {
 					mainVM.delete(it)
@@ -80,11 +39,22 @@ class SavedLocationsFragment: Fragment() {
 				onItemClick = {
 					// todo
 				},
-				onHandleTouch = {
-					touchHelper.startDrag(it)
+				onStartDrag = {
+					val scale = 1.05f
+					it.animate()
+						.scaleX(scale)
+						.scaleY(scale)
+				},
+				onEndDrag = {
+					val scale = 1f
+					it.animate()
+						.scaleX(scale)
+						.scaleY(scale)
+				},
+				onReorder = {location, to ->
+					mainVM.reorder(location, to)
 				}
 			)
-			touchHelper.attachToRecyclerView(rvLocations)
 			rvLocations.apply {
 				this.adapter = adapter
 				val layoutManager = layoutManager as LinearLayoutManager

@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.Flow
 abstract class WeatherInfoDao {
 
 	@Transaction
-	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
+	@Query("SELECT * FROM saved_locations ORDER BY pos")
 	abstract fun loadAll(): Flow<List<WeatherInfoEntity>>
 
-	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
+	@Query("SELECT * FROM saved_locations ORDER BY pos")
 	abstract suspend fun savedLocations(): List<SavedLocationEntity>
 
-	@Query("SELECT * FROM saved_locations ORDER BY pos DESC")
+	@Query("SELECT * FROM saved_locations ORDER BY pos")
 	abstract fun loadSavedLocations(): Flow<List<SavedLocationEntity>>
 
 	@Transaction
@@ -56,10 +56,10 @@ abstract class WeatherInfoDao {
 	open suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
 		if(fromPos == toPos) return
 		//setPos(l.id, -1) // since pos column is not unique, we can skip this
-		if(fromPos > toPos) // move down to smaller pos
-			shiftPosUp(toPos, fromPos - 1) // shift up items in between
-		else // move up to bigger pos
-			shiftPosDown(toPos, fromPos + 1) // shift down items in between
+		if(fromPos < toPos) // from small index to bigger (move down in list)
+			decPos(fromPos + 1, toPos) // dec pos of items in between (move up in list)
+		else // from big index to smaller (move it up in list)
+			incPos(toPos, fromPos - 1) // inc pos of items in between (move in list)
 		setPos(id, toPos)
 	}
 
@@ -69,13 +69,10 @@ abstract class WeatherInfoDao {
 		pullPosDown(locationPos + 1) // shift down all rows with bigger pos
 	}
 
-	@Query("DELETE FROM saved_locations WHERE id != :locationId")
-	abstract suspend fun retain(locationId: Int)
-
 	@Query("DELETE FROM saved_locations")
 	abstract suspend fun deleteAll()
 
-	@Query("SELECT IFNULL(MAX(pos), 0) + 1 FROM saved_locations")
+	@Query("SELECT IFNULL(MAX(pos), 0) FROM saved_locations")
 	abstract suspend fun getMaxSavedLocationPos(): Int
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -101,10 +98,10 @@ abstract class WeatherInfoDao {
 	protected abstract suspend fun pushPosUp(fromPos: Int)
 
 	@Query("UPDATE saved_locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
-	protected abstract suspend fun shiftPosUp(fromPos: Int, toPos: Int)
+	protected abstract suspend fun incPos(fromPos: Int, toPos: Int)
 
 	@Query("UPDATE saved_locations SET pos = pos-1 WHERE pos BETWEEN :fromPos AND :toPos")
-	protected abstract suspend fun shiftPosDown(fromPos: Int, toPos: Int)
+	protected abstract suspend fun decPos(fromPos: Int, toPos: Int)
 
 	@Query("UPDATE saved_locations SET pos = pos-1 WHERE pos >= :fromPos")
 	protected abstract suspend fun pullPosDown(fromPos: Int)

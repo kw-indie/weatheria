@@ -30,7 +30,7 @@ fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope) = Media
 }
 
 @RequiresPermission(value = "android.permission.ACCESS_COARSE_LOCATION")
-suspend fun FusedLocationProviderClient.getFreshLocation() =
+suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 	suspendCancellableCoroutine<Location> {
 		val cts = CancellationTokenSource()
 		// Setting priority to BALANCED may only work on a real device that is also connected to

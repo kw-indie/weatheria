@@ -1,7 +1,9 @@
-apply plugin: "com.android.application"
-apply plugin: "kotlin-android" // for kotlin lang support
-apply plugin: "kotlin-kapt" // for annotations: data binding, etc
-apply plugin: "dagger.hilt.android.plugin"
+plugins {
+	id "com.android.application"
+	id "kotlin-android" // for kotlin lang support
+	id "kotlin-kapt" // for annotations: data binding, etc
+	id "dagger.hilt.android.plugin"
+}
 
 android {
 	compileSdkVersion targetSdkVer
@@ -112,7 +114,7 @@ dependencies {
 	implementation "androidx.core:core-animation:$animatorVer"
 	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableVer"
 
-	// preferences fragment
+	// new preferences (fragment, etc.)
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
 
 	// room

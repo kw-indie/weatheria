@@ -83,5 +83,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
 				work
 			)
 		}
+		// debugging commands:
+		// adb shell dumpsys jobscheduler
+		// adb shell am broadcast -a "androidx.work.diagnostics.REQUEST_DIAGNOSTICS" -p "<package_name>"
 	}
 }

@@ -17,7 +17,7 @@ buildscript {
 		constraintLayoutVer = '2.0.4'
 		swipeRefreshVer = '1.1.0'
 		viewPagerVer = '1.0.0'
-		materialVer = '1.2.1'
+		materialVer = '1.3.0'
 		lifecycleVer = '2.3.0-rc01'
 		navVer = '2.3.3'
 		animatorVer = '1.0.0-alpha02'

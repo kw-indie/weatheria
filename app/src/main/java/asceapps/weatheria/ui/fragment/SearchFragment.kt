@@ -2,7 +2,6 @@ package asceapps.weatheria.ui.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.location.LocationManager
 import android.os.Build
@@ -15,10 +14,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
+import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -53,7 +54,7 @@ class SearchFragment: Fragment() {
 	private lateinit var googleMap: GoogleMap
 
 	// need to register this anywhere before onCreateView
-	private val locationPermissionRequester = registerForActivityResult(
+	private val permissionRequester = registerForActivityResult(
 		ActivityResultContracts.RequestPermission()
 	) {checkLocationPermission(true, false)}
 
@@ -197,7 +198,7 @@ class SearchFragment: Fragment() {
 
 	override fun onDestroy() {
 		super.onDestroy()
-		locationPermissionRequester.unregister()
+		permissionRequester.unregister()
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
@@ -215,7 +216,7 @@ class SearchFragment: Fragment() {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
 	}
 
-	private fun checkLocationPermission(showRationale: Boolean, request: Boolean) {
+	private fun checkLocationPermission(tryShowRationale: Boolean, request: Boolean) {
 		when {
 			ContextCompat.checkSelfPermission(requireContext(), permission) == PERMISSION_GRANTED -> {
 				// our method gets called from different contexts, some of them don't guarantee initialization
@@ -224,36 +225,36 @@ class SearchFragment: Fragment() {
 					googleMap.isMyLocationEnabled = true
 				}
 			}
-			showRationale -> {
-				if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)) {
-					AlertDialog.Builder(requireContext())
-						.setTitle(R.string.request_rationale_title)
-						.setMessage(R.string.location_request_rationale)
-						.setPositiveButton(R.string.request_again) {_, _ ->
-							checkLocationPermission(false, true)
-						}
-						.setNegativeButton(R.string.dismiss, null)
-						.create()
-						.show()
-				}
+			tryShowRationale &&
+				ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission) -> {
+				AlertDialog.Builder(requireContext())
+					.setTitle(R.string.request_rationale_title)
+					.setMessage(R.string.location_request_rationale)
+					.setPositiveButton(R.string.request_again) {_, _ ->
+						requestPermission()
+					}
+					.setNegativeButton(R.string.dismiss, null)
+					.create()
+					.show()
 			}
 			request -> {
-				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					locationPermissionRequester.launch(permission)
-				} else {
-					showMessage(R.string.error_location_denied)
-				}
+				requestPermission()
 			}
+		}
+	}
+
+	private fun requestPermission() {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			permissionRequester.launch(permission)
+		} else {
+			showMessage(R.string.error_location_denied)
 		}
 	}
 
 	private fun getLocation() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-		val providers = arrayOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
-		if(providers.any {lm.isProviderEnabled(it)}) {
-			viewModel.getMyLocation(
-				LocationServices.getFusedLocationProviderClient(requireContext())
-			)
+		if(LocationManagerCompat.isLocationEnabled(lm)) {
+			viewModel.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

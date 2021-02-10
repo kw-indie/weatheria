@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.lifecycle.*
 import asceapps.weatheria.data.repo.LocationRepo
+import asceapps.weatheria.util.awaitCurrentLocation
 import asceapps.weatheria.util.debounce
-import asceapps.weatheria.util.getFreshLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ class SearchViewModel @Inject constructor(
 		viewModelScope.launch {
 			try {
 				@SuppressLint("MissingPermission")
-				_mylocation.value = client.getFreshLocation()
+				_mylocation.value = client.awaitCurrentLocation()
 			} catch(e: Exception) {
 				e.printStackTrace()
 				_error.value = e

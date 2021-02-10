@@ -2,14 +2,13 @@ package asceapps.weatheria.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.databinding.ItemSearchResultBinding
 
 class SearchAdapter(
 	private val onClick: (LocationEntity) -> Unit
-): BaseListAdapter<LocationEntity, SearchAdapter.ViewHolder>(DiffCallback()) {
+): BaseAdapter<LocationEntity, SearchAdapter.ViewHolder>(DiffCallback()) {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(ItemSearchResultBinding.inflate(
@@ -23,7 +22,7 @@ class SearchAdapter(
 	}
 
 	override fun getItemId(position: Int): Long {
-		return currentList[position].id.toLong()
+		return list[position].id.toLong()
 	}
 
 	class ViewHolder(
@@ -47,12 +46,10 @@ class SearchAdapter(
 		}
 	}
 
-	private class DiffCallback: DiffUtil.ItemCallback<LocationEntity>() {
+	private class DiffCallback: BaseAdapter.DiffCallback<LocationEntity>() {
 
-		override fun areItemsTheSame(oldItem: LocationEntity, newItem: LocationEntity) =
-			oldItem.id == newItem.id
+		override fun areItemsTheSame(old: LocationEntity, new: LocationEntity) = old.id == new.id
 
-		override fun areContentsTheSame(oldItem: LocationEntity, newItem: LocationEntity) =
-			oldItem.id == newItem.id
+		override fun areContentsTheSame(old: LocationEntity, new: LocationEntity) = true
 	}
 }

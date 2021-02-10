@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.databinding.ItemLocationBinding
@@ -18,7 +17,7 @@ class SavedLocationsAdapter(
 	private val onStartDrag: (View) -> Unit,
 	private val onEndDrag: (View) -> Unit,
 	private val onReorder: (Location, Int) -> Unit
-): BaseListAdapter<Location, SavedLocationsAdapter.ViewHolder>(DiffCallback()) {
+): BaseAdapter<Location, SavedLocationsAdapter.ViewHolder>(DiffCallback()) {
 
 	private val touchHelper = ItemTouchHelper(ReorderCallback())
 
@@ -42,21 +41,7 @@ class SavedLocationsAdapter(
 	}
 
 	override fun getItemId(position: Int): Long {
-		return currentList[position].id.toLong()
-	}
-
-	private fun reorder(fromPos: Int, toPos: Int) {
-		val newList = currentList.toMutableList()
-		if(fromPos < toPos) {
-			for(i in fromPos until toPos) {
-				Collections.swap(newList, i, i + 1)
-			}
-		} else {
-			for(i in fromPos downTo toPos + 1) {
-				Collections.swap(newList, i, i - 1)
-			}
-		}
-		submitList(newList)
+		return list[position].id.toLong()
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -95,13 +80,11 @@ class SavedLocationsAdapter(
 		}
 	}
 
-	private class DiffCallback: DiffUtil.ItemCallback<Location>() {
+	private class DiffCallback: BaseAdapter.DiffCallback<Location>() {
 
-		override fun areItemsTheSame(oldItem: Location, newItem: Location) =
-			oldItem.id == newItem.id
+		override fun areItemsTheSame(old: Location, new: Location) = old.id == new.id
 
-		override fun areContentsTheSame(oldItem: Location, newItem: Location) =
-			oldItem.id == newItem.id
+		override fun areContentsTheSame(old: Location, new: Location) = true
 	}
 
 	private inner class ReorderCallback: ItemTouchHelper.SimpleCallback(
@@ -134,7 +117,7 @@ class SavedLocationsAdapter(
 		override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
 			super.clearView(recyclerView, viewHolder)
 			onEndDrag(viewHolder.itemView)
-			val newPos = viewHolder.bindingAdapterPosition
+			val newPos = lastMove.second
 			val item = getItem(newPos)
 			onReorder(item, newPos)
 			lastMove = noMove

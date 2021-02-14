@@ -2,7 +2,6 @@ package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -30,12 +29,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
 		super.onViewCreated(view, savedInstanceState)
 
 		val unitsKey = requireContext().getString(R.string.key_units)
-		val themeKey = requireContext().getString(R.string.key_theme)
 		val autoRefreshKey = requireContext().getString(R.string.key_auto_refresh)
 		repo.changes.observe(viewLifecycleOwner) {
 			when(it) {
 				unitsKey -> updateUnits()
-				themeKey -> updateTheme()
 				autoRefreshKey -> updateAutoRefresh()
 			}
 		}
@@ -43,16 +40,6 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
 	private fun updateUnits() {
 		// todo setMetric
-	}
-
-	private fun updateTheme() {
-		AppCompatDelegate.setDefaultNightMode(
-			when(repo.theme) {
-				0 -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-				1 -> AppCompatDelegate.MODE_NIGHT_YES
-				else -> AppCompatDelegate.MODE_NIGHT_NO
-			}
-		)
 	}
 
 	private fun updateAutoRefresh() {

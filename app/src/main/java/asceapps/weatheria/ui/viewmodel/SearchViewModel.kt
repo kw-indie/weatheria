@@ -2,14 +2,21 @@ package asceapps.weatheria.ui.viewmodel
 
 import android.annotation.SuppressLint
 import android.location.Location
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.*
 import asceapps.weatheria.data.repo.LocationRepo
-import asceapps.weatheria.util.awaitCurrentLocation
-import asceapps.weatheria.util.debounce
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -45,5 +52,42 @@ class SearchViewModel @Inject constructor(
 				_error.value = e
 			}
 		}
+	}
+
+	companion object {
+
+		private fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope) =
+			MediatorLiveData<T>().also {mld ->
+				var job: Job? = null
+				mld.addSource(this) {
+					job?.cancel()
+					job = scope.launch {
+						delay(timeoutMillis)
+						mld.value = value
+					}
+				}
+			}
+
+		@RequiresPermission(value = "android.permission.ACCESS_COARSE_LOCATION")
+		private suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
+			suspendCancellableCoroutine<Location> {
+				val cts = CancellationTokenSource()
+				// Setting priority to BALANCED may only work on a real device that is also connected to
+				// wifi, cellular, bluetooth, etc. anything lower will never get a fresh location
+				// when called on a device with no cached location.
+				// Having it at high guarantees that if GPS is enabled (device only, high accuracy settings),
+				// a fresh location will be fetched.
+				// Our permission does not force enabling GPS, thus, a device can just give a cached location.
+				getCurrentLocation(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+					.addOnSuccessListener {location ->
+						it.resume(location)
+					}.addOnFailureListener {e ->
+						it.resumeWithException(e)
+					}
+
+				it.invokeOnCancellation {
+					cts.cancel()
+				}
+			}
 	}
 }

@@ -121,13 +121,6 @@
 		<item>م/ث</item>
 		<item>ميل/ساعة</item>
 	</string-array>
-	<string name="cat_header_display">العرض</string>
-	<string name="title_theme">المظهر</string>
-	<string-array name="theme_entries">
-		<item>حسب النظام</item>
-		<item>داكن</item>
-		<item>فاتح</item>
-	</string-array>
 	<string name="cat_header_sync">المزامنة</string>
 	<string name="title_auto_refresh">التحديث التلقائي</string>
 	<string-array name="auto_refresh_entries">

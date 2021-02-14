@@ -14,17 +14,17 @@
 	<!--dawn-->
 	<color name="dawn_1">#311B92</color>
 	<color name="dawn_2">#3D5AFE</color>
-	<color name="dawn_3">#3D9AFE</color>
+	<color name="dawn_3">#1783F7</color>
 	<!--day-->
-	<color name="day_1">#03A9F4</color>
-	<color name="day_2">#2196F3</color>
-	<color name="day_3">#1976D2</color>
+	<color name="day_1">#07518C</color>
+	<color name="day_2">#0E6EBB</color>
+	<color name="day_3">#2189DC</color>
 	<!--dusk-->
-	<color name="dusk_1">#FF8B07</color>
+	<color name="dusk_1">#8F0C75</color>
 	<color name="dusk_2">#F44336</color>
-	<color name="dusk_3">#8F0C75</color>
+	<color name="dusk_3">#FF6607</color>
 	<!--night-->
-	<color name="night_1">#0E2D88</color>
+	<color name="night_1">#050121</color>
 	<color name="night_2">#032163</color>
-	<color name="night_3">#050121</color>
+	<color name="night_3">#0E2D88</color>
 </resources>

@@ -12,6 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -110,6 +111,7 @@ class SearchFragment: Fragment() {
 
 			val adapter = SearchAdapter {
 				mainVM.addNewLocation(it)
+				hideKeyboard()
 			}
 			rvResults.apply {
 				this.adapter = adapter
@@ -214,6 +216,12 @@ class SearchFragment: Fragment() {
 	// todo share
 	private fun showMessage(resId: Int) {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
+	}
+
+	private fun hideKeyboard() {
+		val view = requireView()
+		ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
+			?.hideSoftInputFromWindow(view.windowToken, 0)
 	}
 
 	private fun checkLocationPermission(tryShowRationale: Boolean, request: Boolean) {

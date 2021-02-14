@@ -36,7 +36,7 @@ abstract class WeatherInfoDao {
 		h: List<HourlyEntity>,
 		d: List<DailyEntity>
 	) {
-		l.pos = getMaxSavedLocationPos()
+		l.pos = getMaxSavedLocationPos() + 1
 		insertLocation(l)
 		insertCurrent(c)
 		insertHourly(h)
@@ -72,7 +72,7 @@ abstract class WeatherInfoDao {
 	@Query("DELETE FROM saved_locations")
 	abstract suspend fun deleteAll()
 
-	@Query("SELECT IFNULL(MAX(pos), 0) FROM saved_locations")
+	@Query("SELECT IFNULL(MAX(pos), -1) FROM saved_locations")
 	abstract suspend fun getMaxSavedLocationPos(): Int
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)

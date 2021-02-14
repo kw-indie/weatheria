@@ -19,7 +19,6 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 	private val defVal = 0
 	private val defValStr = context.getString(R.string.def_value)
 	private val unitsKey = context.getString(R.string.key_units)
-	private val themeKey = context.getString(R.string.key_theme)
 	private val autoRefreshKey = context.getString(R.string.key_auto_refresh)
 	private val selectedLocKey = "selected"
 
@@ -36,9 +35,6 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 
 	val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
-
-	val theme: Int
-		get() = (prefs.getString(themeKey, defValStr) ?: defValStr).toInt()
 
 	val autoRefresh: Int
 		get() = (prefs.getString(autoRefreshKey, defValStr) ?: defValStr).toInt()

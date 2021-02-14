@@ -8,15 +8,6 @@
 			app:defaultValue="@string/def_value"
 			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
-	<PreferenceCategory app:title="@string/cat_header_display">
-		<ListPreference
-			app:key="@string/key_theme"
-			app:title="@string/title_theme"
-			app:entries="@array/theme_entries"
-			app:entryValues="@array/theme_values"
-			app:defaultValue="@string/def_value"
-			app:useSimpleSummaryProvider="true"/>
-	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_sync">
 		<ListPreference
 			app:key="@string/key_auto_refresh"

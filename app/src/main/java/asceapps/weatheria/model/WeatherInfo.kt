@@ -3,6 +3,7 @@ package asceapps.weatheria.model
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 
 class WeatherInfo(
 	val location: Location,
@@ -16,14 +17,12 @@ class WeatherInfo(
 	val today get() = Instant.now().let {daily.lastOrNull {day -> day.date < it}} ?: daily[0]
 	// if hourly includes this hour, get it, else get last hour
 	val thisHour get() = Instant.now().let {hourly.lastOrNull {hour -> hour.hour < it}} ?: hourly[0]
-
 	val secondOfToday get() = LocalTime.now(location.zoneOffset).toSecondOfDay()
-	val secondOfSunriseToday
-		get() = LocalDateTime.ofInstant(today.sunrise, location.zoneOffset)
-			.toLocalTime()
-			.toSecondOfDay()
-	val secondOfSunsetToday
-		get() = LocalDateTime.ofInstant(today.sunset, location.zoneOffset)
-			.toLocalTime()
-			.toSecondOfDay()
+	val secondOfSunriseToday get() = localSecondOfDay(today.sunrise, location.zoneOffset)
+	val secondOfSunsetToday get() = localSecondOfDay(today.sunset, location.zoneOffset)
+
+	private fun localSecondOfDay(instant: Instant, offset: ZoneOffset) = LocalDateTime.ofInstant(instant,
+		offset)
+		.toLocalTime()
+		.toSecondOfDay()
 }

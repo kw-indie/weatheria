@@ -97,7 +97,7 @@
 	<string name="request_again">Request again</string>
 	<string name="dismiss">Dismiss</string>
 	<string name="no_search_result">No result.\nUse the search bar above or zoom the map enough to start showing nearby places here.</string>
-	<string name="search_hint">Search by name or coordinates</string>
+	<string name="hint_search">Search by name or coordinates</string>
 	<!--locations-->
 	<string name="action_delete_all">Delete all locations</string>
 	<string name="cd_delete_location">Delete location</string>

@@ -43,18 +43,25 @@ class HomeFragment: Fragment() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setHasOptionsMenu(true)
+
+		val activity = requireActivity()
+		val window = activity.window
+		contentView = window.findViewById(android.R.id.content)
+		bg = ResourcesCompat.getDrawable(resources, R.drawable.bg_sky, activity.theme) as GradientDrawable
 	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		// on reinstall or sth, make sure all settings are reapplied
+		// note: this is prolly never needed irl scenarios
+		// settingsRepo.reapply()
+
 		// setup prefs
 		// todo clean up
 		// need to re-read this every time we are back to the fragment in case it changes
-		val units = settingsRepo.units
-		val speedUnit = resources.getStringArray(R.array.units_speed)[units]
-		setMetric(units == 0, speedUnit)
+		setMetric(settingsRepo.metric, settingsRepo.speedUnit)
 
 		binding = FragmentHomeBinding.inflate(inflater, container, false).apply {
 			val adapter = WeatherInfoAdapter()
@@ -65,20 +72,10 @@ class HomeFragment: Fragment() {
 						pager.post {
 							pager.currentItem = positionStart
 						}
-					} else {
-						// fragment reload or sth
-						pager.post {
-							pager.setCurrentItem(settingsRepo.selectedLocation, false)
-						}
 					}
 				}
 			}
 			adapter.registerAdapterDataObserver(adapterDataObserver)
-
-			val activity = requireActivity()
-			val window = activity.window
-			contentView = window.findViewById(android.R.id.content)
-			bg = ResourcesCompat.getDrawable(resources, R.drawable.bg_sky, activity.theme) as GradientDrawable
 
 			val (init, dawn, day, dusk, night) = getDayPartsColors(requireContext())
 			val evaluator = getGradientEvaluator()
@@ -87,10 +84,11 @@ class HomeFragment: Fragment() {
 			}
 			val onPageChangeCallback = object: OnPageChangeCallback() {
 				override fun onPageSelected(pos: Int) {
-					// todo check no npe is throw when last item deleted
 					updateColors(adapter.getItem(pos), dawn, day, dusk, night, evaluator, animator)
 				}
 			}
+			// todo we could merge home + savedLocations fragments with help from a
+			//  recyclerView + different layout managers/adapters
 			pager.apply {
 				this.adapter = adapter
 				registerOnPageChangeCallback(onPageChangeCallback)
@@ -103,6 +101,7 @@ class HomeFragment: Fragment() {
 
 			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
+				pager.setCurrentItem(settingsRepo.selectedLocation, false)
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
 					swipeRefresh.visibility = View.GONE // to prevent swipe
@@ -129,17 +128,25 @@ class HomeFragment: Fragment() {
 		return true
 	}
 
-	override fun onResume() {
-		super.onResume()
-		contentView.background = bg
-	}
-
 	override fun onPause() {
 		super.onPause()
-		contentView.background = null
+
 		settingsRepo.selectedLocation = binding.pager.currentItem
 	}
 
+	override fun onStart() {
+		super.onStart()
+		contentView.background = bg
+	}
+
+	override fun onStop() {
+		super.onStop()
+
+		// todo animate out?
+		contentView.background = null
+	}
+
+	// todo move to settings?
 	private fun getDayPartsColors(context: Context) = arrayOf(
 		intArrayOf(0, 0, 0, 0), // transparent, init colors
 		intArrayOf(

@@ -8,8 +8,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-var metric = true
-	private set
+private var metric = true
 private var speedUnit = ""
 // todo instead of asking to be set, go and read it from setting repo
 fun setMetric(b: Boolean, speedUnit: String) {

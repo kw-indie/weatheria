@@ -24,7 +24,6 @@ import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,15 +38,12 @@ import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class SearchFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
-	private val viewModel: SearchViewModel by viewModels()
+	private val searchVM: SearchViewModel by viewModels()
 	private val permission = Manifest.permission.ACCESS_COARSE_LOCATION
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
@@ -112,6 +108,7 @@ class SearchFragment: Fragment() {
 			val adapter = SearchAdapter {
 				mainVM.addNewLocation(it)
 				hideKeyboard()
+				findNavController().navigateUp()
 			}
 			rvResults.apply {
 				this.adapter = adapter
@@ -121,12 +118,12 @@ class SearchFragment: Fragment() {
 				setHasFixedSize(true)
 			}
 
-			viewModel.myLocation.observe(viewLifecycleOwner) {
+			searchVM.myLocation.observe(viewLifecycleOwner) {
 				googleMap.animateCamera(CameraUpdateFactory
 					.newLatLngZoom(LatLng(it.latitude, it.longitude), maxZoom)
 				)
 			}
-			viewModel.result.observe(viewLifecycleOwner) {
+			searchVM.result.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
 				if(it.isEmpty()) {
 					tvNoResult.visibility = View.VISIBLE
@@ -137,7 +134,7 @@ class SearchFragment: Fragment() {
 					rvResults.smoothScrollToPosition(0)
 				}
 			}
-			viewModel.error.observe(viewLifecycleOwner) {
+			searchVM.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
 					requireContext(),
 					// todo did we cover other reasons?
@@ -148,12 +145,6 @@ class SearchFragment: Fragment() {
 					Toast.LENGTH_LONG
 				).show()
 			}
-			// fixme find better way to go back on success
-			mainVM.savedLocationsList
-				.drop(1) // first time load
-				.onEach { // go back once new value is added successfully
-					findNavController().navigateUp()
-				}.launchIn(viewLifecycleOwner.lifecycleScope)
 		}.root
 	}
 
@@ -162,8 +153,7 @@ class SearchFragment: Fragment() {
 		searchMenuItem = menu.findItem(R.id.action_search)
 		searchView = searchMenuItem.actionView as SearchView
 		searchView.apply {
-			setIconifiedByDefault(false)
-			queryHint = getString(R.string.search_hint)
+			queryHint = getString(R.string.hint_search)
 			setOnQueryTextListener(object: SearchView.OnQueryTextListener {
 				override fun onQueryTextSubmit(query: String?): Boolean {
 					clearFocus()
@@ -171,7 +161,7 @@ class SearchFragment: Fragment() {
 				}
 
 				override fun onQueryTextChange(newText: String?): Boolean {
-					viewModel.query.value = newText
+					searchVM.query.value = newText
 					return true
 				}
 			})
@@ -200,6 +190,7 @@ class SearchFragment: Fragment() {
 
 	override fun onDestroy() {
 		super.onDestroy()
+		mapView.onDestroy()
 		permissionRequester.unregister()
 	}
 
@@ -262,7 +253,7 @@ class SearchFragment: Fragment() {
 	private fun getLocation() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			viewModel.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
+			searchVM.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

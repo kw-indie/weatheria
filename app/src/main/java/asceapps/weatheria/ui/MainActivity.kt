@@ -12,7 +12,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import asceapps.weatheria.R
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.TimeoutCancellationException
+import java.io.IOException
 
 @AndroidEntryPoint
 class MainActivity: AppCompatActivity() {
@@ -23,19 +26,33 @@ class MainActivity: AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 
-		WindowCompat.setDecorFitsSystemWindows(window, false)
+		WindowCompat.setDecorFitsSystemWindows(window, true)
 		window.statusBarColor = 0
 
 		setupNavigation()
 
-		viewModel.error.observe(this) {e ->
+		val snackbar = Snackbar.make(
+			findViewById(R.id.nav_host),
+			R.string.error_no_internet,
+			Snackbar.LENGTH_INDEFINITE
+		).apply {
+			animationMode = Snackbar.ANIMATION_MODE_SLIDE
+			setAction(R.string.retry) {
+				viewModel.checkOnline()
+			}
+		}
+		viewModel.onlineStatus.observe(this) {
+			if(it) snackbar.dismiss()
+			else snackbar.show()
+		}
+
+		viewModel.error.observe(this) {
 			Toast.makeText(
 				this,
-				when(e) {
-					// obvious timeout (default 2.5 s)
-					//is TimeoutError -> R.string.error_timed_out
-					// no internet (in fact, no dns)
-					//is NoConnectionError -> R.string.error_no_internet
+				when(it) {
+					// obvious timeout
+					is TimeoutCancellationException -> R.string.error_timed_out
+					is IOException -> R.string.error_no_internet
 					// server didn't like the request for some reason
 					//is ServerError -> R.string.error_server_error
 					// failed to parse response string to json

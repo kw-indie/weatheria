@@ -16,17 +16,20 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfo
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.onItemInsertedFlow
+import asceapps.weatheria.util.onPageSelectedFlow
 import asceapps.weatheria.util.setMetric
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,10 +38,11 @@ class HomeFragment: Fragment() {
 	private val mainVM: MainViewModel by activityViewModels()
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
-	lateinit var binding: FragmentHomeBinding
 
 	private lateinit var contentView: ViewGroup
 	private lateinit var bg: GradientDrawable
+
+	private var selectedLocation = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -63,45 +67,38 @@ class HomeFragment: Fragment() {
 		// need to re-read this every time we are back to the fragment in case it changes
 		setMetric(settingsRepo.metric, settingsRepo.speedUnit)
 
-		binding = FragmentHomeBinding.inflate(inflater, container, false).apply {
-			val adapter = WeatherInfoAdapter()
-			val adapterDataObserver = object: RecyclerView.AdapterDataObserver() {
-				override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-					if(itemCount == 1) {
-						// animate to newly added item
-						pager.post {
-							pager.currentItem = positionStart
-						}
-					}
-				}
+		return FragmentHomeBinding.inflate(inflater, container, false).apply {
+			val adapter = WeatherInfoAdapter().apply {
+				onItemInsertedFlow().onEach {pos ->
+					// animate to newly added item
+					pager.currentItem = pos
+				}.launchIn(viewLifecycleOwner.lifecycleScope)
 			}
-			adapter.registerAdapterDataObserver(adapterDataObserver)
 
 			val (init, dawn, day, dusk, night) = getDayPartsColors(requireContext())
 			val evaluator = getGradientEvaluator()
 			val animator = ObjectAnimator.ofObject(bg, "colors", evaluator, init).apply {
 				duration = 1000L
 			}
-			val onPageChangeCallback = object: OnPageChangeCallback() {
-				override fun onPageSelected(pos: Int) {
-					updateColors(adapter.getItem(pos), dawn, day, dusk, night, evaluator, animator)
-				}
-			}
 			// todo we could merge home + savedLocations fragments with help from a
 			//  recyclerView + different layout managers/adapters
 			pager.apply {
 				this.adapter = adapter
-				registerOnPageChangeCallback(onPageChangeCallback)
 				offscreenPageLimit = 2
+				onPageSelectedFlow().onEach {pos ->
+					selectedLocation = pos
+					updateColors(adapter.getItem(pos), dawn, day, dusk, night, evaluator, animator)
+				}.launchIn(viewLifecycleOwner.lifecycleScope)
 			}
 
 			swipeRefresh.setOnRefreshListener {
 				mainVM.refresh(adapter.getItem(pager.currentItem).location)
 			}
 
-			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
+			selectedLocation = settingsRepo.selectedLocation
+			mainVM.weatherInfoList.onEach {
 				adapter.submitList(it)
-				pager.setCurrentItem(settingsRepo.selectedLocation, false)
+				pager.setCurrentItem(selectedLocation, false)
 				if(it.isEmpty()) {
 					tvEmptyPager.visibility = View.VISIBLE
 					swipeRefresh.visibility = View.GONE // to prevent swipe
@@ -109,10 +106,11 @@ class HomeFragment: Fragment() {
 					tvEmptyPager.visibility = View.GONE
 					swipeRefresh.visibility = View.VISIBLE
 				}
+			}.launchIn(viewLifecycleOwner.lifecycleScope)
+			mainVM.loading.observe(viewLifecycleOwner) {
+				swipeRefresh.isRefreshing = it
 			}
-			mainVM.loading.observe(viewLifecycleOwner, swipeRefresh::setRefreshing)
-		}
-		return binding.root
+		}.root
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -122,7 +120,7 @@ class HomeFragment: Fragment() {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
 			R.id.action_locations -> findNavController().navigate(R.id.action_open_saved_locations)
-			R.id.action_search -> findNavController().navigate(R.id.action_open_search)
+			R.id.action_add_location -> findNavController().navigate(R.id.action_open_add_location)
 			else -> return super.onOptionsItemSelected(item)
 		}
 		return true
@@ -131,7 +129,7 @@ class HomeFragment: Fragment() {
 	override fun onPause() {
 		super.onPause()
 
-		settingsRepo.selectedLocation = binding.pager.currentItem
+		settingsRepo.selectedLocation = selectedLocation
 	}
 
 	override fun onStart() {

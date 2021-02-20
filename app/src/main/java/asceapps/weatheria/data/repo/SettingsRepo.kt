@@ -1,9 +1,7 @@
 package asceapps.weatheria.data.repo
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.lifecycle.asLiveData
 import androidx.preference.PreferenceManager
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -11,11 +9,10 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
+import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -29,22 +26,10 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 	private val unitsKey = context.getString(R.string.key_units)
 	private val speedUnits = context.resources.getStringArray(R.array.units_speed)
 	private val autoRefreshKey = context.getString(R.string.key_auto_refresh)
+	private val autoRefreshValues = context.resources.getStringArray(R.array.auto_refresh_entry_values)
 	private val selectedLocKey = "selected"
 
-	val changes = callbackFlow<String> {
-		val changeListener = SharedPreferences.OnSharedPreferenceChangeListener {_, key ->
-			try {
-				offer(key)
-			} catch(e: Exception) {
-				close(e)
-			}
-		}
-		prefs.registerOnSharedPreferenceChangeListener(changeListener)
-
-		awaitClose {
-			prefs.unregisterOnSharedPreferenceChangeListener(changeListener)
-		}
-	}.asLiveData()
+	val changes = prefs.onChangeFlow()
 
 	private val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
@@ -67,42 +52,32 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 			}
 		}
 
-	fun reapply() {
-		updateAutoRefresh()
-	}
-
 	fun updateAutoRefresh() {
-		val autoRefreshWorkName = "autoRefreshWork"
-		val duration: Long = when(autoRefresh) {
-			0 -> { // never
-				workManager.cancelUniqueWork(autoRefreshWorkName)
-				return
-			}
-			1 -> {
-				// cancel all other work
-				workManager.cancelAllWorkByTag("12")
-				workManager.cancelAllWorkByTag("24")
-				6
-			}
-			2 -> {
-				workManager.cancelAllWorkByTag("6")
-				workManager.cancelAllWorkByTag("24")
-				12
-			}
-			else -> {
-				workManager.cancelAllWorkByTag("6")
-				workManager.cancelAllWorkByTag("12")
-				24
-			}
+		val autoRefreshWorkName = AutoRefreshWorker::class.qualifiedName!!
+		if(autoRefresh == 0) { // never
+			workManager.cancelUniqueWork(autoRefreshWorkName)
+			return
 		}
+
+		val periods = autoRefreshValues.map {it.toInt()}
+		val period = periods[autoRefresh]
+		val periodL = period.toLong()
+
+		// cancel previous work, if any
+		periods.filterNot {it == 0 || it == period}
+			.forEach {
+				workManager.cancelAllWorkByTag(it.toString())
+			}
+
+		// enqueue new work, if not already enqueued
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.UNMETERED)
 			.setRequiresBatteryNotLow(true)
 			.build()
-		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(duration, TimeUnit.HOURS)
-			.addTag("$duration")
+		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(periodL, TimeUnit.HOURS)
+			.addTag(period.toString())
 			.setConstraints(constraints)
-			.setInitialDelay(duration, TimeUnit.HOURS)
+			.setInitialDelay(periodL, TimeUnit.HOURS)
 			.build()
 		workManager.enqueueUniquePeriodicWork(
 			autoRefreshWorkName,

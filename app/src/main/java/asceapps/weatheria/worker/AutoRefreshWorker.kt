@@ -21,7 +21,7 @@ class AutoRefreshWorker @AssistedInject constructor(
 			repo.refreshAll()
 			Result.success()
 		} catch(e: Exception) {
-			Result.failure()
+			Result.retry()
 		}
 	}
 }

@@ -7,9 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.databinding.ItemLocationBinding
+import asceapps.weatheria.databinding.ItemSavedLocationBinding
 import asceapps.weatheria.model.Location
-import java.util.*
 
 class SavedLocationsAdapter(
 	private val onDeleteClick: (Location) -> Unit,
@@ -30,7 +29,7 @@ class SavedLocationsAdapter(
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		return ViewHolder(ItemLocationBinding.inflate(
+		return ViewHolder(ItemSavedLocationBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent, false
 		), onDeleteClick, onItemClick, {touchHelper.startDrag(it)})
@@ -46,7 +45,7 @@ class SavedLocationsAdapter(
 
 	@SuppressLint("ClickableViewAccessibility")
 	class ViewHolder(
-		private val binding: ItemLocationBinding,
+		private val binding: ItemSavedLocationBinding,
 		onDeleteClick: (Location) -> Unit,
 		onItemClick: (Location) -> Unit,
 		onHandleTouch: (ViewHolder) -> Unit

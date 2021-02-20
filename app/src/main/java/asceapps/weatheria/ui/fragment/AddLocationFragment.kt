@@ -24,26 +24,30 @@ import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
-import asceapps.weatheria.databinding.FragmentSearchBinding
+import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
+import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import asceapps.weatheria.ui.viewmodel.SearchViewModel
+import asceapps.weatheria.util.onTextChangeFlow
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class SearchFragment: Fragment() {
+class AddLocationFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
-	private val searchVM: SearchViewModel by viewModels()
+	private val addLocationVM: AddLocationViewModel by viewModels()
 	private val permission = Manifest.permission.ACCESS_COARSE_LOCATION
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
@@ -64,7 +68,7 @@ class SearchFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		return FragmentSearchBinding.inflate(inflater, container, false).apply {
+		return FragmentAddLocationBinding.inflate(inflater, container, false).apply {
 			val maxZoom = 13f
 			val searchZoom = 11f
 			mapView = map.apply {
@@ -83,7 +87,7 @@ class SearchFragment: Fragment() {
 						}
 						setOnMyLocationButtonClickListener {
 							// todo disable when already in progress
-							getLocation()
+							onMyLocationClick()
 							true
 						}
 						setOnMapClickListener {latLng ->
@@ -118,12 +122,12 @@ class SearchFragment: Fragment() {
 				setHasFixedSize(true)
 			}
 
-			searchVM.myLocation.observe(viewLifecycleOwner) {
+			addLocationVM.myLocation.observe(viewLifecycleOwner) {
 				googleMap.animateCamera(CameraUpdateFactory
 					.newLatLngZoom(LatLng(it.latitude, it.longitude), maxZoom)
 				)
 			}
-			searchVM.result.observe(viewLifecycleOwner) {
+			addLocationVM.result.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
 				if(it.isEmpty()) {
 					tvNoResult.visibility = View.VISIBLE
@@ -134,7 +138,7 @@ class SearchFragment: Fragment() {
 					rvResults.smoothScrollToPosition(0)
 				}
 			}
-			searchVM.error.observe(viewLifecycleOwner) {
+			addLocationVM.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
 					requireContext(),
 					// todo did we cover other reasons?
@@ -149,22 +153,13 @@ class SearchFragment: Fragment() {
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-		inflater.inflate(R.menu.search_menu, menu)
+		inflater.inflate(R.menu.add_location_menu, menu)
 		searchMenuItem = menu.findItem(R.id.action_search)
-		searchView = searchMenuItem.actionView as SearchView
-		searchView.apply {
+		searchView = (searchMenuItem.actionView as SearchView).apply {
 			queryHint = getString(R.string.hint_search)
-			setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-				override fun onQueryTextSubmit(query: String?): Boolean {
-					clearFocus()
-					return true
-				}
-
-				override fun onQueryTextChange(newText: String?): Boolean {
-					searchVM.query.value = newText
-					return true
-				}
-			})
+			onTextChangeFlow().onEach {
+				addLocationVM.query.value = it
+			}.launchIn(viewLifecycleOwner.lifecycleScope)
 		}
 	}
 
@@ -250,10 +245,10 @@ class SearchFragment: Fragment() {
 		}
 	}
 
-	private fun getLocation() {
+	private fun onMyLocationClick() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			searchVM.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
+			addLocationVM.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

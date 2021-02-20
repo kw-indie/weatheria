@@ -4,22 +4,24 @@ apply plugin: "kotlin-kapt" // for annotations: data binding, etc
 apply plugin: "dagger.hilt.android.plugin"
 
 android {
+	def targetSdkVer = 30
 	compileSdkVersion targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
-	buildToolsVersion buildToolsVer
-	ndkVersion ndkVer
+	buildToolsVersion "31.0.0-rc1"
+	ndkVersion "22.0.7026061"
 
 	// these config apply to all build types
 	defaultConfig {
 		// if not specified, package name from manifest will be used, will change when that one changes
 		applicationId "asceapps.weatheria"
-		minSdkVersion minSdkVer
+		minSdkVersion 21
 		targetSdkVersion targetSdkVer
 		versionCode 4
 		versionName "0.3.1"
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables.useSupportLibrary = true
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 		// if i don't add the quotes separately, the generated var is typed in as a broken int
 		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty("weather_app_id") + "\"")
@@ -50,17 +52,19 @@ android {
 			debuggable true
 			minifyEnabled true
 			applicationIdSuffix ".staging"
-			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "proguard-staging-rules.pro"
+			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro", "staging-rules.pro"
 		}
 		release {
 			minifyEnabled true
-			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+			shrinkResources true // verify needed
+			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro"
 			ndk {
 				debugSymbolLevel "full" // include android vitals debug file in app bundle
 			}
 		}
 	}
 
+	def javaVer = '1.8'
 	compileOptions {
 		// to use java 8 libs in api < 26. needed even with kotlin for time apis
 		coreLibraryDesugaringEnabled true
@@ -73,6 +77,9 @@ android {
 		jvmTarget = javaVer
 		// new kotlin compiler backend (supposedly faster, also for jetpack compose, and default in future)
 		useIR = true
+		freeCompilerArgs += [
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+		]
 	}
 
 }
@@ -81,78 +88,84 @@ dependencies {
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.1"
 
 	// kotlin
-	implementation "androidx.core:core-ktx:$coreVer"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer"
 
 	// coroutines
+	def coroutineVer = '1.4.0-M1'
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
-	// to use viewModels delegate
-	implementation "androidx.activity:activity-ktx:$activityVer"
-	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
+	// general & ui
+	implementation "androidx.core:core-ktx:1.5.0-beta01"
+	implementation "androidx.recyclerview:recyclerview:1.2.0-beta01"
+	implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+	implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+	implementation "androidx.viewpager2:viewpager2:1.0.0"
+	implementation "com.google.android.material:material:1.3.0"
 
-	// general
-	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
-	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
-	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
-	implementation "androidx.viewpager2:viewpager2:$viewPagerVer"
-	implementation "com.google.android.material:material:$materialVer"
+	// to use viewModels delegate, new result system, and lots more
+	implementation "androidx.activity:activity-ktx:1.3.0-alpha02"
+	implementation "androidx.fragment:fragment-ktx:1.3.0"
 
 	// viewModel & liveData
+	def lifecycleVer = '2.3.0'
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
 	// runtime offers findNavController() and navArgs property
+	def navVer = '2.3.3'
 	implementation "androidx.navigation:navigation-runtime-ktx:$navVer"
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
-	implementation "androidx.core:core-animation:$animatorVer"
-	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableVer"
+	implementation "androidx.core:core-animation:1.0.0-alpha02"
+	implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
 
 	// new preferences (fragment, etc.)
-	implementation "androidx.preference:preference-ktx:$preferenceVer"
+	implementation "androidx.preference:preference-ktx:1.1.1"
 
 	// room
 	// runtime is core
 	// ktx adds suspend and Flow support
+	def roomVer = '2.3.0-beta01'
 	kapt "androidx.room:room-compiler:$roomVer"
 	implementation "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
 
 	// retrofit
+	def retrofitVer = '2.9.0'
 	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
 	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-	implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVer"
+	implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
 
-	// maps
-	implementation "com.google.android.libraries.maps:maps:$mapsVer"
-	implementation "com.google.android.gms:play-services-location:$locationVer"
+	// maps & location
+	implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
+	implementation "com.google.android.gms:play-services-location:17.1.0"
 
 	// work manager
-	implementation "androidx.work:work-runtime-ktx:$workVer"
+	implementation "androidx.work:work-runtime-ktx:2.5.0"
 
 	// hilt
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
 	// hilt with jetpack (viewModel, workManager)
+	def hiltJetpackVer = '1.0.0-alpha03'
 	kapt "androidx.hilt:hilt-compiler:$hiltJetpackVer"
 	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltJetpackVer"
 	implementation "androidx.hilt:hilt-work:$hiltJetpackVer"
 
 	// coil
-	implementation "io.coil-kt:coil:$coilVer"
+	implementation "io.coil-kt:coil:1.1.1"
 
 	// multi screen size support
 	implementation "com.intuit.sdp:sdp-android:1.0.6"
 	implementation "com.intuit.ssp:ssp-android:1.0.6"
 
 	// android tests
-	testImplementation "junit:junit:4.13.1"
+	testImplementation 'junit:junit:4.13.2'
 	androidTestImplementation "androidx.test.ext:junit:1.1.2"
 }

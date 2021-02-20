@@ -13,7 +13,7 @@
 			android:gravity="center_horizontal"
 			android:text="@string/no_saved_locations"
 			android:textSize="@dimen/_12ssp"
-			app:layout_constraintWidth_percent="0.6"
+			app:layout_constraintWidth_percent="0.75"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"

@@ -2,7 +2,7 @@
 <resources>
 	<!--home-->
 	<string name="action_locations">المواقع</string>
-	<string name="action_search">بحث</string>
+	<string name="action_add_location">أضف موقعًا</string>
 	<string name="action_settings">الإعدادات</string>
 	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
@@ -91,6 +91,7 @@
 		<item>محاق</item>
 	</string-array>
 	<!--search-->
+	<string name="action_search">بحث</string>
 	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
 	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع التقريبي فقط، وذلك ليعمل زر <b>موقعي</b>. بإمكانك سحب الإذن بأمان عند الانتهاء.</string>
 	<string name="request_again">إعادة الطلب</string>
@@ -102,6 +103,7 @@
 	<string name="cd_delete_location">احذف الموقع</string>
 	<string name="cd_reorder">إعادة ترتيب</string>
 	<!--errors-->
+	<string name="retry">أعد المحاولة</string>
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
 	<string name="error_location_disabled">الرجاء تفعيل خدمة تحديد الموقع ثم المحاولة مجددًا</string>
 	<string name="error_location_not_found">لم نعثر على موقعك. حاول تفعيل GPS ثم تحريك الهاتف قليلًا.</string>
@@ -113,7 +115,7 @@
 	<!--settings-->
 	<string name="cat_header_general">عام</string>
 	<string name="title_units">نظام الوحدات</string>
-	<string-array name="units_entries">
+	<string-array name="unit_system_entries">
 		<item>متري</item>
 		<item>إنجليزي</item>
 	</string-array>

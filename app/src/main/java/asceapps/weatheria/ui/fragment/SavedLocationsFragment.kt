@@ -9,13 +9,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.map
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
 import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 class SavedLocationsFragment: Fragment() {
 
@@ -64,7 +67,7 @@ class SavedLocationsFragment: Fragment() {
 			}
 			mainVM.weatherInfoList
 				.map {list -> list.map {it.location}}
-				.observe(viewLifecycleOwner) {
+				.onEach {
 					adapter.submitList(it)
 					val empty = it.isEmpty()
 					if(empty) {
@@ -78,7 +81,7 @@ class SavedLocationsFragment: Fragment() {
 						emptyList = empty
 						requireActivity().invalidateOptionsMenu()
 					}
-				}
+				}.launchIn(viewLifecycleOwner.lifecycleScope)
 		}.root
 	}
 

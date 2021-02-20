@@ -25,6 +25,6 @@
 			app:layoutManager="LinearLayoutManager"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			tools:listitem="@layout/item_location"/>
+			tools:listitem="@layout/item_saved_location"/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

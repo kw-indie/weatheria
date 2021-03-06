@@ -6,13 +6,7 @@ import android.content.Context
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.core.location.LocationManagerCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -33,6 +28,7 @@ import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.onTextChangeFlow
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
@@ -111,7 +107,7 @@ class AddLocationFragment: Fragment() {
 
 			val adapter = SearchAdapter {
 				mainVM.addNewLocation(it)
-				hideKeyboard()
+				hideKeyboard(root)
 				findNavController().navigateUp()
 			}
 			rvResults.apply {
@@ -129,14 +125,11 @@ class AddLocationFragment: Fragment() {
 			}
 			addLocationVM.result.observe(viewLifecycleOwner) {
 				adapter.submitList(it)
-				if(it.isEmpty()) {
-					tvNoResult.visibility = View.VISIBLE
-					rvResults.visibility = View.INVISIBLE
-				} else {
-					tvNoResult.visibility = View.GONE
-					rvResults.visibility = View.VISIBLE
+				val isEmpty = it.isEmpty()
+				tvNoResult.isVisible = isEmpty
+				rvResults.isVisible = !isEmpty
+				if (!isEmpty)
 					rvResults.smoothScrollToPosition(0)
-				}
 			}
 			addLocationVM.error.observe(viewLifecycleOwner) {
 				Toast.makeText(
@@ -202,12 +195,6 @@ class AddLocationFragment: Fragment() {
 	// todo share
 	private fun showMessage(resId: Int) {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
-	}
-
-	private fun hideKeyboard() {
-		val view = requireView()
-		ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
-			?.hideSoftInputFromWindow(view.windowToken, 0)
 	}
 
 	private fun checkLocationPermission(tryShowRationale: Boolean, request: Boolean) {

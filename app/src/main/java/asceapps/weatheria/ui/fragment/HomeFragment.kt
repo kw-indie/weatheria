@@ -3,17 +3,13 @@ package asceapps.weatheria.ui.fragment
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.animation.TypeEvaluator
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -59,17 +55,17 @@ class HomeFragment: Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		// on reinstall or sth, make sure all settings are reapplied
-		// note: this is prolly never needed irl scenarios
+		// note: irl, this happens when app settings are auto backed up
 		// settingsRepo.reapply()
 
 		// setup prefs
 		// todo clean up
 		// need to re-read this every time we are back to the fragment in case it changes
-		setMetric(settingsRepo.metric, settingsRepo.speedUnit)
+		setMetric(settingsRepo.isMetric, settingsRepo.speedUnit)
 
 		return FragmentHomeBinding.inflate(inflater, container, false).apply {
-			val adapter = WeatherInfoAdapter().apply {
-				onItemInsertedFlow().onEach {pos ->
+			val infoAdapter = WeatherInfoAdapter().apply {
+				onItemInsertedFlow().onEach { pos ->
 					// animate to newly added item
 					pager.currentItem = pos
 				}.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -83,29 +79,33 @@ class HomeFragment: Fragment() {
 			// todo we could merge home + savedLocations fragments with help from a
 			//  recyclerView + different layout managers/adapters
 			pager.apply {
-				this.adapter = adapter
+				adapter = infoAdapter
 				offscreenPageLimit = 2
-				onPageSelectedFlow().onEach {pos ->
+				onPageSelectedFlow().onEach { pos ->
 					selectedLocation = pos
-					updateColors(adapter.getItem(pos), dawn, day, dusk, night, evaluator, animator)
+					updateColors(
+						infoAdapter.getItem(pos),
+						dawn,
+						day,
+						dusk,
+						night,
+						evaluator,
+						animator
+					)
 				}.launchIn(viewLifecycleOwner.lifecycleScope)
 			}
 
 			swipeRefresh.setOnRefreshListener {
-				mainVM.refresh(adapter.getItem(pager.currentItem).location)
+				mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
 			}
 
 			selectedLocation = settingsRepo.selectedLocation
 			mainVM.weatherInfoList.onEach {
-				adapter.submitList(it)
+				infoAdapter.submitList(it)
 				pager.setCurrentItem(selectedLocation, false)
-				if(it.isEmpty()) {
-					tvEmptyPager.visibility = View.VISIBLE
-					swipeRefresh.visibility = View.GONE // to prevent swipe
-				} else {
-					tvEmptyPager.visibility = View.GONE
-					swipeRefresh.visibility = View.VISIBLE
-				}
+				val isEmpty = it.isEmpty()
+				tvEmptyPager.isVisible = isEmpty
+				swipeRefresh.isVisible = !isEmpty
 			}.launchIn(viewLifecycleOwner.lifecycleScope)
 			mainVM.loading.observe(viewLifecycleOwner) {
 				swipeRefresh.isRefreshing = it

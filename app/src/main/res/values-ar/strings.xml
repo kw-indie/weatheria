@@ -110,12 +110,11 @@
 	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
 	<string name="error_timed_out">انتهت مهلة الطلب</string>
 	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
-	<string name="error_parsing_resp">خطأ في قراءة الرد. حاول إدخال موقعٍ مختلف</string>
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--settings-->
 	<string name="cat_header_general">عام</string>
 	<string name="title_units">نظام الوحدات</string>
-	<string-array name="unit_system_entries">
+	<string-array name="entries_unit_system">
 		<item>متري</item>
 		<item>إنجليزي</item>
 	</string-array>
@@ -125,7 +124,7 @@
 	</string-array>
 	<string name="cat_header_sync">المزامنة</string>
 	<string name="title_auto_refresh">التحديث التلقائي</string>
-	<string-array name="auto_refresh_entries">
+	<string-array name="entries_auto_refresh">
 		<item>متوقف</item>
 		<item>كل ٦ ساعات</item>
 		<item>كل ١٢ ساعة</item>

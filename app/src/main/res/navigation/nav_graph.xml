@@ -12,38 +12,41 @@
 		<action
 			android:id="@+id/action_open_add_location"
 			app:destination="@id/addLocationFragment"
-			app:launchSingleTop="true"/>
+			app:launchSingleTop="true"
+			app:enterAnim="@anim/enter"
+			app:exitAnim="@anim/exit"
+			app:popEnterAnim="@anim/pop_enter"
+			app:popExitAnim="@anim/pop_exit" />
 		<action
 			android:id="@+id/action_open_saved_locations"
 			app:destination="@id/savedLocationsFragment"
-			app:launchSingleTop="true"/>
-		<action
-			android:id="@+id/action_open_settings"
-			app:destination="@id/settingsFragment"
-			app:launchSingleTop="true"/>
+			app:launchSingleTop="true"
+			app:enterAnim="@anim/enter"
+			app:exitAnim="@anim/exit"
+			app:popEnterAnim="@anim/pop_enter"
+			app:popExitAnim="@anim/pop_exit" />
 	</fragment>
 	<fragment
 		android:id="@+id/savedLocationsFragment"
 		android:name="asceapps.weatheria.ui.fragment.SavedLocationsFragment"
 		android:label="@string/action_locations"
 		tools:layout="@layout/fragment_saved_locations">
-		<action
-			android:id="@id/action_open_settings"
-			app:destination="@id/settingsFragment"
-			app:launchSingleTop="true"/>
 	</fragment>
 	<fragment
 		android:id="@+id/addLocationFragment"
 		android:name="asceapps.weatheria.ui.fragment.AddLocationFragment"
 		android:label="@string/action_add_location"
-		tools:layout="@layout/fragment_add_location">
-		<action
-			android:id="@id/action_open_settings"
-			app:destination="@id/settingsFragment"
-			app:launchSingleTop="true"/>
-	</fragment>
+		tools:layout="@layout/fragment_add_location"></fragment>
 	<fragment
 		android:id="@+id/settingsFragment"
 		android:name="asceapps.weatheria.ui.fragment.SettingsFragment"
-		android:label="@string/action_settings"/>
+		android:label="@string/action_settings" />
+	<action
+		android:id="@+id/action_open_settings"
+		app:destination="@id/settingsFragment"
+		app:launchSingleTop="true"
+		app:enterAnim="@anim/enter"
+		app:exitAnim="@anim/exit"
+		app:popEnterAnim="@anim/pop_enter"
+		app:popExitAnim="@anim/pop_exit" />
 </navigation>

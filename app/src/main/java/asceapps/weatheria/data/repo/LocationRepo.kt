@@ -17,10 +17,10 @@ class LocationRepo @Inject constructor(private val dao: LocationDao) {
 
 	fun search(query: String, limit: Int = 30) = when {
 		// todo remove below line when downstream converts to flow
-		query.isEmpty() -> liveData {emit(emptyList<LocationEntity>())}
+		query.isEmpty() -> liveData { emit(emptyList<LocationEntity>()) }
 		query.matches(Regex(coordinateRegex)) -> {
 			val (lat, lng) = query.split(',')
-				.map {it.toFloat()}
+				.map { it.toFloat() }
 			// Radius calculation logic:
 			// Since our radius is not in distance but in coordinate points,
 			// points closer to the equator will cover a much wider area with a static radius,

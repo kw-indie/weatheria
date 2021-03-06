@@ -1,12 +1,8 @@
 package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -69,16 +65,11 @@ class SavedLocationsFragment: Fragment() {
 				.map {list -> list.map {it.location}}
 				.onEach {
 					adapter.submitList(it)
-					val empty = it.isEmpty()
-					if(empty) {
-						tvNoLocations.visibility = View.VISIBLE
-						rvLocations.visibility = View.GONE
-					} else {
-						tvNoLocations.visibility = View.GONE
-						rvLocations.visibility = View.VISIBLE
-					}
-					if(emptyList != empty) {
-						emptyList = empty
+					val isEmpty = it.isEmpty()
+					tvNoLocations.isVisible = isEmpty
+					rvLocations.isVisible = !isEmpty
+					if (emptyList != isEmpty) {
+						emptyList = isEmpty
 						requireActivity().invalidateOptionsMenu()
 					}
 				}.launchIn(viewLifecycleOwner.lifecycleScope)

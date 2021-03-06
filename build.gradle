@@ -2,14 +2,14 @@
 
 buildscript {
 	ext {
-		gradleVer = '4.1.2'
+		gradleVer = '7.0.0-alpha08'
 		kotlinVer = '1.4.30'
-		hiltVer = '2.32-alpha'
+		hiltVer = '2.33-beta'
 	}
 
 	repositories {
 		google()
-		jcenter()
+		mavenCentral()
 	}
 
 	dependencies {
@@ -22,7 +22,12 @@ buildscript {
 allprojects {
 	repositories {
 		google()
-		jcenter()
+		mavenCentral()
+		jcenter() {
+			content {
+				includeModule("com.android.volley", "volley")
+			}
+		}
 	}
 }
 

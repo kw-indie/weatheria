@@ -3,24 +3,14 @@ package asceapps.weatheria.data.repo
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherService
 import asceapps.weatheria.data.dao.WeatherInfoDao
-import asceapps.weatheria.data.entity.CurrentEntity
-import asceapps.weatheria.data.entity.DailyEntity
-import asceapps.weatheria.data.entity.HourlyEntity
-import asceapps.weatheria.data.entity.LocationEntity
-import asceapps.weatheria.data.entity.SavedLocationEntity
-import asceapps.weatheria.data.entity.WeatherInfoEntity
-import asceapps.weatheria.model.Current
-import asceapps.weatheria.model.Daily
-import asceapps.weatheria.model.Hourly
-import asceapps.weatheria.model.Location
-import asceapps.weatheria.model.WeatherInfo
+import asceapps.weatheria.data.entity.*
+import asceapps.weatheria.di.IoDispatcher
+import asceapps.weatheria.model.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import kotlinx.coroutines.withContext
+import java.time.*
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -31,50 +21,73 @@ import kotlin.math.roundToInt
 @Singleton
 class WeatherInfoRepo @Inject constructor(
 	private val service: WeatherService,
-	private val dao: WeatherInfoDao
+	private val dao: WeatherInfoDao,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
 	fun loadAll() = dao.loadAll()
 		//.distinctUntilChanged() not needed since any change has to show on ui
-		.map {list -> list.map {entityToModel(it)}}
+		.map { list -> list.map { entityToModel(it) } }
 
 	fun loadAllIds() = dao.loadAllIds()
 
 	fun load(locationId: Int) = dao.load(locationId)
+		.distinctUntilChanged()
 
 	suspend fun fetch(l: LocationEntity) {
-		val oneCallResp = with(l) {
-			service.oneCall(lat.toString(), lng.toString())
+		withContext(ioDispatcher) {
+			val oneCallResp = with(l) {
+				service.oneCall(lat.toString(), lng.toString())
+			}
+			with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
+				dao.insert(location, current, hourly, daily)
+			}
+			// no need to return, as updating db will trigger live data
 		}
-		with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
-			dao.insert(location, current, hourly, daily)
-		}
-		// no need to return, as updating db will trigger live data
 	}
 
 	suspend fun refresh(id: Int, lat: Float, lng: Float) {
-		val oneCallResp = service.oneCall(lat.toString(), lng.toString())
-		val current = extractCurrentEntity(id, oneCallResp)
-		val hourly = extractHourlyEntity(id, oneCallResp)
-		val daily = extractDailyEntity(id, oneCallResp)
-		dao.update(current, hourly, daily)
-	}
-
-	suspend fun refreshAll() {
-		dao.getSavedLocations().forEach {
-			with(it) {refresh(id, lat, lng)}
+		withContext(ioDispatcher) {
+			val oneCallResp = service.oneCall(lat.toString(), lng.toString())
+			val current = extractCurrentEntity(id, oneCallResp)
+			val hourly = extractHourlyEntity(id, oneCallResp)
+			val daily = extractDailyEntity(id, oneCallResp)
+			dao.update(current, hourly, daily)
 		}
 	}
 
-	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) = dao.reorder(id, fromPos, toPos)
+	suspend fun refreshAll() {
+		withContext(ioDispatcher) {
+			dao.getSavedLocations().forEach {
+				with(it) { refresh(id, lat, lng) }
+			}
+		}
+	}
 
-	suspend fun delete(id: Int, pos: Int) = dao.delete(id, pos)
+	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
+		withContext(ioDispatcher) {
+			dao.reorder(id, fromPos, toPos)
+		}
+	}
 
-	suspend fun deleteAll() = dao.deleteAll()
+	suspend fun delete(id: Int, pos: Int) {
+		withContext(ioDispatcher) {
+			dao.delete(id, pos)
+		}
+	}
+
+	suspend fun deleteAll() {
+		withContext(ioDispatcher) {
+			dao.deleteAll()
+		}
+	}
 
 	companion object {
 
-		private fun oneCallToWeatherInfoEntity(l: LocationEntity, resp: OneCallResponse): WeatherInfoEntity {
+		private fun oneCallToWeatherInfoEntity(
+			l: LocationEntity,
+			resp: OneCallResponse
+		): WeatherInfoEntity {
 			val savedLocation = with(l) {
 				SavedLocationEntity(id, lat, lng, name, country, resp.timezone_offset)
 			}
@@ -85,24 +98,25 @@ class WeatherInfoRepo @Inject constructor(
 			return WeatherInfoEntity(savedLocation, current, hourly, daily)
 		}
 
-		private fun extractCurrentEntity(locationId: Int, resp: OneCallResponse) = with(resp.current) {
-			CurrentEntity(
-				locationId,
-				dt,
-				weather[0].id,
-				wind_speed,
-				wind_deg,
-				pressure,
-				humidity,
-				dew_point.roundToInt(),
-				clouds,
-				temp.roundToInt(),
-				feels_like.roundToInt(),
-				visibility,
-				rain?._1h,
-				snow?._1h
-			)
-		}
+		private fun extractCurrentEntity(locationId: Int, resp: OneCallResponse) =
+			with(resp.current) {
+				CurrentEntity(
+					locationId,
+					dt,
+					weather[0].id,
+					wind_speed,
+					wind_deg,
+					pressure,
+					humidity,
+					dew_point.roundToInt(),
+					clouds,
+					temp.roundToInt(),
+					feels_like.roundToInt(),
+					visibility,
+					rain?._1h,
+					snow?._1h
+				)
+			}
 
 		private fun extractHourlyEntity(locationId: Int, resp: OneCallResponse) = resp.hourly.map {
 			with(it) {
@@ -164,7 +178,8 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
 			val location = with(info.location) {
-				Location(id, lat, lng, name, country,
+				Location(
+					id, lat, lng, name, country,
 					ZoneOffset.ofTotalSeconds(info.location.zoneOffset),
 					pos
 				)
@@ -184,9 +199,9 @@ class WeatherInfoRepo @Inject constructor(
 				}
 			}
 			val first3DaysDaytime = arrayListOf(
-				with(daily[0]) {sunrise..sunset},
-				with(daily[1]) {sunrise..sunset},
-				with(daily[2]) {sunrise..sunset}
+				with(daily[0]) { sunrise..sunset },
+				with(daily[1]) { sunrise..sunset },
+				with(daily[2]) { sunrise..sunset }
 			)
 			val hourly = info.hourly.map {
 				with(it) {
@@ -194,7 +209,9 @@ class WeatherInfoRepo @Inject constructor(
 					// hourly data are only from first 48 hours, starting from this hour not 00:00
 					Hourly(
 						hour,
-						conditionIcon(conditionId, first3DaysDaytime.any {daytime -> hour in daytime}),
+						conditionIcon(
+							conditionId,
+							first3DaysDaytime.any { daytime -> hour in daytime }),
 						temp,
 						pop
 					)
@@ -223,10 +240,12 @@ class WeatherInfoRepo @Inject constructor(
 					}
 				}
 				elapsedTime.toHours() < info.hourly.size -> { // approximate from hourly
-					with(info.hourly.last {it.dt < now.epochSecond}) {
+					with(info.hourly.last { it.dt < now.epochSecond }) {
 						Current(
 							conditionIndex(conditionId),
-							conditionIcon(conditionId, first3DaysDaytime.any {daytime -> now in daytime}),
+							conditionIcon(
+								conditionId,
+								first3DaysDaytime.any { daytime -> now in daytime }),
 							temp,
 							feelsLike,
 							pressure,
@@ -241,7 +260,7 @@ class WeatherInfoRepo @Inject constructor(
 					}
 				}
 				else -> { // approximate from daily, if no match, just use last day
-					val day = info.daily.last {it.dt < now.epochSecond}
+					val day = info.daily.last { it.dt < now.epochSecond }
 					// we can push all times to offset, but we'll get the same result with default offset
 					val nowTime = LocalTime.now()
 					val morn = LocalTime.of(6, 0)
@@ -289,7 +308,7 @@ class WeatherInfoRepo @Inject constructor(
 		private fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)
 
 		private fun conditionIcon(conditionId: Int, isDay: Boolean? = null) =
-			when(conditionId) {
+			when (conditionId) {
 				in 200..232 -> "11" // thunderstorm
 				in 300..321 -> "09" // drizzle
 				in 500..504 -> "10" // rain
@@ -303,14 +322,14 @@ class WeatherInfoRepo @Inject constructor(
 				803 -> "04" // broken clouds
 				804 -> "04" // overcast clouds
 				else -> throw IllegalArgumentException("no such condition")
-			} + when(isDay) {
+			} + when (isDay) {
 				true -> "d"
 				false -> "n"
 				else -> ""
 			}
 		// endregion
 
-		private fun dirIndex(deg: Int) = when((deg + 22) % 360) {
+		private fun dirIndex(deg: Int) = when ((deg + 22) % 360) {
 			in 0..44 -> 0 // E
 			in 45..89 -> 1 // NE
 			in 90..134 -> 2 // N
@@ -325,7 +344,7 @@ class WeatherInfoRepo @Inject constructor(
 			val day = HijrahDate.from(
 				OffsetDateTime.ofInstant(instant, offset)
 			)[ChronoField.DAY_OF_MONTH]
-			val phase = when(day) {
+			val phase = when (day) {
 				in 2..6 -> 0 //"Waxing Crescent Moon"
 				in 6..8 -> 1 //"Quarter Moon"
 				in 8..13 -> 2 //"Waxing Gibbous Moon"
@@ -350,7 +369,7 @@ class WeatherInfoRepo @Inject constructor(
 			val cycles = days / lunarCycle
 			// take fractional part of cycles x full cycle = current lunation
 			val lunation = (cycles % 1) * lunarCycle
-			return when(lunation) {
+			return when (lunation) {
 				in 1.0..6.38 -> 0 //"Waxing Crescent Moon"
 				in 6.38..8.38 -> 1 //"Quarter Moon"
 				in 8.38..13.765 -> 2 //"Waxing Gibbous Moon"

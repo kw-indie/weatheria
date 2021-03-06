@@ -3,19 +3,19 @@
 		<ListPreference
 			app:key="@string/key_units"
 			app:title="@string/title_units"
-			app:entries="@array/unit_system_entries"
-			app:entryValues="@array/unit_system_entry_values"
+			app:entries="@array/entries_unit_system"
+			app:entryValues="@array/values_unit_system"
 			app:defaultValue="@string/def_value"
-			app:useSimpleSummaryProvider="true"/>
+			app:useSimpleSummaryProvider="true" />
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_sync">
 		<ListPreference
 			app:key="@string/key_auto_refresh"
 			app:title="@string/title_auto_refresh"
-			app:entries="@array/auto_refresh_entries"
-			app:entryValues="@array/auto_refresh_entry_values"
+			app:entries="@array/entries_auto_refresh"
+			app:entryValues="@array/values_auto_refresh"
 			app:defaultValue="@string/def_value"
-			app:useSimpleSummaryProvider="true"/>
+			app:useSimpleSummaryProvider="true" />
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_help">
 		<Preference app:title="@string/title_about"/>

@@ -1,43 +1,44 @@
 package asceapps.weatheria.data.repo
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.preference.PreferenceManager
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import asceapps.weatheria.R
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ActivityRetainedScoped
-class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
+class SettingsRepo @Inject constructor(
+	@ApplicationContext appContext: Context,
+	private val prefs: SharedPreferences
+) {
 
-	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-	private val workManager = WorkManager.getInstance(context)
+	private val workManager = WorkManager.getInstance(appContext)
 	private val defVal = 0
-	private val defValStr = context.getString(R.string.def_value)
-	private val unitsKey = context.getString(R.string.key_units)
-	private val speedUnits = context.resources.getStringArray(R.array.units_speed)
-	private val autoRefreshKey = context.getString(R.string.key_auto_refresh)
-	private val autoRefreshValues = context.resources.getStringArray(R.array.auto_refresh_entry_values)
+	private val defValStr = appContext.getString(R.string.def_value)
+	private val unitsKey = appContext.getString(R.string.key_units)
+	private val speedUnits = appContext.resources.getStringArray(R.array.units_speed)
+	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
+	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
 	private val selectedLocKey = "selected"
 
-	val changes = prefs.onChangeFlow()
+	val changesFlow = prefs.onChangeFlow()
 
+	// 0 = metric, 1 = imperial
 	private val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
 
-	private val autoRefresh: Int
-		get() = (prefs.getString(autoRefreshKey, defValStr) ?: defValStr).toInt()
+	private val autoRefreshPeriod: String
+		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr
 
-	val metric: Boolean
+	val isMetric: Boolean
 		get() = units == 0
 
 	val speedUnit: String
@@ -46,36 +47,39 @@ class SettingsRepo @Inject constructor(@ApplicationContext context: Context) {
 	var selectedLocation = prefs.getInt(selectedLocKey, defVal)
 		get() = prefs.getInt(selectedLocKey, defVal)
 		set(value) {
-			if(field != value) {
+			if (field != value) {
 				field = value
-				prefs.edit {putInt(selectedLocKey, value)}
+				prefs.edit { putInt(selectedLocKey, value) }
 			}
 		}
 
-	fun updateAutoRefresh() {
+	suspend fun update(key: String): Unit = withContext(Dispatchers.IO) {
+		when (key) {
+			autoRefreshKey -> updateAutoRefresh()
+		}
+	}
+
+	private fun updateAutoRefresh() {
 		val autoRefreshWorkName = AutoRefreshWorker::class.qualifiedName!!
-		if(autoRefresh == 0) { // never
+		val never = autoRefreshValues[0]
+		if (autoRefreshPeriod == never) {
 			workManager.cancelUniqueWork(autoRefreshWorkName)
 			return
 		}
 
-		val periods = autoRefreshValues.map {it.toInt()}
-		val period = periods[autoRefresh]
-		val periodL = period.toLong()
-
-		// cancel previous work, if any
-		periods.filterNot {it == 0 || it == period}
+		// cancel any previous different work
+		autoRefreshValues.filterNot { it == never || it == autoRefreshPeriod }
 			.forEach {
-				workManager.cancelAllWorkByTag(it.toString())
+				workManager.cancelAllWorkByTag(it)
 			}
 
-		// enqueue new work, if not already enqueued
+		val periodL = autoRefreshPeriod.toLong()
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.UNMETERED)
 			.setRequiresBatteryNotLow(true)
 			.build()
 		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(periodL, TimeUnit.HOURS)
-			.addTag(period.toString())
+			.addTag(autoRefreshPeriod)
 			.setConstraints(constraints)
 			.setInitialDelay(periodL, TimeUnit.HOURS)
 			.build()

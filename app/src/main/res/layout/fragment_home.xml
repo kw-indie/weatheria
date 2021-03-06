@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools">
-	<androidx.constraintlayout.widget.ConstraintLayout
+<layout>
+
+	<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:tools="http://schemas.android.com/tools"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		tools:context=".ui.fragment.HomeFragment">
+
 		<TextView
 			android:id="@+id/tv_empty_pager"
-			android:layout_width="0dp"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginHorizontal="@dimen/_48sdp"
+			android:layout_gravity="center"
 			android:gravity="center_horizontal"
 			android:text="@string/no_saved_locations"
-			android:textSize="@dimen/_12ssp"
-			app:layout_constraintWidth_percent="0.75"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent"/>
+			android:textSize="@dimen/_12ssp" />
+
 		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 			android:id="@+id/swipe_refresh"
 			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintTop_toTopOf="parent">
+			android:layout_height="match_parent">
+
 			<androidx.viewpager2.widget.ViewPager2
 				android:id="@+id/pager"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"/>
+				android:layout_height="match_parent" />
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-	</androidx.constraintlayout.widget.ConstraintLayout>
+	</FrameLayout>
 </layout>

@@ -26,11 +26,19 @@ import java.net.Socket
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		mld.addSource(this) {
+			block(it)
+			mld.value = it
+		}
+	}
+
 fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
-	val changeListener = SharedPreferences.OnSharedPreferenceChangeListener {_, key ->
+	val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
 		try {
 			offer(key)
-		} catch(e: Exception) {
+		} catch (e: Exception) {
 			close(e)
 		}
 	}
@@ -42,9 +50,9 @@ fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
 }
 
 fun RecyclerView.Adapter<*>.onItemInsertedFlow() = callbackFlow<Int> {
-	val observer = object: RecyclerView.AdapterDataObserver() {
+	val observer = object : RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-			if(itemCount == 1)
+			if (itemCount == 1)
 				offer(positionStart)
 		}
 	}
@@ -56,7 +64,7 @@ fun RecyclerView.Adapter<*>.onItemInsertedFlow() = callbackFlow<Int> {
 }
 
 fun ViewPager2.onPageSelectedFlow() = callbackFlow<Int> {
-	val callback = object: ViewPager2.OnPageChangeCallback() {
+	val callback = object : ViewPager2.OnPageChangeCallback() {
 		override fun onPageSelected(position: Int) {
 			offer(position)
 		}
@@ -74,12 +82,15 @@ fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
 		.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 		.build()
 
-	val callback = object: ConnectivityManager.NetworkCallback() {
+	val callback = object : ConnectivityManager.NetworkCallback() {
 		override fun onAvailable(network: Network) {
 			offer(blockingPing())
 		}
 
-		override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+		override fun onCapabilitiesChanged(
+			network: Network,
+			networkCapabilities: NetworkCapabilities
+		) {
 			offer(blockingPing())
 		}
 
@@ -90,7 +101,7 @@ fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
 	}
 
 	// fire initial value
-	offer(ping())
+	offer(asyncPing())
 
 	val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 	cm.registerNetworkCallback(request, callback)
@@ -100,7 +111,7 @@ fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
 	}
 }
 
-suspend fun ping(): Boolean = withContext(Dispatchers.IO) {
+suspend fun asyncPing(): Boolean = withContext(Dispatchers.IO) {
 	blockingPing()
 }
 
@@ -112,22 +123,23 @@ private fun blockingPing(): Boolean {
 			it.connect(socketAddress, 1500)
 		}
 		true
-	} catch(e: Exception) {
+	} catch (e: Exception) {
 		e.printStackTrace()
 		false
 	}
 }
 
-fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope) = MediatorLiveData<T>().also {mld ->
-	var job: Job? = null
-	mld.addSource(this) {
-		job?.cancel()
-		job = scope.launch {
-			delay(timeoutMillis)
-			mld.value = value
+fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		var job: Job? = null
+		mld.addSource(this) {
+			job?.cancel()
+			job = scope.launch {
+				delay(timeoutMillis)
+				mld.value = it
+			}
 		}
 	}
-}
 
 @RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)
 suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
@@ -140,9 +152,9 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 		// a fresh location will be fetched.
 		// Our permission does not force enabling GPS, thus, a device can just give a cached location.
 		getCurrentLocation(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
-			.addOnSuccessListener {location ->
+			.addOnSuccessListener { location ->
 				it.resume(location)
-			}.addOnFailureListener {e ->
+			}.addOnFailureListener { e ->
 				it.resumeWithException(e)
 			}
 
@@ -152,7 +164,7 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 	}
 
 fun SearchView.onTextChangeFlow() = callbackFlow<String> {
-	setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+	setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 		override fun onQueryTextSubmit(query: String?): Boolean {
 			clearFocus()
 			return true

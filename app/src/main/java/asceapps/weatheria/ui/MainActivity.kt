@@ -3,6 +3,7 @@ package asceapps.weatheria.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,13 +13,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import asceapps.weatheria.R
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.edgeToEdge
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.TimeoutCancellationException
+import retrofit2.HttpException
 import java.io.IOException
+import java.io.InterruptedIOException
 
 @AndroidEntryPoint
-class MainActivity: AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
 	private val viewModel: MainViewModel by viewModels()
 
@@ -26,8 +29,8 @@ class MainActivity: AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 
-		WindowCompat.setDecorFitsSystemWindows(window, true)
-		window.statusBarColor = 0
+		WindowCompat.setDecorFitsSystemWindows(window, false)
+		findViewById<View>(android.R.id.content).edgeToEdge()
 
 		setupNavigation()
 
@@ -37,26 +40,23 @@ class MainActivity: AppCompatActivity() {
 			Snackbar.LENGTH_INDEFINITE
 		).apply {
 			animationMode = Snackbar.ANIMATION_MODE_SLIDE
-			setAction(R.string.retry) {
-				viewModel.checkOnline()
-			}
+			setAction(R.string.retry) { viewModel.checkOnline() }
 		}
 		viewModel.onlineStatus.observe(this) {
-			if(it) snackbar.dismiss()
+			if (it) snackbar.dismiss()
 			else snackbar.show()
 		}
 
 		viewModel.error.observe(this) {
 			Toast.makeText(
 				this,
-				when(it) {
+				when (it) {
 					// obvious timeout
-					is TimeoutCancellationException -> R.string.error_timed_out
+					is InterruptedIOException -> R.string.error_timed_out
+					// others like UnknownHostException when it can't resolve hostname
 					is IOException -> R.string.error_no_internet
-					// server didn't like the request for some reason
-					//is ServerError -> R.string.error_server_error
-					// failed to parse response string to json
-					//is ParseError -> R.string.error_parsing_resp
+					// others like http error codes (400, 404, etc.)
+					is HttpException -> R.string.error_server_error
 					else -> R.string.error_unknown
 				},
 				Toast.LENGTH_LONG
@@ -70,8 +70,9 @@ class MainActivity: AppCompatActivity() {
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when(item.itemId) {
-			R.id.action_settings -> findNavController(this, R.id.nav_host).navigate(R.id.action_open_settings)
+		when (item.itemId) {
+			R.id.action_settings -> findNavController(this, R.id.nav_host)
+				.navigate(R.id.action_open_settings)
 			else -> return super.onOptionsItemSelected(item)
 		}
 		return true

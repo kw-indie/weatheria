@@ -12,9 +12,8 @@
 		<item name="android:colorBackground"></item>-->
 		<!--api 19 >= x > 21-->
 		<!--<item name="android:windowTranslucentStatus">true</item>-->
-		<!--has no effect pre api 29-->
-		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-		<!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="statusBarBackground">@android:color/transparent</item>
 	</style>
 
 	<style name="ListItem" parent="Widget.MaterialComponents.TextView">

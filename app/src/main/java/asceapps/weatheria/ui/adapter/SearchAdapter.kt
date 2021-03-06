@@ -8,35 +8,28 @@ import asceapps.weatheria.databinding.ItemSearchResultBinding
 
 class SearchAdapter(
 	private val onItemClick: (LocationEntity) -> Unit
-): BaseAdapter<LocationEntity, SearchAdapter.ViewHolder>(DiffCallback()) {
+) : BaseAdapter<LocationEntity, SearchAdapter.ViewHolder>() {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		return ViewHolder(ItemSearchResultBinding.inflate(
+		val binding = ItemSearchResultBinding.inflate(
 			LayoutInflater.from(parent.context),
-			parent, false
-		), onItemClick)
+			parent,
+			false
+		).apply {
+			root.setOnClickListener {
+				onItemClick(location!!)
+			}
+		}
+		return ViewHolder(binding)
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		holder.bind(getItem(position))
 	}
 
-	override fun getItemId(position: Int): Long {
-		return list[position].id.toLong()
-	}
-
 	class ViewHolder(
-		private val binding: ItemSearchResultBinding,
-		onClick: (LocationEntity) -> Unit
-	): RecyclerView.ViewHolder(binding.root) {
-
-		init {
-			with(binding) {
-				root.setOnClickListener {
-					onClick(location!!) // had to add '!!' cuz of inferred type mismatch
-				}
-			}
-		}
+		private val binding: ItemSearchResultBinding
+	) : RecyclerView.ViewHolder(binding.root) {
 
 		fun bind(l: LocationEntity) {
 			with(binding) {
@@ -44,12 +37,5 @@ class SearchAdapter(
 				executePendingBindings()
 			}
 		}
-	}
-
-	private class DiffCallback: BaseAdapter.DiffCallback<LocationEntity>() {
-
-		override fun areItemsTheSame(old: LocationEntity, new: LocationEntity) = old.id == new.id
-
-		override fun areContentsTheSame(old: LocationEntity, new: LocationEntity) = true
 	}
 }

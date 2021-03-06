@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-class SavedLocationsFragment: Fragment() {
+class SavedLocationsFragment : Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private var emptyList = true
@@ -50,7 +50,7 @@ class SavedLocationsFragment: Fragment() {
 						.scaleX(scale)
 						.scaleY(scale)
 				},
-				onReorder = {location, to ->
+				onReorder = { location, to ->
 					mainVM.reorder(location, to)
 				}
 			)
@@ -81,7 +81,7 @@ class SavedLocationsFragment: Fragment() {
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when(item.itemId) {
+		when (item.itemId) {
 			R.id.action_delete_all -> mainVM.deleteAll()
 			else -> return super.onOptionsItemSelected(item)
 		}

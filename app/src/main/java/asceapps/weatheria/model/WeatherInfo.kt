@@ -1,5 +1,6 @@
 package asceapps.weatheria.model
 
+import asceapps.weatheria.data.IDed
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -11,7 +12,9 @@ class WeatherInfo(
 	val current: Current,
 	val hourly: List<Hourly>,
 	val daily: List<Daily>
-) {
+) : IDed {
+
+	override val id = location.id
 
 	// if daily includes today, get it, else, get last day
 	val today = Instant.now().let { daily.lastOrNull { day -> day.date < it } } ?: daily[0]
@@ -26,4 +29,7 @@ class WeatherInfo(
 		LocalDateTime.ofInstant(instant, offset)
 			.toLocalTime()
 			.toSecondOfDay()
+
+	// for HashItemCallback
+	override fun hashCode() = id + lastUpdate.epochSecond.toInt()
 }

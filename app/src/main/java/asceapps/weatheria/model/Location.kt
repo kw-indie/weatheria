@@ -1,13 +1,18 @@
 package asceapps.weatheria.model
 
+import asceapps.weatheria.data.IDed
 import java.time.ZoneOffset
 
 class Location(
-	val id: Int,
+	override val id: Int,
 	val lat: Float,
 	val lng: Float,
 	val name: String,
 	val country: String,
 	val zoneOffset: ZoneOffset,
 	val pos: Int
-)
+) : IDed {
+
+	// for HashCallback
+	override fun hashCode() = id
+}

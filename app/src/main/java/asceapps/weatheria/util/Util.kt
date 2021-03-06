@@ -1,6 +1,5 @@
 package asceapps.weatheria.util
 
-import android.content.res.Configuration
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,20 +11,23 @@ fun hideKeyboard(any: View) {
 fun isKeyboardVisible(any: View) =
 	ViewCompat.getRootWindowInsets(any)?.isVisible(WindowInsetsCompat.Type.ime())
 
-fun View.edgeToEdge() {
-	ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-		val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-		val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-		val config = view.context.resources.configuration
-		when (config.orientation) {
-			Configuration.ORIENTATION_PORTRAIT -> {
-				setPadding(0, statusBarInsets.top, 0, navBarInsets.bottom)
-			}
-			else -> {
-				setPadding(0, statusBarInsets.bottom, navBarInsets.right, 0)
-			}
-		}
+fun View.edgeToEdge(
+	consume: Boolean = true,
+	statusBar: Boolean = true,
+	navBar: Boolean = true
+) {
+	ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+		val navBarInsets =
+			if (navBar) insets.getInsets(WindowInsetsCompat.Type.navigationBars()) else null
+		val statusBarInsets =
+			if (statusBar) insets.getInsets(WindowInsetsCompat.Type.statusBars()) else null
+		setPadding(
+			navBarInsets?.left ?: 0,
+			statusBarInsets?.top ?: 0,
+			navBarInsets?.right ?: 0,
+			navBarInsets?.bottom ?: 0
+		)
 		setOnApplyWindowInsetsListener(null)
-		insets
+		if (consume) WindowInsetsCompat.CONSUMED else insets
 	}
 }

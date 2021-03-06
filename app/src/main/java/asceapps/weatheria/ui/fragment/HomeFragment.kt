@@ -80,7 +80,7 @@ class HomeFragment: Fragment() {
 			//  recyclerView + different layout managers/adapters
 			pager.apply {
 				adapter = infoAdapter
-				offscreenPageLimit = 2
+				offscreenPageLimit = 1
 				onPageSelectedFlow().onEach { pos ->
 					selectedLocation = pos
 					updateColors(

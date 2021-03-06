@@ -95,8 +95,11 @@ class HomeFragment: Fragment() {
 				}.launchIn(viewLifecycleOwner.lifecycleScope)
 			}
 
-			swipeRefresh.setOnRefreshListener {
-				mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
+			swipeRefresh.apply {
+				setProgressViewOffset(true, 0, 0)
+				setOnRefreshListener {
+					mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
+				}
 			}
 
 			selectedLocation = settingsRepo.selectedLocation

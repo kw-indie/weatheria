@@ -12,15 +12,8 @@ abstract class BaseAdapter<T, VH: RecyclerView.ViewHolder>(
 
 	init {
 		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-		// todo diffUtil removes the need for stable ids
-		// https://medium.com/androiddevelopers/merge-adapters-sequentially-with-mergeadapter-294d2942127a
-		setHasStableIds(true)
 
 		callback.oldList = list
-	}
-
-	final override fun setHasStableIds(hasStableIds: Boolean) {
-		super.setHasStableIds(hasStableIds)
 	}
 
 	override fun getItemCount() = list.size

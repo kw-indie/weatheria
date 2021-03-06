@@ -1,5 +1,6 @@
 package asceapps.weatheria.util
 
+import android.content.res.Configuration
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,20 +15,29 @@ fun isKeyboardVisible(any: View) =
 fun View.edgeToEdge(
 	consume: Boolean = true,
 	statusBar: Boolean = true,
-	navBar: Boolean = true
+	navBarPortrait: Boolean = true
 ) {
 	ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
-		val navBarInsets =
-			if (navBar) insets.getInsets(WindowInsetsCompat.Type.navigationBars()) else null
-		val statusBarInsets =
-			if (statusBar) insets.getInsets(WindowInsetsCompat.Type.statusBars()) else null
-		setPadding(
-			navBarInsets?.left ?: 0,
-			statusBarInsets?.top ?: 0,
-			navBarInsets?.right ?: 0,
-			navBarInsets?.bottom ?: 0
-		)
-		setOnApplyWindowInsetsListener(null)
+		val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+		val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+		val left: Int
+		val top = if (statusBar) statusBarInsets.top else 0
+		val right: Int
+		val bot: Int
+		val orientation = context.resources.configuration.orientation
+		if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			left = 0
+			right = 0
+			bot = if (navBarPortrait) navBarInsets.bottom else 0
+		} else {
+			// in landscape mode, (most prolly) all edgeToEdge views are affected by navBar insets
+			left = navBarInsets.left // when navBar is on the left
+			right = navBarInsets.right // when navBar is on the right
+			bot = 0
+		}
+		setPadding(left, top, right, bot)
+		// removing this listener here will work when launching the app for the first time,
+		// but will fail when rotating while the app is still in the foreground
 		if (consume) WindowInsetsCompat.CONSUMED else insets
 	}
 }

@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 			DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
 		WindowCompat.setDecorFitsSystemWindows(window, false)
-		binding.navHost.edgeToEdge()
-		binding.appbar.edgeToEdge()
+		binding.navHost.edgeToEdge(statusBar = false)
+		binding.appbar.edgeToEdge(navBarPortrait = false)
 
 		setupNavigation(binding.toolbar)
 

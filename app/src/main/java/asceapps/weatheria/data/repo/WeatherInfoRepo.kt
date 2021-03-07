@@ -8,6 +8,7 @@ import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.model.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.*
@@ -28,6 +29,7 @@ class WeatherInfoRepo @Inject constructor(
 	fun loadAll() = dao.loadAll()
 		//.distinctUntilChanged() not needed since any change has to show on ui
 		.map { list -> list.map { entityToModel(it) } }
+		.flowOn(ioDispatcher)
 
 	fun loadAllIds() = dao.loadAllIds()
 

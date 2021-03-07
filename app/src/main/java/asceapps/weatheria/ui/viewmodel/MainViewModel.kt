@@ -11,7 +11,9 @@ import asceapps.weatheria.util.debounce
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.time.Instant
@@ -28,6 +30,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 	val weatherInfoList = infoRepo.loadAll()
+		.shareIn(viewModelScope, SharingStarted.Lazily, 1)
 		.onEach { _loading.value = false }
 
 	// todo add selectLocation here and init it from settingsRepo
@@ -42,10 +45,10 @@ class MainViewModel @Inject constructor(
 	// used liveData for now cuz flows don't re-emit same value
 	private val onlineManualCheck = MutableLiveData<Boolean?>()
 	val onlineStatus: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
-		// this debounce helps when ui hasn't completed responding to last emission
-		addSource(onlineManualCheck.debounce(500, viewModelScope)) { value = it }
+		addSource(onlineManualCheck) { value = it }
 		addSource(appContext.onlineStatusFlow().asLiveData()) { value = it }
-	}
+	}.debounce(500, viewModelScope)
+	// this debounce helps when ui hasn't completed responding to last emission
 
 	fun checkOnline() = viewModelScope.launch {
 		onlineManualCheck.value = asyncPing()

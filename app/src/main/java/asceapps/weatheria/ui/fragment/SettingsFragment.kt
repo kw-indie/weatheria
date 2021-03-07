@@ -7,8 +7,7 @@ import androidx.preference.PreferenceFragmentCompat
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,8 +23,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 
-		repo.changesFlow.onEach { key ->
-			repo.update(key)
-		}.launchIn(viewLifecycleOwner.lifecycleScope)
+		viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+			repo.changesFlow.collect { key ->
+				repo.update(key)
+			}
+		}
 	}
 }

@@ -12,9 +12,8 @@ import asceapps.weatheria.R
 import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
 import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 
 class SavedLocationsFragment : Fragment() {
 
@@ -61,18 +60,20 @@ class SavedLocationsFragment : Fragment() {
 				addItemDecoration(divider)
 				setHasFixedSize(true)
 			}
-			mainVM.weatherInfoList
-				.map {list -> list.map {it.location}}
-				.onEach {
-					adapter.submitList(it)
-					val isEmpty = it.isEmpty()
-					tvNoLocations.isVisible = isEmpty
-					rvLocations.isVisible = !isEmpty
-					if (emptyList != isEmpty) {
-						emptyList = isEmpty
-						requireActivity().invalidateOptionsMenu()
+			viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+				mainVM.weatherInfoList
+					.map { list -> list.map { it.location } }
+					.collect {
+						adapter.submitList(it)
+						val isEmpty = it.isEmpty()
+						tvNoLocations.isVisible = isEmpty
+						rvLocations.isVisible = !isEmpty
+						if (emptyList != isEmpty) {
+							emptyList = isEmpty
+							requireActivity().invalidateOptionsMenu()
+						}
 					}
-				}.launchIn(viewLifecycleOwner.lifecycleScope)
+			}
 		}.root
 	}
 

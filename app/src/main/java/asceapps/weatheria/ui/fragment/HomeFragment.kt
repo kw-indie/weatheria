@@ -24,8 +24,7 @@ import asceapps.weatheria.util.onItemInsertedFlow
 import asceapps.weatheria.util.onPageSelectedFlow
 import asceapps.weatheria.util.setMetric
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -65,10 +64,12 @@ class HomeFragment: Fragment() {
 
 		return FragmentHomeBinding.inflate(inflater, container, false).apply {
 			val infoAdapter = WeatherInfoAdapter().apply {
-				onItemInsertedFlow().onEach { pos ->
-					// animate to newly added item
-					pager.currentItem = pos
-				}.launchIn(viewLifecycleOwner.lifecycleScope)
+				viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+					onItemInsertedFlow().collect { pos ->
+						// animate to newly added item
+						pager.currentItem = pos
+					}
+				}
 			}
 
 			val (init, dawn, day, dusk, night) = getDayPartsColors(requireContext())
@@ -81,35 +82,38 @@ class HomeFragment: Fragment() {
 			pager.apply {
 				adapter = infoAdapter
 				offscreenPageLimit = 1
-				onPageSelectedFlow().onEach { pos ->
-					selectedLocation = pos
-					updateColors(
-						infoAdapter.getItem(pos),
-						dawn,
-						day,
-						dusk,
-						night,
-						evaluator,
-						animator
-					)
-				}.launchIn(viewLifecycleOwner.lifecycleScope)
+				viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+					onPageSelectedFlow().collect { pos ->
+						selectedLocation = pos
+						updateColors(
+							infoAdapter.getItem(pos),
+							dawn,
+							day,
+							dusk,
+							night,
+							evaluator,
+							animator
+						)
+					}
+				}
 			}
 
 			swipeRefresh.apply {
-				setProgressViewOffset(true, 0, 0)
 				setOnRefreshListener {
 					mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
 				}
 			}
 
 			selectedLocation = settingsRepo.selectedLocation
-			mainVM.weatherInfoList.onEach {
-				infoAdapter.submitList(it)
-				pager.setCurrentItem(selectedLocation, false)
-				val isEmpty = it.isEmpty()
-				tvEmptyPager.isVisible = isEmpty
-				swipeRefresh.isVisible = !isEmpty
-			}.launchIn(viewLifecycleOwner.lifecycleScope)
+			viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+				mainVM.weatherInfoList.collect {
+					infoAdapter.submitList(it)
+					pager.setCurrentItem(selectedLocation, false)
+					val isEmpty = it.isEmpty()
+					tvEmptyPager.isVisible = isEmpty
+					swipeRefresh.isVisible = !isEmpty
+				}
+			}
 			mainVM.loading.observe(viewLifecycleOwner) {
 				swipeRefresh.isRefreshing = it
 			}

@@ -36,8 +36,7 @@ import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
 class AddLocationFragment: Fragment() {
@@ -150,9 +149,11 @@ class AddLocationFragment: Fragment() {
 		searchMenuItem = menu.findItem(R.id.action_search)
 		searchView = (searchMenuItem.actionView as SearchView).apply {
 			queryHint = getString(R.string.hint_search)
-			onTextChangeFlow().onEach {
-				addLocationVM.query.value = it
-			}.launchIn(viewLifecycleOwner.lifecycleScope)
+			viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+				onTextChangeFlow().collect {
+					addLocationVM.query.value = it
+				}
+			}
 		}
 	}
 

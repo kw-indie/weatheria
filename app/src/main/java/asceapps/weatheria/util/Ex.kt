@@ -26,14 +26,6 @@ import java.net.Socket
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
-	MediatorLiveData<T>().also { mld ->
-		mld.addSource(this) {
-			block(it)
-			mld.value = it
-		}
-	}
-
 fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
 	val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
 		try {
@@ -46,6 +38,24 @@ fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
 
 	awaitClose {
 		unregisterOnSharedPreferenceChangeListener(changeListener)
+	}
+}
+
+fun SearchView.onTextChangeFlow() = callbackFlow<String> {
+	setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+		override fun onQueryTextSubmit(query: String?): Boolean {
+			clearFocus()
+			return true
+		}
+
+		override fun onQueryTextChange(newText: String): Boolean {
+			offer(newText)
+			return true
+		}
+	})
+
+	awaitClose {
+		setOnQueryTextListener(null)
 	}
 }
 
@@ -77,7 +87,11 @@ fun ViewPager2.onPageSelectedFlow() = callbackFlow<Int> {
 }
 
 @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
+fun Context.onlineStatusFlow(): Flow<Boolean> = onlineStatusFlow(
+	getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+)
+
+private fun onlineStatusFlow(cm: ConnectivityManager): Flow<Boolean> = callbackFlow {
 	val request = NetworkRequest.Builder()
 		.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 		.build()
@@ -103,7 +117,6 @@ fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
 	// fire initial value
 	offer(asyncPing())
 
-	val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 	cm.registerNetworkCallback(request, callback)
 
 	awaitClose {
@@ -111,10 +124,12 @@ fun Context.onlineStatusFlow(): Flow<Boolean> = callbackFlow {
 	}
 }
 
+// todo move to a repo with other methods and share a dispatcher
 suspend fun asyncPing(): Boolean = withContext(Dispatchers.IO) {
 	blockingPing()
 }
 
+// todo throttle, don't start new if already started
 private fun blockingPing(): Boolean {
 	return try {
 		Socket().use {
@@ -129,15 +144,23 @@ private fun blockingPing(): Boolean {
 	}
 }
 
-fun <T> LiveData<T>.debounce(timeoutMillis: Long, scope: CoroutineScope): LiveData<T> =
+fun <T> LiveData<T>.debounce(timeoutMillis: Int, scope: CoroutineScope): LiveData<T> =
 	MediatorLiveData<T>().also { mld ->
 		var job: Job? = null
 		mld.addSource(this) {
 			job?.cancel()
 			job = scope.launch {
-				delay(timeoutMillis)
+				delay(timeoutMillis.toLong())
 				mld.value = it
 			}
+		}
+	}
+
+inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		mld.addSource(this) {
+			block(it)
+			mld.value = it
 		}
 	}
 
@@ -162,21 +185,3 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 			cts.cancel()
 		}
 	}
-
-fun SearchView.onTextChangeFlow() = callbackFlow<String> {
-	setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-		override fun onQueryTextSubmit(query: String?): Boolean {
-			clearFocus()
-			return true
-		}
-
-		override fun onQueryTextChange(newText: String): Boolean {
-			offer(newText)
-			return true
-		}
-	})
-
-	awaitClose {
-		setOnQueryTextListener(null)
-	}
-}

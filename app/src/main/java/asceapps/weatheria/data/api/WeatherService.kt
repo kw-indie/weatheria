@@ -43,7 +43,7 @@ interface WeatherService {
 			val client = OkHttpClient.Builder()
 				.cache(cache)
 				.addInterceptor(interceptor)
-				.callTimeout(5L, TimeUnit.SECONDS) // throws InterruptedIOException
+				.callTimeout(10L, TimeUnit.SECONDS) // throws InterruptedIOException
 				.build()
 			return Retrofit.Builder()
 				.baseUrl("https://api.openweathermap.org/data/2.5/")

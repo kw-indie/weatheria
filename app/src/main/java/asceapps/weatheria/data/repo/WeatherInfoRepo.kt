@@ -35,51 +35,43 @@ class WeatherInfoRepo @Inject constructor(
 		.distinctUntilChanged()
 
 	suspend fun fetch(l: LocationEntity) {
-		withContext(ioDispatcher) {
-			val oneCallResp = with(l) {
+		val oneCallResp = withContext(ioDispatcher) {
+			with(l) {
 				service.oneCall(lat.toString(), lng.toString())
 			}
-			with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
-				dao.insert(location, current, hourly, daily)
-			}
-			// no need to return, as updating db will trigger live data
 		}
+		with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
+			dao.insert(location, current, hourly, daily)
+		}
+		// no need to return, as updating db will trigger live data
 	}
 
 	suspend fun refresh(id: Int, lat: Float, lng: Float) {
-		withContext(ioDispatcher) {
-			val oneCallResp = service.oneCall(lat.toString(), lng.toString())
-			val current = extractCurrentEntity(id, oneCallResp)
-			val hourly = extractHourlyEntity(id, oneCallResp)
-			val daily = extractDailyEntity(id, oneCallResp)
-			dao.update(current, hourly, daily)
+		val oneCallResp = withContext(ioDispatcher) {
+			service.oneCall(lat.toString(), lng.toString())
 		}
+		val current = extractCurrentEntity(id, oneCallResp)
+		val hourly = extractHourlyEntity(id, oneCallResp)
+		val daily = extractDailyEntity(id, oneCallResp)
+		dao.update(current, hourly, daily)
 	}
 
 	suspend fun refreshAll() {
-		withContext(ioDispatcher) {
-			dao.getSavedLocations().forEach {
-				with(it) { refresh(id, lat, lng) }
-			}
+		dao.getSavedLocations().forEach {
+			with(it) { refresh(id, lat, lng) }
 		}
 	}
 
 	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
-		withContext(ioDispatcher) {
-			dao.reorder(id, fromPos, toPos)
-		}
+		dao.reorder(id, fromPos, toPos)
 	}
 
 	suspend fun delete(id: Int, pos: Int) {
-		withContext(ioDispatcher) {
-			dao.delete(id, pos)
-		}
+		dao.delete(id, pos)
 	}
 
 	suspend fun deleteAll() {
-		withContext(ioDispatcher) {
-			dao.deleteAll()
-		}
+		dao.deleteAll()
 	}
 
 	companion object {
@@ -300,10 +292,63 @@ class WeatherInfoRepo @Inject constructor(
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
 		// region weather condition stuff
-		private val conditionIds = intArrayOf(200, 201, 202, 210, 211, 212, 221, 230, 231, 232,
-			300, 301, 302, 310, 311, 312, 313, 314, 321, 500, 501, 502, 503, 504, 511, 520, 521, 522, 531,
-			600, 601, 602, 611, 612, 613, 615, 616, 620, 621, 622, 701, 711, 721, 731, 741, 751, 761, 762,
-			771, 781, 800, 801, 802, 803, 804)
+		private val conditionIds = intArrayOf(
+			200,
+			201,
+			202,
+			210,
+			211,
+			212,
+			221,
+			230,
+			231,
+			232,
+			300,
+			301,
+			302,
+			310,
+			311,
+			312,
+			313,
+			314,
+			321,
+			500,
+			501,
+			502,
+			503,
+			504,
+			511,
+			520,
+			521,
+			522,
+			531,
+			600,
+			601,
+			602,
+			611,
+			612,
+			613,
+			615,
+			616,
+			620,
+			621,
+			622,
+			701,
+			711,
+			721,
+			731,
+			741,
+			751,
+			761,
+			762,
+			771,
+			781,
+			800,
+			801,
+			802,
+			803,
+			804
+		)
 
 		private fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)
 

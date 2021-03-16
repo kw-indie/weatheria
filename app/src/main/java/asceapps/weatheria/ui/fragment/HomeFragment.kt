@@ -12,7 +12,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
@@ -20,11 +19,11 @@ import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfo
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInsertedFlow
 import asceapps.weatheria.util.onPageSelectedFlow
 import asceapps.weatheria.util.setMetric
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,11 +63,9 @@ class HomeFragment: Fragment() {
 
 		return FragmentHomeBinding.inflate(inflater, container, false).apply {
 			val infoAdapter = WeatherInfoAdapter().apply {
-				viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-					onItemInsertedFlow().collect { pos ->
-						// animate to newly added item
-						pager.currentItem = pos
-					}
+				onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
+					// animate to newly added item
+					pager.currentItem = pos
 				}
 			}
 
@@ -82,19 +79,17 @@ class HomeFragment: Fragment() {
 			pager.apply {
 				adapter = infoAdapter
 				offscreenPageLimit = 1
-				viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-					onPageSelectedFlow().collect { pos ->
-						selectedLocation = pos
-						updateColors(
-							infoAdapter.getItem(pos),
-							dawn,
-							day,
-							dusk,
-							night,
-							evaluator,
-							animator
-						)
-					}
+				onPageSelectedFlow().observe(viewLifecycleOwner) { pos ->
+					selectedLocation = pos
+					updateColors(
+						infoAdapter.getItem(pos),
+						dawn,
+						day,
+						dusk,
+						night,
+						evaluator,
+						animator
+					)
 				}
 			}
 
@@ -105,14 +100,12 @@ class HomeFragment: Fragment() {
 			}
 
 			selectedLocation = settingsRepo.selectedLocation
-			viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-				mainVM.weatherInfoList.collect {
-					infoAdapter.submitList(it)
-					pager.setCurrentItem(selectedLocation, false)
-					val isEmpty = it.isEmpty()
-					tvEmptyPager.isVisible = isEmpty
-					swipeRefresh.isVisible = !isEmpty
-				}
+			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
+				infoAdapter.submitList(it)
+				pager.setCurrentItem(selectedLocation, false)
+				val isEmpty = it.isEmpty()
+				tvEmptyPager.isVisible = isEmpty
+				swipeRefresh.isVisible = !isEmpty
 			}
 			mainVM.loading.observe(viewLifecycleOwner) {
 				swipeRefresh.isRefreshing = it

@@ -19,16 +19,17 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
+import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.hideKeyboard
+import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onTextChangeFlow
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
@@ -36,10 +37,9 @@ import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
-class AddLocationFragment: Fragment() {
+class AddLocationFragment : Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private val addLocationVM: AddLocationViewModel by viewModels()
@@ -52,7 +52,7 @@ class AddLocationFragment: Fragment() {
 	// need to register this anywhere before onCreateView
 	private val permissionRequester = registerForActivityResult(
 		ActivityResultContracts.RequestPermission()
-	) {checkLocationPermission(true, false)}
+	) { checkLocationPermission(true, false) }
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -63,85 +63,107 @@ class AddLocationFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		return FragmentAddLocationBinding.inflate(inflater, container, false).apply {
-			val maxZoom = 13f
-			val searchZoom = 11f
-			mapView = map.apply {
-				onCreate(savedInstanceState)
-				getMapAsync {map ->
-					map.apply {
-						googleMap = this
-						checkLocationPermission(false, true)
-						setMaxZoomPreference(maxZoom)
-						uiSettings.apply {
-							isZoomControlsEnabled = true
-							isRotateGesturesEnabled = false
-							isTiltGesturesEnabled = false
-							isIndoorEnabled = false
-							isMapToolbarEnabled = false
-						}
-						setOnMyLocationButtonClickListener {
-							// todo disable when already in progress
-							onMyLocationClick()
-							true
-						}
-						setOnMapClickListener {latLng ->
-							animateCamera(CameraUpdateFactory.newLatLng(latLng))
-						}
-						setOnCameraIdleListener {
-							val query = if(cameraPosition.zoom >= searchZoom) {
-								searchMenuItem.expandActionView()
-								with(cameraPosition.target) {
-									"%1$.3f,%2$.3f".format(latitude, longitude)
-								}
-							} else {
-								searchMenuItem.collapseActionView()
-								""
+		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
+
+		val maxZoom = 13f
+		val searchZoom = 11f
+		mapView = binding.map.apply {
+			onCreate(savedInstanceState)
+			getMapAsync { map ->
+				map.apply {
+					googleMap = this
+					checkLocationPermission(false, true)
+					setMaxZoomPreference(maxZoom)
+					uiSettings.apply {
+						isZoomControlsEnabled = true
+						isRotateGesturesEnabled = false
+						isTiltGesturesEnabled = false
+						isIndoorEnabled = false
+						isMapToolbarEnabled = false
+					}
+					setOnMyLocationButtonClickListener {
+						// todo disable when already in progress
+						onMyLocationClick()
+						true
+					}
+					setOnMapClickListener { latLng ->
+						animateCamera(CameraUpdateFactory.newLatLng(latLng))
+					}
+					setOnCameraIdleListener {
+						val query = if (cameraPosition.zoom >= searchZoom) {
+							searchMenuItem.expandActionView()
+							with(cameraPosition.target) {
+								"%1$.3f,%2$.3f".format(latitude, longitude)
 							}
-							searchView.setQuery(query, true)
+						} else {
+							searchMenuItem.collapseActionView()
+							""
 						}
+						searchView.setQuery(query, true)
 					}
 				}
 			}
+		}
 
-			val adapter = SearchAdapter {
-				mainVM.addNewLocation(it)
-				hideKeyboard(root)
-				findNavController().navigateUp()
-			}
-			rvResults.apply {
-				this.adapter = adapter
-				val layoutManager = rvResults.layoutManager as LinearLayoutManager
-				val divider = DividerItemDecoration(context, layoutManager.orientation)
-				addItemDecoration(divider)
-				setHasFixedSize(true)
+		val searchAdapter = SearchAdapter {
+			mainVM.addNewLocation(it)
+			findNavController().navigateUp()
+		}
+		binding.rvResults.apply {
+			adapter = searchAdapter
+			val layoutManager = layoutManager as LinearLayoutManager
+			val divider = DividerItemDecoration(context, layoutManager.orientation)
+			addItemDecoration(divider)
+			setHasFixedSize(true)
+		}
+
+		addLocationVM.myLocation.observe(viewLifecycleOwner) {
+			when (it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					val l = it.data
+					googleMap.animateCamera(
+						CameraUpdateFactory
+							.newLatLngZoom(LatLng(l.latitude, l.longitude), maxZoom)
+					)
+				}
+				is Result.Error -> {
+					Toast.makeText(
+						requireContext(),
+						// todo did we cover other reasons?
+						when (it) {
+							is NullPointerException -> R.string.error_location_not_found
+							else -> R.string.error_unknown
+						},
+						Toast.LENGTH_LONG
+					).show()
+				}
 			}
 
-			addLocationVM.myLocation.observe(viewLifecycleOwner) {
-				googleMap.animateCamera(CameraUpdateFactory
-					.newLatLngZoom(LatLng(it.latitude, it.longitude), maxZoom)
-				)
+		}
+		addLocationVM.result.observe(viewLifecycleOwner) {
+			when (it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					val list = it.data
+					searchAdapter.submitList(list)
+					val isEmpty = list.isEmpty()
+					binding.tvNoResult.isVisible = isEmpty
+					binding.rvResults.isVisible = !isEmpty
+					if (!isEmpty)
+						binding.rvResults.smoothScrollToPosition(0)
+				}
+				is Result.Error -> {
+					// this shouldn't happen
+				}
 			}
-			addLocationVM.result.observe(viewLifecycleOwner) {
-				adapter.submitList(it)
-				val isEmpty = it.isEmpty()
-				tvNoResult.isVisible = isEmpty
-				rvResults.isVisible = !isEmpty
-				if (!isEmpty)
-					rvResults.smoothScrollToPosition(0)
-			}
-			addLocationVM.error.observe(viewLifecycleOwner) {
-				Toast.makeText(
-					requireContext(),
-					// todo did we cover other reasons?
-					when(it) {
-						is NullPointerException -> R.string.error_location_not_found
-						else -> R.string.error_unknown
-					},
-					Toast.LENGTH_LONG
-				).show()
-			}
-		}.root
+		}
+
+		return binding.root
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -149,10 +171,8 @@ class AddLocationFragment: Fragment() {
 		searchMenuItem = menu.findItem(R.id.action_search)
 		searchView = (searchMenuItem.actionView as SearchView).apply {
 			queryHint = getString(R.string.hint_search)
-			viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-				onTextChangeFlow().collect {
-					addLocationVM.query.value = it
-				}
+			onTextChangeFlow().observe(viewLifecycleOwner) {
+				addLocationVM.setQuery(it)
 			}
 		}
 	}
@@ -174,6 +194,7 @@ class AddLocationFragment: Fragment() {
 
 	override fun onStop() {
 		super.onStop()
+		hideKeyboard(requireView())
 		mapView.onStop()
 	}
 
@@ -200,19 +221,20 @@ class AddLocationFragment: Fragment() {
 
 	private fun checkLocationPermission(tryShowRationale: Boolean, request: Boolean) {
 		when {
-			ContextCompat.checkSelfPermission(requireContext(), permission) == PERMISSION_GRANTED -> {
+			ContextCompat.checkSelfPermission(requireContext(), permission)
+				== PERMISSION_GRANTED -> {
 				// our method gets called from different contexts, some of them don't guarantee initialization
-				if(::googleMap.isInitialized) {
+				if (::googleMap.isInitialized) {
 					@SuppressLint("MissingPermission")
 					googleMap.isMyLocationEnabled = true
 				}
 			}
-			tryShowRationale &&
-				ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission) -> {
+			ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)
+				&& tryShowRationale -> {
 				AlertDialog.Builder(requireContext())
 					.setTitle(R.string.request_rationale_title)
 					.setMessage(R.string.location_request_rationale)
-					.setPositiveButton(R.string.request_again) {_, _ ->
+					.setPositiveButton(R.string.request_again) { _, _ ->
 						requestPermission()
 					}
 					.setNegativeButton(R.string.dismiss, null)
@@ -226,7 +248,7 @@ class AddLocationFragment: Fragment() {
 	}
 
 	private fun requestPermission() {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			permissionRequester.launch(permission)
 		} else {
 			showMessage(R.string.error_location_denied)
@@ -235,8 +257,10 @@ class AddLocationFragment: Fragment() {
 
 	private fun onMyLocationClick() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.getMyLocation(LocationServices.getFusedLocationProviderClient(requireContext()))
+		if (LocationManagerCompat.isLocationEnabled(lm)) {
+			addLocationVM.getMyLocation(
+				LocationServices.getFusedLocationProviderClient(requireContext())
+			)
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

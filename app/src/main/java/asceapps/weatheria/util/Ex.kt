@@ -10,8 +10,10 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -21,6 +23,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.coroutines.resume
@@ -144,26 +147,6 @@ private fun blockingPing(): Boolean {
 	}
 }
 
-fun <T> LiveData<T>.debounce(timeoutMillis: Int, scope: CoroutineScope): LiveData<T> =
-	MediatorLiveData<T>().also { mld ->
-		var job: Job? = null
-		mld.addSource(this) {
-			job?.cancel()
-			job = scope.launch {
-				delay(timeoutMillis.toLong())
-				mld.value = it
-			}
-		}
-	}
-
-inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
-	MediatorLiveData<T>().also { mld ->
-		mld.addSource(this) {
-			block(it)
-			mld.value = it
-		}
-	}
-
 @RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)
 suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 	suspendCancellableCoroutine<Location> {
@@ -185,3 +168,36 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 			cts.cancel()
 		}
 	}
+
+fun <T> LiveData<T>.debounce(timeoutMillis: Int, scope: CoroutineScope): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		var job: Job? = null
+		mld.addSource(this) {
+			job?.cancel()
+			job = scope.launch {
+				delay(timeoutMillis.toLong())
+				mld.value = it
+			}
+		}
+	}
+
+inline fun <T> LiveData<T>.filter(crossinline predicate: (T) -> Boolean): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		mld.addSource(this) {
+			if (predicate(it)) mld.value = it
+		}
+	}
+
+inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
+	MediatorLiveData<T>().also { mld ->
+		mld.addSource(this) {
+			block(it)
+			mld.value = it
+		}
+	}
+
+inline fun <T> Flow<T>.observe(owner: LifecycleOwner, crossinline block: suspend (T) -> Unit) {
+	owner.lifecycleScope.launchWhenCreated {
+		collect(block)
+	}
+}

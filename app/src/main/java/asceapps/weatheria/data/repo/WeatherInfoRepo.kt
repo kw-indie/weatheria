@@ -36,7 +36,7 @@ class WeatherInfoRepo @Inject constructor(
 	fun load(locationId: Int) = dao.load(locationId)
 		.distinctUntilChanged()
 
-	suspend fun fetch(l: LocationEntity) {
+	suspend fun get(l: LocationEntity) {
 		val oneCallResp = withContext(ioDispatcher) {
 			with(l) {
 				service.oneCall(lat.toString(), lng.toString())

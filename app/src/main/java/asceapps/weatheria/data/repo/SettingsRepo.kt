@@ -5,21 +5,17 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.work.*
 import asceapps.weatheria.R
-import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ActivityRetainedScoped
 class SettingsRepo @Inject constructor(
 	@ApplicationContext appContext: Context,
-	private val prefs: SharedPreferences,
-	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
+	private val prefs: SharedPreferences
 ) {
 
 	private val workManager = WorkManager.getInstance(appContext)
@@ -55,7 +51,7 @@ class SettingsRepo @Inject constructor(
 			}
 		}
 
-	suspend fun update(key: String): Unit = withContext(ioDispatcher) {
+	fun update(key: String) {
 		when (key) {
 			autoRefreshKey -> updateAutoRefresh()
 		}

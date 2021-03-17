@@ -10,7 +10,7 @@ import asceapps.weatheria.util.asyncPing
 import asceapps.weatheria.util.debounce
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	@ApplicationContext appContext: Context,
+	@ActivityContext context: Context,
 	private val infoRepo: WeatherInfoRepo
 ) : ViewModel() {
 
@@ -33,7 +33,7 @@ class MainViewModel @Inject constructor(
 		.shareIn(viewModelScope, SharingStarted.Lazily, 1)
 		.onEach { _loading.value = false }
 
-	// todo add selectLocation here and init it from settingsRepo
+	// todo add selectedLocation here and init it from settingsRepo
 
 	private val _loading = MutableLiveData(true)
 	val loading: LiveData<Boolean> get() = _loading
@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(
 	private val onlineManualCheck = MutableLiveData<Boolean?>()
 	val onlineStatus: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
 		addSource(onlineManualCheck) { value = it }
-		addSource(appContext.onlineStatusFlow().asLiveData()) { value = it }
+		addSource(context.onlineStatusFlow().asLiveData()) { value = it }
 	}.debounce(500, viewModelScope)
 	// this debounce helps when ui hasn't completed responding to last emission
 
@@ -57,7 +57,7 @@ class MainViewModel @Inject constructor(
 	fun addNewLocation(l: LocationEntity) = viewModelScope.launch {
 		try {
 			_loading.value = true
-			infoRepo.fetch(l)
+			infoRepo.get(l)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			_error.value = e

@@ -15,7 +15,7 @@ class DatabaseModule {
 
 	@Provides
 	@Singleton
-	fun provideAppDB(@ApplicationContext context: Context) = AppDatabase.build(context)
+	fun provideAppDB(@ApplicationContext appContext: Context) = AppDatabase.build(appContext)
 
 	@Provides
 	fun provideLocationDao(appDatabase: AppDatabase) = appDatabase.locationDao()

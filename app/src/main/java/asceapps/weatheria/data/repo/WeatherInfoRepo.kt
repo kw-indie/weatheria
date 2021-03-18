@@ -7,9 +7,7 @@ import asceapps.weatheria.data.entity.*
 import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.model.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.time.*
 import java.time.chrono.HijrahDate
@@ -26,54 +24,79 @@ class WeatherInfoRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	fun loadAll() = dao.loadAll()
-		//.distinctUntilChanged() not needed since any change has to show on ui
-		.map { list -> list.map { entityToModel(it) } }
-		.flowOn(ioDispatcher)
+	fun getAll() = flow {
+		emit(Result.Loading)
+		val flow = dao.loadAll()
+			.map { list ->
+				val modList = list.map { e -> entityToModel(e) }
+				Result.Success(modList)
+			}
+			.flowOn(ioDispatcher)
+		emitAll(flow)
+	}
 
-	fun loadAllIds() = dao.loadAllIds()
+	fun getAllIds() = flow {
+		emit(Result.Loading)
+		val flow = dao.loadAllIds()
+			.distinctUntilChanged()
+			.map { Result.Success(it) }
+		emitAll(flow)
+	}
 
-	fun load(locationId: Int) = dao.load(locationId)
-		.distinctUntilChanged()
+	fun get(locationId: Int) = flow {
+		emit(Result.Loading)
+		val flow = dao.load(locationId)
+			.distinctUntilChanged()
+			.map { Result.Success(it) }
+		emitAll(flow)
+	}
 
 	suspend fun get(l: LocationEntity) {
-		val oneCallResp = withContext(ioDispatcher) {
-			with(l) {
+		withContext(ioDispatcher) {
+			val oneCallResp = with(l) {
 				service.oneCall(lat.toString(), lng.toString())
 			}
+			with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
+				dao.insert(location, current, hourly, daily)
+			}
+			// no need to return, as updating db will trigger new emission on [all]
 		}
-		with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
-			dao.insert(location, current, hourly, daily)
-		}
-		// no need to return, as updating db will trigger live data
 	}
 
 	suspend fun refresh(id: Int, lat: Float, lng: Float) {
-		val oneCallResp = withContext(ioDispatcher) {
-			service.oneCall(lat.toString(), lng.toString())
+		withContext(ioDispatcher) {
+			val oneCallResp = service.oneCall(lat.toString(), lng.toString())
+			val current = extractCurrentEntity(id, oneCallResp)
+			val hourly = extractHourlyEntity(id, oneCallResp)
+			val daily = extractDailyEntity(id, oneCallResp)
+			dao.update(current, hourly, daily)
 		}
-		val current = extractCurrentEntity(id, oneCallResp)
-		val hourly = extractHourlyEntity(id, oneCallResp)
-		val daily = extractDailyEntity(id, oneCallResp)
-		dao.update(current, hourly, daily)
 	}
 
 	suspend fun refreshAll() {
-		dao.getSavedLocations().forEach {
-			with(it) { refresh(id, lat, lng) }
+		withContext(ioDispatcher) {
+			dao.getSavedLocations().forEach {
+				with(it) { refresh(id, lat, lng) }
+			}
 		}
 	}
 
 	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
-		dao.reorder(id, fromPos, toPos)
+		withContext(ioDispatcher) {
+			dao.reorder(id, fromPos, toPos)
+		}
 	}
 
 	suspend fun delete(id: Int, pos: Int) {
-		dao.delete(id, pos)
+		withContext(ioDispatcher) {
+			dao.delete(id, pos)
+		}
 	}
 
 	suspend fun deleteAll() {
-		dao.deleteAll()
+		withContext(ioDispatcher) {
+			dao.deleteAll()
+		}
 	}
 
 	companion object {

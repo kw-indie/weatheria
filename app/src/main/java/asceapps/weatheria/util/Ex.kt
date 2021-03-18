@@ -16,6 +16,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import asceapps.weatheria.data.repo.Result
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -90,34 +91,35 @@ fun ViewPager2.onPageSelectedFlow() = callbackFlow<Int> {
 }
 
 @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-fun Context.onlineStatusFlow(): Flow<Boolean> = onlineStatusFlow(
+fun Context.onlineStatusFlow() = onlineStatusFlow(
 	getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 )
 
-private fun onlineStatusFlow(cm: ConnectivityManager): Flow<Boolean> = callbackFlow {
+private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 	val request = NetworkRequest.Builder()
 		.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 		.build()
 
 	val callback = object : ConnectivityManager.NetworkCallback() {
 		override fun onAvailable(network: Network) {
+			offer(Result.Loading)
 			offer(blockingPing())
 		}
 
-		override fun onCapabilitiesChanged(
-			network: Network,
-			networkCapabilities: NetworkCapabilities
-		) {
+		override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+			offer(Result.Loading)
 			offer(blockingPing())
 		}
 
 		override fun onLost(network: Network) {
-			//offer(false) may have lost one network, but not the others
+			offer(Result.Loading)
+			//offer(error) may have lost one network, but not the others
 			offer(blockingPing())
 		}
 	}
 
 	// fire initial value
+	offer(Result.Loading)
 	offer(asyncPing())
 
 	cm.registerNetworkCallback(request, callback)
@@ -128,22 +130,22 @@ private fun onlineStatusFlow(cm: ConnectivityManager): Flow<Boolean> = callbackF
 }
 
 // todo move to a repo with other methods and share a dispatcher
-suspend fun asyncPing(): Boolean = withContext(Dispatchers.IO) {
+suspend fun asyncPing() = withContext(Dispatchers.IO) {
 	blockingPing()
 }
 
 // todo throttle, don't start new if already started
-private fun blockingPing(): Boolean {
+private fun blockingPing(): Result<Unit> {
 	return try {
 		Socket().use {
 			// dns servers listen on port 53
 			val socketAddress = InetSocketAddress("8.8.8.8", 53)
 			it.connect(socketAddress, 1500)
 		}
-		true
+		Result.Success(Unit)
 	} catch (e: Exception) {
 		e.printStackTrace()
-		false
+		Result.Error(e)
 	}
 }
 

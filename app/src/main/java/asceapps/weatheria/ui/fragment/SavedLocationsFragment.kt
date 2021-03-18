@@ -8,11 +8,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
+import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
 import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
-import kotlinx.coroutines.flow.map
 
 class SavedLocationsFragment : Fragment() {
 
@@ -28,6 +28,7 @@ class SavedLocationsFragment : Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+
 		val binding = FragmentSavedLocationsBinding.inflate(inflater, container, false)
 		val locationsAdapter = SavedLocationsAdapter(
 			onDeleteClick = {
@@ -59,18 +60,28 @@ class SavedLocationsFragment : Fragment() {
 			addItemDecoration(divider)
 			setHasFixedSize(true)
 		}
-		mainVM.weatherInfoList
-			.map { list -> list.map { it.location } }
-			.observe(viewLifecycleOwner) {
-				locationsAdapter.submitList(it)
-				val isEmpty = it.isEmpty()
-				binding.tvNoLocations.isVisible = isEmpty
-				binding.rvLocations.isVisible = !isEmpty
-				if (emptyList != isEmpty) {
-					emptyList = isEmpty
-					requireActivity().invalidateOptionsMenu()
+		mainVM.weatherInfoList.observe(viewLifecycleOwner) {
+			when (it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					// todo cancel loading anim
+					val list = it.data.map { e -> e.location }
+					locationsAdapter.submitList(list)
+					val isEmpty = list.isEmpty()
+					binding.tvNoLocations.isVisible = isEmpty
+					binding.rvLocations.isVisible = !isEmpty
+					if (emptyList != isEmpty) {
+						emptyList = isEmpty
+						requireActivity().invalidateOptionsMenu()
+					}
+				}
+				is Result.Error -> {
+					// todo does this ever happen?
 				}
 			}
+		}
 
 		return binding.root
 	}

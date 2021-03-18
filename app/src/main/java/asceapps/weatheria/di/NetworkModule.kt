@@ -6,7 +6,7 @@ import asceapps.weatheria.data.api.WeatherService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -16,5 +16,6 @@ class NetworkModule {
 
 	@Provides
 	@Singleton
-	fun provideWeatherService(@ActivityContext context: Context) = WeatherService.create(context)
+	fun provideWeatherService(@ApplicationContext appContext: Context) =
+		WeatherService.create(appContext)
 }

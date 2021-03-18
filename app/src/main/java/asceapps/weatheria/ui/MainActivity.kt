@@ -13,9 +13,11 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import asceapps.weatheria.R
+import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.ActivityMainBinding
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.edgeToEdge
+import asceapps.weatheria.util.observe
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
@@ -45,8 +47,18 @@ class MainActivity : AppCompatActivity() {
 					setAction(R.string.retry) { viewModel.checkOnline() }
 				}
 		viewModel.onlineStatus.observe(this) {
-			if (it) snackbar.dismiss()
-			else snackbar.show()
+			when (it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					// todo cancel loading anim
+					snackbar.dismiss()
+				}
+				is Result.Error -> {
+					snackbar.show()
+				}
+			}
 		}
 
 		viewModel.error.observe(this) {

@@ -1,15 +1,7 @@
 package asceapps.weatheria.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import asceapps.weatheria.data.entity.CurrentEntity
-import asceapps.weatheria.data.entity.DailyEntity
-import asceapps.weatheria.data.entity.HourlyEntity
-import asceapps.weatheria.data.entity.SavedLocationEntity
-import asceapps.weatheria.data.entity.WeatherInfoEntity
+import androidx.room.*
+import asceapps.weatheria.data.entity.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -36,6 +28,7 @@ abstract class WeatherInfoDao {
 		h: List<HourlyEntity>,
 		d: List<DailyEntity>
 	) {
+		// todo we can replace this by getCount()
 		l.pos = getMaxSavedLocationPos() + 1
 		insertLocation(l)
 		insertCurrent(c)

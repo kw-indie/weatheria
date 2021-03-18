@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
+import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfo
@@ -101,14 +102,24 @@ class HomeFragment: Fragment() {
 
 			selectedLocation = settingsRepo.selectedLocation
 			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
-				infoAdapter.submitList(it)
-				pager.setCurrentItem(selectedLocation, false)
-				val isEmpty = it.isEmpty()
-				tvEmptyPager.isVisible = isEmpty
-				swipeRefresh.isVisible = !isEmpty
-			}
-			mainVM.loading.observe(viewLifecycleOwner) {
-				swipeRefresh.isRefreshing = it
+				when (it) {
+					is Result.Loading -> {
+						swipeRefresh.isRefreshing = true
+					}
+					is Result.Success -> {
+						swipeRefresh.isRefreshing = false
+						val list = it.data
+						infoAdapter.submitList(list)
+						pager.setCurrentItem(selectedLocation, false)
+						val isEmpty = list.isEmpty()
+						tvEmptyPager.isVisible = isEmpty
+						swipeRefresh.isVisible = !isEmpty
+					}
+					is Result.Error -> {
+						swipeRefresh.isRefreshing = false
+						// todo does this ever happen?
+					}
+				}
 			}
 		}.root
 	}

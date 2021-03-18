@@ -2,18 +2,19 @@ package asceapps.weatheria.ui.viewmodel
 
 import android.content.Context
 import android.text.format.DateUtils
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.entity.LocationEntity
+import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.model.Location
 import asceapps.weatheria.util.asyncPing
-import asceapps.weatheria.util.debounce
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.time.Instant
@@ -25,58 +26,45 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	@ActivityContext context: Context,
+	@ApplicationContext appContext: Context,
 	private val infoRepo: WeatherInfoRepo
 ) : ViewModel() {
 
-	val weatherInfoList = infoRepo.loadAll()
+	val weatherInfoList = infoRepo.getAll()
 		.shareIn(viewModelScope, SharingStarted.Lazily, 1)
-		.onEach { _loading.value = false }
 
 	// todo add selectedLocation here and init it from settingsRepo
-
-	private val _loading = MutableLiveData(true)
-	val loading: LiveData<Boolean> get() = _loading
 
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> get() = _error
 
-	// fixme use StateFlow<Result>() e.g. Result.loading()
-	// used liveData for now cuz flows don't re-emit same value
-	private val onlineManualCheck = MutableLiveData<Boolean?>()
-	val onlineStatus: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
-		addSource(onlineManualCheck) { value = it }
-		addSource(context.onlineStatusFlow().asLiveData()) { value = it }
-	}.debounce(500, viewModelScope)
-	// this debounce helps when ui hasn't completed responding to last emission
+	private val onlineManualCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
+	val onlineStatus = merge(onlineManualCheck, appContext.onlineStatusFlow())
+		// debounce helps ui completed responding (anim) to last emission
+		.debounce(500)
 
 	fun checkOnline() = viewModelScope.launch {
+		onlineManualCheck.value = Result.Loading
 		onlineManualCheck.value = asyncPing()
 	}
 
 	fun addNewLocation(l: LocationEntity) = viewModelScope.launch {
 		try {
-			_loading.value = true
 			infoRepo.get(l)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			_error.value = e
-		} finally {
-			_loading.value = false
 		}
 	}
 
 	fun refresh(l: Location) = viewModelScope.launch {
 		try {
-			_loading.value = true
 			with(l) {
 				infoRepo.refresh(id, lat, lng)
 			}
 		} catch (e: Exception) {
 			e.printStackTrace()
 			_error.value = e
-		} finally {
-			_loading.value = false
 		}
 	}
 

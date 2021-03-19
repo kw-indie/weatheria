@@ -8,28 +8,27 @@ import kotlinx.coroutines.flow.Flow
 abstract class WeatherInfoDao {
 
 	@Transaction
-	@Query("SELECT * FROM saved_locations ORDER BY pos")
+	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract fun loadAll(): Flow<List<WeatherInfoEntity>>
 
-	@Query("SELECT id FROM saved_locations ORDER BY pos")
+	@Query("SELECT id FROM locations ORDER BY pos")
 	abstract fun loadAllIds(): Flow<List<Int>>
 
 	@Transaction
-	@Query("SELECT * FROM saved_locations WHERE id = :locationId")
+	@Query("SELECT * FROM locations WHERE id = :locationId")
 	abstract fun load(locationId: Int): Flow<WeatherInfoEntity>
 
-	@Query("SELECT * FROM saved_locations ORDER BY pos")
-	abstract suspend fun getSavedLocations(): List<SavedLocationEntity>
+	@Query("SELECT * FROM locations ORDER BY pos")
+	abstract suspend fun getLocations(): List<LocationEntity>
 
 	@Transaction
 	open suspend fun insert(
-		l: SavedLocationEntity,
+		l: LocationEntity,
 		c: CurrentEntity,
 		h: List<HourlyEntity>,
 		d: List<DailyEntity>
 	) {
-		// todo we can replace this by getCount()
-		l.pos = getMaxSavedLocationPos() + 1
+		l.pos = getLocationsCount()
 		insertLocation(l)
 		insertCurrent(c)
 		insertHourly(h)
@@ -62,14 +61,14 @@ abstract class WeatherInfoDao {
 		pullPosDown(locationPos + 1) // shift down all rows with bigger pos
 	}
 
-	@Query("DELETE FROM saved_locations")
+	@Query("DELETE FROM locations")
 	abstract suspend fun deleteAll()
 
-	@Query("SELECT IFNULL(MAX(pos), -1) FROM saved_locations")
-	abstract suspend fun getMaxSavedLocationPos(): Int
+	@Query("SELECT COUNT(*) FROM locations")
+	abstract suspend fun getLocationsCount(): Int
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	protected abstract suspend fun insertLocation(l: SavedLocationEntity)
+	protected abstract suspend fun insertLocation(l: LocationEntity)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun insertCurrent(c: CurrentEntity)
@@ -81,22 +80,22 @@ abstract class WeatherInfoDao {
 	protected abstract suspend fun insertDaily(d: List<DailyEntity>)
 
 	// rely on FK cascade to delete related info
-	@Query("DELETE FROM saved_locations WHERE id = :locationId")
+	@Query("DELETE FROM locations WHERE id = :locationId")
 	protected abstract suspend fun delete(locationId: Int)
 
-	@Query("UPDATE saved_locations SET pos = :pos WHERE id = :locationId")
+	@Query("UPDATE locations SET pos = :pos WHERE id = :locationId")
 	protected abstract suspend fun setPos(locationId: Int, pos: Int)
 
-	@Query("UPDATE saved_locations SET pos = pos+1 WHERE pos >= :fromPos")
+	@Query("UPDATE locations SET pos = pos+1 WHERE pos >= :fromPos")
 	protected abstract suspend fun pushPosUp(fromPos: Int)
 
-	@Query("UPDATE saved_locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
+	@Query("UPDATE locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun incPos(fromPos: Int, toPos: Int)
 
-	@Query("UPDATE saved_locations SET pos = pos-1 WHERE pos BETWEEN :fromPos AND :toPos")
+	@Query("UPDATE locations SET pos = pos-1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun decPos(fromPos: Int, toPos: Int)
 
-	@Query("UPDATE saved_locations SET pos = pos-1 WHERE pos >= :fromPos")
+	@Query("UPDATE locations SET pos = pos-1 WHERE pos >= :fromPos")
 	protected abstract suspend fun pullPosDown(fromPos: Int)
 
 	@Query("DELETE FROM hourly WHERE locationId = :locationId")

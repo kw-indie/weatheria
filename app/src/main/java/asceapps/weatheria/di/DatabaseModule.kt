@@ -18,8 +18,5 @@ class DatabaseModule {
 	fun provideAppDB(@ApplicationContext appContext: Context) = AppDatabase.build(appContext)
 
 	@Provides
-	fun provideLocationDao(appDatabase: AppDatabase) = appDatabase.locationDao()
-
-	@Provides
 	fun provideWeatherInfoDao(appDatabase: AppDatabase) = appDatabase.weatherInfoDao()
 }

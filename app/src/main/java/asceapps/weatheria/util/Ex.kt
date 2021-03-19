@@ -45,15 +45,15 @@ fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
 	}
 }
 
-fun SearchView.onTextChangeFlow() = callbackFlow<String> {
+fun SearchView.onTextSubmitFlow() = callbackFlow<String> {
 	setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-		override fun onQueryTextSubmit(query: String?): Boolean {
+		override fun onQueryTextSubmit(query: String): Boolean {
+			offer(query)
 			clearFocus()
 			return true
 		}
 
 		override fun onQueryTextChange(newText: String): Boolean {
-			offer(newText)
 			return true
 		}
 	})

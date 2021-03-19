@@ -8,7 +8,7 @@ import androidx.room.ForeignKey
 	primaryKeys = ["locationId", "dt"],
 	foreignKeys = [
 		ForeignKey(
-			entity = SavedLocationEntity::class,
+			entity = LocationEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["locationId"],
 			onDelete = ForeignKey.CASCADE

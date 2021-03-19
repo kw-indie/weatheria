@@ -2,32 +2,35 @@ package asceapps.weatheria.ui.viewmodel
 
 import android.annotation.SuppressLint
 import android.location.Location
-import androidx.lifecycle.*
-import asceapps.weatheria.data.repo.LocationRepo
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.util.awaitCurrentLocation
-import asceapps.weatheria.util.debounce
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddLocationViewModel @Inject constructor(
-	private val locationRepo: LocationRepo
+	private val infoRepo: WeatherInfoRepo
 ) : ViewModel() {
 
-	private val _myLocation = MutableLiveData<Result<Location>>()
-	val myLocation: LiveData<Result<Location>> get() = _myLocation
-	private var query = MutableLiveData<String>()
+	private val _myLocation = MutableStateFlow<Result<Location>>(Result.Loading)
+	val myLocation: Flow<Result<Location>> get() = _myLocation
+	private var query = MutableStateFlow("")
 	val result = query
-		.debounce(500, viewModelScope)
-		//.filter { it.isNotBlank() } // this is actually not good since we want an empty list if we clear query
-		.distinctUntilChanged()
-		.switchMap { q -> locationRepo.search(q) }
+		.debounce(1000)
+		.flatMapLatest { q -> infoRepo.search(q) }
 
 	fun setQuery(q: String) {
-		query.value = q
+		if (query.value != q)
+			query.value = q
 	}
 
 	fun getMyLocation(client: FusedLocationProviderClient) = viewModelScope.launch {

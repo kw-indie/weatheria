@@ -1,5 +1,6 @@
 package asceapps.weatheria.data.repo
 
+import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherService
 import asceapps.weatheria.data.dao.WeatherInfoDao
@@ -51,15 +52,32 @@ class WeatherInfoRepo @Inject constructor(
 		emitAll(flow)
 	}
 
-	suspend fun get(l: LocationEntity) {
+	suspend fun get(l: FindResponse.Location) {
 		withContext(ioDispatcher) {
 			val oneCallResp = with(l) {
-				service.oneCall(lat.toString(), lng.toString())
+				service.oneCall(coord.lat.toString(), coord.lon.toString())
 			}
-			with(oneCallToWeatherInfoEntity(l, oneCallResp)) {
+			with(responsesToEntity(l, oneCallResp)) {
 				dao.insert(location, current, hourly, daily)
 			}
 			// no need to return, as updating db will trigger new emission on [all]
+		}
+	}
+
+	fun search(query: String) = flow {
+		emit(Result.Loading)
+		// todo catch errors
+		when {
+			query.isEmpty() -> emit(Result.Success(emptyList<FindResponse.Location>()))
+			query.matches(coordinateRegex) -> {
+				val (lat, lng) = query.split(',')
+				val list = service.find(lat, lng).list
+				emit(Result.Success(list))
+			}
+			else -> {
+				val list = service.find(query).list
+				emit(Result.Success(list))
+			}
 		}
 	}
 
@@ -75,7 +93,7 @@ class WeatherInfoRepo @Inject constructor(
 
 	suspend fun refreshAll() {
 		withContext(ioDispatcher) {
-			dao.getSavedLocations().forEach {
+			dao.getLocations().forEach {
 				with(it) { refresh(id, lat, lng) }
 			}
 		}
@@ -101,18 +119,20 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun oneCallToWeatherInfoEntity(
-			l: LocationEntity,
-			resp: OneCallResponse
+		private val coordinateRegex =
+			Regex("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$")
+
+		private fun responsesToEntity(
+			l: FindResponse.Location,
+			ocr: OneCallResponse
 		): WeatherInfoEntity {
-			val savedLocation = with(l) {
-				SavedLocationEntity(id, lat, lng, name, country, resp.timezone_offset)
+			val location = with(l) {
+				LocationEntity(id, coord.lat, coord.lon, name, sys.country, ocr.timezone_offset)
 			}
-			// if we are parsing with a found location, all nullables are non-null
-			val current = extractCurrentEntity(l.id, resp)
-			val hourly = extractHourlyEntity(l.id, resp)
-			val daily = extractDailyEntity(l.id, resp)
-			return WeatherInfoEntity(savedLocation, current, hourly, daily)
+			val current = extractCurrentEntity(l.id, ocr)
+			val hourly = extractHourlyEntity(l.id, ocr)
+			val daily = extractDailyEntity(l.id, ocr)
+			return WeatherInfoEntity(location, current, hourly, daily)
 		}
 
 		private fun extractCurrentEntity(locationId: Int, resp: OneCallResponse) =

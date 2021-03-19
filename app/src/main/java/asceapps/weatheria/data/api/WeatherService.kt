@@ -18,6 +18,12 @@ interface WeatherService {
 	@GET("onecall?exclude=minutely")
 	suspend fun oneCall(@Query("lat") lat: String, @Query("lon") lng: String): OneCallResponse
 
+	@GET("find")
+	suspend fun find(@Query("q") name: String): FindResponse
+
+	@GET("find")
+	suspend fun find(@Query("lat") lat: String, @Query("lon") lng: String): FindResponse
+
 	companion object {
 
 		const val ICON_URL_PATTERN = "https://openweathermap.org/img/wn/%s@2x.png"

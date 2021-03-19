@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import asceapps.weatheria.data.entity.LocationEntity
+import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.model.Location
@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
 
 	private val onlineManualCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
 	val onlineStatus = merge(onlineManualCheck, appContext.onlineStatusFlow())
-		// debounce helps ui completed responding (anim) to last emission
+		// debounce helps ui complete responding (anim) to last emission
 		.debounce(500)
 
 	fun checkOnline() = viewModelScope.launch {
@@ -48,7 +48,7 @@ class MainViewModel @Inject constructor(
 		onlineManualCheck.value = asyncPing()
 	}
 
-	fun addNewLocation(l: LocationEntity) = viewModelScope.launch {
+	fun addNewLocation(l: FindResponse.Location) = viewModelScope.launch {
 		try {
 			infoRepo.get(l)
 		} catch (e: Exception) {

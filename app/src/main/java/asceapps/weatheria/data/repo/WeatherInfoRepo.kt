@@ -36,6 +36,7 @@ class WeatherInfoRepo @Inject constructor(
 		emitAll(flow)
 	}
 
+	// todo remove unused
 	fun getAllIds() = flow {
 		emit(Result.Loading)
 		val flow = dao.loadAllIds()
@@ -52,7 +53,8 @@ class WeatherInfoRepo @Inject constructor(
 		emitAll(flow)
 	}
 
-	suspend fun get(l: FindResponse.Location) {
+	// todo shorten param type or convert to model FoundLocation
+	suspend fun add(l: FindResponse.Location) {
 		withContext(ioDispatcher) {
 			val oneCallResp = with(l) {
 				service.oneCall(coord.lat.toString(), coord.lon.toString())

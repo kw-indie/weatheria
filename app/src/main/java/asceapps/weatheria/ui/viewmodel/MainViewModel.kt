@@ -50,7 +50,7 @@ class MainViewModel @Inject constructor(
 
 	fun addNewLocation(l: FindResponse.Location) = viewModelScope.launch {
 		try {
-			infoRepo.get(l)
+			infoRepo.add(l)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			_error.value = e

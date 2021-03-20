@@ -38,6 +38,9 @@ import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 
+// todo move to util or sth
+private const val latLngFormat = "%1$.3f,%2$.3f"
+
 @AndroidEntryPoint
 class AddLocationFragment : Fragment() {
 
@@ -93,7 +96,7 @@ class AddLocationFragment : Fragment() {
 						val query = if (cameraPosition.zoom >= searchZoom) {
 							searchMenuItem.expandActionView()
 							with(cameraPosition.target) {
-								"%1$.3f,%2$.3f".format(latitude, longitude)
+								latLngFormat.format(latitude, longitude)
 							}
 						} else {
 							searchMenuItem.collapseActionView()

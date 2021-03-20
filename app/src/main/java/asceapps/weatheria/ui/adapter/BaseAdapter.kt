@@ -16,7 +16,7 @@ abstract class BaseAdapter<T : IDed, VH : RecyclerView.ViewHolder> :
 		return super.getItem(position)
 	}
 
-	class HashItemCallback<T : IDed> : DiffUtil.ItemCallback<T>() {
+	private class HashItemCallback<T : IDed> : DiffUtil.ItemCallback<T>() {
 
 		override fun areItemsTheSame(oldT: T, newT: T) = oldT.id == newT.id
 		override fun areContentsTheSame(oldT: T, newT: T) = oldT.hashCode() == newT.hashCode()

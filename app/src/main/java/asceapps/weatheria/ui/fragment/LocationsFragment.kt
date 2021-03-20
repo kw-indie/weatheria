@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
-import asceapps.weatheria.databinding.FragmentSavedLocationsBinding
-import asceapps.weatheria.ui.adapter.SavedLocationsAdapter
+import asceapps.weatheria.databinding.FragmentLocationsBinding
+import asceapps.weatheria.ui.adapter.LocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
 
-class SavedLocationsFragment : Fragment() {
+class LocationsFragment : Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private var emptyList = true
@@ -29,8 +29,8 @@ class SavedLocationsFragment : Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 
-		val binding = FragmentSavedLocationsBinding.inflate(inflater, container, false)
-		val locationsAdapter = SavedLocationsAdapter(
+		val binding = FragmentLocationsBinding.inflate(inflater, container, false)
+		val locationsAdapter = LocationsAdapter(
 			onDeleteClick = {
 				mainVM.delete(it)
 			},

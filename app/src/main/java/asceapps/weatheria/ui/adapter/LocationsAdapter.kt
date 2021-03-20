@@ -9,17 +9,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.IDed
-import asceapps.weatheria.databinding.ItemSavedLocationBinding
+import asceapps.weatheria.databinding.ItemLocationBinding
 import asceapps.weatheria.model.Location
 import java.util.*
 
-class SavedLocationsAdapter(
+class LocationsAdapter(
 	private val onDeleteClick: (Location) -> Unit,
 	private val onItemClick: (Location) -> Unit,
 	private val onStartDrag: (View) -> Unit,
 	private val onEndDrag: (View) -> Unit,
 	private val onReorder: (Location, Int) -> Unit
-) : RecyclerView.Adapter<SavedLocationsAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
 
 	private val list = mutableListOf<Location>()
 	private val callback = HashCallback<Location>()
@@ -64,7 +64,7 @@ class SavedLocationsAdapter(
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val holder: ViewHolder
-		ItemSavedLocationBinding.inflate(
+		ItemLocationBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent, false
 		).apply {
@@ -91,7 +91,7 @@ class SavedLocationsAdapter(
 	}
 
 	class ViewHolder(
-		private val binding: ItemSavedLocationBinding
+		private val binding: ItemLocationBinding
 	) : RecyclerView.ViewHolder(binding.root) {
 
 		fun bind(l: Location) {

@@ -1,6 +1,7 @@
 package asceapps.weatheria.util
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
@@ -102,18 +103,20 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 
 	val callback = object : ConnectivityManager.NetworkCallback() {
 		override fun onAvailable(network: Network) {
-			offer(Result.Loading)
-			offer(blockingPing())
+			refresh()
 		}
 
 		override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-			offer(Result.Loading)
-			offer(blockingPing())
+			refresh()
 		}
 
 		override fun onLost(network: Network) {
-			offer(Result.Loading)
 			//offer(error) may have lost one network, but not the others
+			refresh()
+		}
+
+		private fun refresh() {
+			offer(Result.Loading)
 			offer(blockingPing())
 		}
 	}
@@ -149,7 +152,7 @@ private fun blockingPing(): Result<Unit> {
 	}
 }
 
-@RequiresPermission(value = Manifest.permission.ACCESS_COARSE_LOCATION)
+@SuppressLint("MissingPermission")
 suspend fun FusedLocationProviderClient.awaitCurrentLocation() =
 	suspendCancellableCoroutine<Location> {
 		val cts = CancellationTokenSource()
@@ -198,8 +201,7 @@ inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
 		}
 	}
 
-inline fun <T> Flow<T>.observe(owner: LifecycleOwner, crossinline block: suspend (T) -> Unit) {
-	owner.lifecycleScope.launchWhenCreated {
+inline fun <T> Flow<T>.observe(owner: LifecycleOwner, crossinline block: suspend (T) -> Unit) =
+	owner.lifecycleScope.launchWhenStarted {
 		collect(block)
 	}
-}

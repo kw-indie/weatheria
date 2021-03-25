@@ -2,7 +2,7 @@ package asceapps.weatheria.data.repo
 
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.OneCallResponse
-import asceapps.weatheria.data.api.WeatherService
+import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.data.dao.WeatherInfoDao
 import asceapps.weatheria.data.entity.*
 import asceapps.weatheria.di.IoDispatcher
@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 
 @Singleton
 class WeatherInfoRepo @Inject constructor(
-	private val service: WeatherService,
+	private val api: WeatherApi,
 	private val dao: WeatherInfoDao,
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
@@ -57,7 +57,7 @@ class WeatherInfoRepo @Inject constructor(
 	suspend fun add(l: FindResponse.Location) {
 		withContext(ioDispatcher) {
 			val oneCallResp = with(l) {
-				service.oneCall(coord.lat.toString(), coord.lon.toString())
+				api.oneCall(coord.lat.toString(), coord.lon.toString())
 			}
 			with(responsesToEntity(l, oneCallResp)) {
 				dao.insert(location, current, hourly, daily)
@@ -66,26 +66,9 @@ class WeatherInfoRepo @Inject constructor(
 		}
 	}
 
-	fun search(query: String) = flow {
-		emit(Result.Loading)
-		// todo catch errors
-		when {
-			query.isEmpty() -> emit(Result.Success(emptyList<FindResponse.Location>()))
-			query.matches(coordinateRegex) -> {
-				val (lat, lng) = query.split(',')
-				val list = service.find(lat, lng).list
-				emit(Result.Success(list))
-			}
-			else -> {
-				val list = service.find(query).list
-				emit(Result.Success(list))
-			}
-		}
-	}
-
 	suspend fun refresh(id: Int, lat: Float, lng: Float) {
 		withContext(ioDispatcher) {
-			val oneCallResp = service.oneCall(lat.toString(), lng.toString())
+			val oneCallResp = api.oneCall(lat.toString(), lng.toString())
 			val current = extractCurrentEntity(id, oneCallResp)
 			val hourly = extractHourlyEntity(id, oneCallResp)
 			val daily = extractDailyEntity(id, oneCallResp)
@@ -120,9 +103,6 @@ class WeatherInfoRepo @Inject constructor(
 	}
 
 	companion object {
-
-		private val coordinateRegex =
-			Regex("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$")
 
 		private fun responsesToEntity(
 			l: FindResponse.Location,

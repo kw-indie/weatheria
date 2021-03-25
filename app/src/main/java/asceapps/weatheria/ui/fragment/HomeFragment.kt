@@ -119,6 +119,8 @@ class HomeFragment: Fragment() {
 						swipeRefresh.isRefreshing = false
 						// todo does this ever happen?
 					}
+					else -> {
+					}
 				}
 			}
 		}.root

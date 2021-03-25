@@ -31,7 +31,6 @@ import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onTextSubmitFlow
-import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
@@ -119,8 +118,7 @@ class AddLocationFragment : Fragment() {
 			addItemDecoration(divider)
 			setHasFixedSize(true)
 		}
-
-		addLocationVM.myLocation.observe(viewLifecycleOwner) {
+		addLocationVM.deviceLocation.observe(viewLifecycleOwner) {
 			when (it) {
 				is Result.Loading -> {
 					// todo show loading anim
@@ -128,25 +126,43 @@ class AddLocationFragment : Fragment() {
 				is Result.Success -> {
 					val l = it.data
 					googleMap.animateCamera(
-						CameraUpdateFactory
-							.newLatLngZoom(LatLng(l.latitude, l.longitude), maxZoom)
+						CameraUpdateFactory.newLatLngZoom(LatLng(l.latitude, l.longitude), maxZoom)
 					)
 				}
 				is Result.Error -> {
-					Toast.makeText(
-						requireContext(),
+					showMessage(
 						// todo did we cover other reasons?
 						when (it) {
 							is NullPointerException -> R.string.error_location_not_found
 							else -> R.string.error_unknown
-						},
-						Toast.LENGTH_LONG
-					).show()
+						}
+					)
+				}
+				else -> {
 				}
 			}
-
 		}
-		addLocationVM.result.observe(viewLifecycleOwner) {
+		addLocationVM.ipGeolocation.observe(viewLifecycleOwner) {
+			when (it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
+					googleMap.animateCamera(
+						// todo move zoom to const
+						CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 13f)
+					)
+				}
+				is Result.Error -> {
+					// todo retrofit errors from homeFragment
+					showMessage(R.string.error_unknown)
+				}
+				else -> {
+				}
+			}
+		}
+		addLocationVM.searchResult.observe(viewLifecycleOwner) {
 			when (it) {
 				is Result.Loading -> {
 					// todo show loading anim
@@ -162,6 +178,8 @@ class AddLocationFragment : Fragment() {
 				}
 				is Result.Error -> {
 					// this shouldn't happen
+				}
+				else -> {
 				}
 			}
 		}
@@ -261,9 +279,7 @@ class AddLocationFragment : Fragment() {
 	private fun onMyLocationClick() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 		if (LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.getMyLocation(
-				LocationServices.getFusedLocationProviderClient(requireContext())
-			)
+			addLocationVM.updateDeviceLocation()
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

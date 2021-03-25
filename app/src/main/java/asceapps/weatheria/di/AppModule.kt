@@ -3,6 +3,8 @@ package asceapps.weatheria.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +18,8 @@ class AppModule {
 	@Provides
 	fun provideSharedPrefs(@ApplicationContext appContext: Context): SharedPreferences =
 		PreferenceManager.getDefaultSharedPreferences(appContext)
+
+	@Provides
+	fun provideLocationProviderClient(@ApplicationContext appContext: Context): FusedLocationProviderClient =
+		LocationServices.getFusedLocationProviderClient(appContext)
 }

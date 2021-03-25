@@ -80,6 +80,8 @@ class LocationsFragment : Fragment() {
 				is Result.Error -> {
 					// todo does this ever happen?
 				}
+				else -> {
+				}
 			}
 		}
 

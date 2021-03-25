@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity() {
 				is Result.Error -> {
 					snackbar.show()
 				}
+				else -> {
+				}
 			}
 		}
 

@@ -31,12 +31,12 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.shareIn(viewModelScope, SharingStarted.Lazily, 1)
+		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(1000), 1)
 
 	// todo add selectedLocation here and init it from settingsRepo
 
 	private val _error = MutableLiveData<Throwable>()
-	val error: LiveData<Throwable> get() = _error
+	val error: LiveData<Throwable> = _error
 
 	private val onlineManualCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
 	val onlineStatus = merge(onlineManualCheck, appContext.onlineStatusFlow())

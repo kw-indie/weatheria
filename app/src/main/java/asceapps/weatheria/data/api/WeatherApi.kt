@@ -3,7 +3,7 @@ package asceapps.weatheria.data.api
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface WeatherService {
+interface WeatherApi {
 
 	@GET("onecall?exclude=minutely")
 	suspend fun oneCall(@Query("lat") lat: String, @Query("lon") lng: String): OneCallResponse
@@ -16,6 +16,6 @@ interface WeatherService {
 
 	companion object {
 
-		const val ICON_URL_PATTERN = "https://openweathermap.org/img/wn/%s@2x.png"
+		const val ICON_URL_FORMAT = "https://openweathermap.org/img/wn/%s@2x.png"
 	}
 }

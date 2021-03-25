@@ -11,10 +11,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import asceapps.weatheria.data.repo.Result
@@ -202,6 +199,6 @@ inline fun <T> LiveData<T>.onEach(crossinline block: (T) -> Unit): LiveData<T> =
 	}
 
 inline fun <T> Flow<T>.observe(owner: LifecycleOwner, crossinline block: suspend (T) -> Unit) =
-	owner.lifecycleScope.launchWhenStarted {
+	owner.addRepeatingJob(Lifecycle.State.STARTED) {
 		collect(block)
 	}

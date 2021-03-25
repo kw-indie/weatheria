@@ -112,6 +112,7 @@ dependencies {
 	def lifecycleVer = '2.4.0-alpha01'
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
+	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 
 	// nav
 	// runtime offers findNavController() and navArgs property

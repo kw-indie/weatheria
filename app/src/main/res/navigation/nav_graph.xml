@@ -30,7 +30,7 @@
 		android:id="@+id/locationsFragment"
 		android:name="asceapps.weatheria.ui.fragment.LocationsFragment"
 		android:label="@string/action_locations"
-		tools:layout="@layout/fragment_locations"></fragment>
+		tools:layout="@layout/fragment_locations" />
 	<fragment
 		android:id="@+id/addLocationFragment"
 		android:name="asceapps.weatheria.ui.fragment.AddLocationFragment"

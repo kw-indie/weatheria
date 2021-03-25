@@ -222,6 +222,7 @@ class AddLocationFragment : Fragment() {
 	override fun onDestroy() {
 		super.onDestroy()
 		mapView.onDestroy()
+		mapView.removeAllViews()
 		permissionRequester.unregister()
 	}
 

@@ -33,7 +33,8 @@ class LocationRepo @Inject constructor(
 		_deviceLocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
-				_deviceLocation.value = Result.Success(locationProvider.awaitCurrentLocation())
+				val location = locationProvider.awaitCurrentLocation()
+				_deviceLocation.value = Result.Success(location)
 			}
 		} catch (e: Exception) {
 			e.printStackTrace()
@@ -45,7 +46,8 @@ class LocationRepo @Inject constructor(
 		_ipGeolocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
-				_ipGeolocation.value = Result.Success(ipApi.lookup())
+				val latLng = ipApi.lookup()
+				_ipGeolocation.value = Result.Success(latLng)
 			}
 		} catch (e: Exception) {
 			e.printStackTrace()

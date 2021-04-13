@@ -90,12 +90,16 @@
 		<item>Waning Crescent</item>
 		<item>New Moon</item>
 	</string-array>
-	<!--search-->
+	<!--add location-->
 	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
+	<string name="location_provider_picker_title">Choose Location Provider</string>
+	<string name="location_provider_picker_message">Which location provider would you like to use?</string>
+	<string name="device_provider">Device (requires permission)</string>
+	<string name="ip_provider">IP (requires internet)</string>
 	<string name="request_rationale_title">Why we need permission</string>
-	<string name="location_request_rationale">The app needs only the coarse (approximate) location permission, for the <b>My Location</b> button to work. You can safely revoke the permission once you are done.</string>
-	<string name="request_again">Request again</string>
+	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.</string>
+	<string name="give_permission">Give permission</string>
 	<string name="dismiss">Dismiss</string>
 	<string name="no_search_result">No result.\nUse the search bar above or zoom the map enough to start showing nearby places here.</string>
 	<string name="hint_search">Search by name or coordinates</string>

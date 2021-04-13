@@ -3,7 +3,11 @@ package asceapps.weatheria.ui.fragment
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.animation.TypeEvaluator
@@ -12,7 +16,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.SettingsRepo
@@ -119,8 +122,6 @@ class HomeFragment: Fragment() {
 						swipeRefresh.isRefreshing = false
 						// todo does this ever happen?
 					}
-					else -> {
-					}
 				}
 			}
 		}.root
@@ -128,15 +129,6 @@ class HomeFragment: Fragment() {
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
 		inflater.inflate(R.menu.home_menu, menu)
-	}
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when(item.itemId) {
-			R.id.action_locations -> findNavController().navigate(R.id.action_open_saved_locations)
-			R.id.action_add_location -> findNavController().navigate(R.id.action_open_add_location)
-			else -> return super.onOptionsItemSelected(item)
-		}
-		return true
 	}
 
 	override fun onPause() {

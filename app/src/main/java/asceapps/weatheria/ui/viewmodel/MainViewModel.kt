@@ -14,7 +14,12 @@ import asceapps.weatheria.util.asyncPing
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.time.Instant
@@ -23,6 +28,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import javax.inject.Inject
+import kotlin.time.minutes
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -31,7 +37,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(1000), 1)
+		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(1.minutes), 1)
 
 	// todo add selectedLocation here and init it from settingsRepo
 
@@ -41,7 +47,7 @@ class MainViewModel @Inject constructor(
 	private val onlineManualCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
 	val onlineStatus = merge(onlineManualCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
-		.debounce(500)
+		.debounce(1000)
 
 	fun checkOnline() = viewModelScope.launch {
 		onlineManualCheck.value = Result.Loading

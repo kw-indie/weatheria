@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddLocationViewModel @Inject constructor(
 	private val locationRepo: LocationRepo
-) : ViewModel() {
+): ViewModel() {
 
 	val deviceLocation = locationRepo.deviceLocation
 	val ipGeolocation = locationRepo.ipGeolocation
@@ -24,8 +24,7 @@ class AddLocationViewModel @Inject constructor(
 		.flatMapLatest { q -> locationRepo.search(q) }
 
 	fun setQuery(q: String) {
-		if (query.value != q)
-			query.value = q
+		query.value = q // already checked for 'same value' internally (in flow)
 	}
 
 	fun updateDeviceLocation() = viewModelScope.launch {

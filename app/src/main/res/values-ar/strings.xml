@@ -90,11 +90,15 @@
 		<item>هلال متناقص</item>
 		<item>محاق</item>
 	</string-array>
-	<!--search-->
+	<!--add location-->
 	<string name="action_search">بحث</string>
+	<string name="location_provider_picker_title">اختر مزوّد الموقع</string>
+	<string name="location_provider_picker_message">اختر مزوّد الموقع الذي توداستخدامه</string>
+	<string name="device_provider">الجهاز (يتطلب الإذن)</string>
+	<string name="ip_provider">عنوان IP (يتطلب الإنترنت)</string>
 	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
-	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع التقريبي فقط، وذلك ليعمل زر <b>موقعي</b>. بإمكانك سحب الإذن بأمان عند الانتهاء.</string>
-	<string name="request_again">إعادة الطلب</string>
+	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع فقط هذه اللحظة، للحصول على موقعك الحالي. بإمكانك سحب الإذن بأمان بعدها.</string>
+	<string name="give_permission">أعط الإذن</string>
 	<string name="dismiss">رفض</string>
 	<string name="no_search_result">لا نتائج.\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بشكل كافٍ لتظهر الأماكن القريبة هنا.</string>
 	<string name="hint_search">ابحث بالاسم أو الإحداثيات</string>

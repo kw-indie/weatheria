@@ -7,14 +7,22 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		tools:context=".ui.fragment.AddLocationFragment">
-
 		<com.google.android.libraries.maps.MapView
 			android:id="@+id/map"
 			android:layout_width="match_parent"
 			android:layout_height="@dimen/_160sdp"
 			app:mapId="@string/map_id"
-			app:layout_constraintTop_toTopOf="parent" />
-
+			app:layout_constraintTop_toTopOf="parent"/>
+		<ImageButton
+			style="@style/Widget.AppCompat.Button.Borderless"
+			android:id="@+id/btn_my_location"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="0dp"
+			android:contentDescription="@string/maps_MY_LOCATION_ALT_TEXT"
+			android:src="@drawable/maps_btn_myl"
+			app:layout_constraintEnd_toEndOf="@id/map"
+			app:layout_constraintTop_toTopOf="@id/map"/>
 		<TextView
 			android:id="@+id/tv_no_result"
 			android:layout_width="0dp"

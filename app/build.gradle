@@ -7,8 +7,8 @@ android {
 	def targetSdkVer = 30
 	compileSdkVersion targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
-	buildToolsVersion "31.0.0-rc1"
-	ndkVersion "22.0.7026061"
+	buildToolsVersion "31.0.0-rc2"
+	ndkVersion "22.1.7171670"
 
 	// these config apply to all build types
 	defaultConfig {
@@ -78,7 +78,9 @@ android {
 		// new kotlin compiler backend (supposedly faster, also for jetpack compose, and default in future)
 		useIR = true
 		freeCompilerArgs += [
-			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
+			"-Xopt-in=kotlin.time.ExperimentalTime" // for 1.minutes
 		]
 	}
 
@@ -96,16 +98,16 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
 	// general & ui
-	implementation "androidx.core:core-ktx:1.5.0-beta03"
-	implementation "androidx.recyclerview:recyclerview:1.2.0-beta02"
+	implementation "androidx.core:core-ktx:1.6.0-alpha01"
+	implementation "androidx.recyclerview:recyclerview:1.2.0"
 	implementation "androidx.constraintlayout:constraintlayout:2.1.0-beta01"
 	implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 	implementation "androidx.viewpager2:viewpager2:1.0.0"
 	implementation "com.google.android.material:material:1.3.0"
 
 	// to use viewModels delegate, new result system, and lots more
-	implementation "androidx.activity:activity-ktx:1.3.0-alpha04"
-	implementation "androidx.fragment:fragment-ktx:1.3.1"
+	implementation "androidx.activity:activity-ktx:1.3.0-alpha06"
+	implementation "androidx.fragment:fragment-ktx:1.3.2"
 
 	// viewModel & liveData
 	// runtime offers new flow consumers (e.g addRepeatingJob)
@@ -116,7 +118,7 @@ dependencies {
 
 	// nav
 	// runtime offers findNavController() and navArgs property
-	def navVer = '2.3.4'
+	def navVer = '2.3.5'
 	implementation "androidx.navigation:navigation-runtime-ktx:$navVer"
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
@@ -132,7 +134,7 @@ dependencies {
 	// room
 	// runtime is core
 	// ktx adds suspend and Flow support
-	def roomVer = '2.3.0-beta03'
+	def roomVer = '2.3.0-rc01'
 	kapt "androidx.room:room-compiler:$roomVer"
 	implementation "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
@@ -148,17 +150,18 @@ dependencies {
 	implementation "com.google.android.gms:play-services-location:18.0.0"
 
 	// work manager
-	implementation "androidx.work:work-runtime-ktx:2.5.0"
+	implementation "androidx.work:work-runtime-ktx:2.6.0-alpha01"
 
 	// hilt
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
 	// hilt with jetpack (viewModel, workManager)
-	def hiltJetpackVer = '1.0.0-alpha03'
-	kapt "androidx.hilt:hilt-compiler:$hiltJetpackVer"
-	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltJetpackVer"
-	implementation "androidx.hilt:hilt-work:$hiltJetpackVer"
+	def hiltCompilerVer = '1.0.0-beta01'
+	kapt "androidx.hilt:hilt-compiler:$hiltCompilerVer"
+	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
+	def hiltLifecycleVer = '1.0.0-alpha03' // could be a 1-time mismatch with above
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltLifecycleVer"
 
 	// coil
 	implementation "io.coil-kt:coil:1.1.1"

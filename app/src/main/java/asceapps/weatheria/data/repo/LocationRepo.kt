@@ -33,7 +33,9 @@ class LocationRepo @Inject constructor(
 		_deviceLocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
-				val location = locationProvider.awaitCurrentLocation()
+				// important (!!) so that our logic catches all anomalies as exceptions, hence error results
+				val location = locationProvider.awaitCurrentLocation()!!
+				//val location = locationProvider.locationUpdates(createLocationRequest(1)).first()
 				_deviceLocation.value = Result.Success(location)
 			}
 		} catch (e: Exception) {

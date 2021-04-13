@@ -9,9 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.onNavDestinationSelected
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.ActivityMainBinding
@@ -25,14 +26,13 @@ import java.io.IOException
 import java.io.InterruptedIOException
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity: AppCompatActivity() {
 
 	private val viewModel: MainViewModel by viewModels()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		val binding =
-			DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+		val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 		binding.navHost.edgeToEdge(statusBar = false)
@@ -40,14 +40,13 @@ class MainActivity : AppCompatActivity() {
 
 		setupNavigation(binding.toolbar)
 
-		val snackbar =
-			Snackbar.make(binding.navHost, R.string.error_no_internet, Snackbar.LENGTH_INDEFINITE)
-				.apply {
-					animationMode = Snackbar.ANIMATION_MODE_SLIDE
-					setAction(R.string.retry) { viewModel.checkOnline() }
-				}
+		val snackbar = Snackbar.make(binding.navHost, R.string.error_no_internet, Snackbar.LENGTH_INDEFINITE)
+			.apply {
+				animationMode = Snackbar.ANIMATION_MODE_SLIDE
+				setAction(R.string.retry) { viewModel.checkOnline() }
+			}
 		viewModel.onlineStatus.observe(this) {
-			when (it) {
+			when(it) {
 				is Result.Loading -> {
 					// todo show loading anim
 				}
@@ -58,15 +57,13 @@ class MainActivity : AppCompatActivity() {
 				is Result.Error -> {
 					snackbar.show()
 				}
-				else -> {
-				}
 			}
 		}
 
 		viewModel.error.observe(this) {
 			Toast.makeText(
 				this,
-				when (it) {
+				when(it) {
 					// obvious timeout
 					is InterruptedIOException -> R.string.error_timed_out
 					// others like UnknownHostException when it can't resolve hostname
@@ -86,16 +83,13 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when (item.itemId) {
-			R.id.action_settings -> findNavController(this, R.id.nav_host)
-				.navigate(R.id.action_open_settings)
-			else -> return super.onOptionsItemSelected(item)
-		}
-		return true
+		return item.onNavDestinationSelected(
+			findNavController(R.id.nav_host)
+		) || super.onOptionsItemSelected(item)
 	}
 
 	override fun onSupportNavigateUp(): Boolean {
-		return findNavController(this, R.id.nav_host).navigateUp()
+		return findNavController(R.id.nav_host).navigateUp()
 	}
 
 	private fun setupNavigation(toolbar: Toolbar) {

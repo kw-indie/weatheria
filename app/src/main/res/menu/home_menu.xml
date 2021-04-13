@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
-		android:id="@+id/action_locations"
+		android:id="@+id/locationsFragment"
 		android:title="@string/action_locations"
 		app:showAsAction="ifRoom"/>
 	<item
-		android:id="@+id/action_add_location"
+		android:id="@+id/addLocationFragment"
 		android:icon="@drawable/ic_add_location"
 		android:title="@string/action_add_location"
 		app:showAsAction="ifRoom"/>

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
@@ -32,6 +33,7 @@ import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 // todo move to util or sth
 private const val latLngFormat = "%1$.3f,%2$.3f"
@@ -41,6 +43,9 @@ class AddLocationFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private val addLocationVM: AddLocationViewModel by viewModels()
+	@Inject
+	lateinit var settingsRepo: SettingsRepo
+
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
 	private lateinit var mapView: MapView
@@ -59,6 +64,8 @@ class AddLocationFragment: Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		setLocationAccuracyHigh(settingsRepo.isLocationAccuracyHigh)
+
 		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
 		val searchAdapter = SearchAdapter {
@@ -104,7 +111,6 @@ class AddLocationFragment: Fragment() {
 						searchView.apply {
 							// this does not submit empty queries regardless of passed value
 							setQuery(query, false)
-							requestFocus()
 						}
 					}
 				}
@@ -234,17 +240,11 @@ class AddLocationFragment: Fragment() {
 	}
 
 	private fun onMyLocationClick() {
-		AlertDialog.Builder(requireContext())
-			.setTitle(R.string.location_provider_picker_title)
-			.setMessage(R.string.location_provider_picker_message)
-			.setPositiveButton(R.string.device_provider) { _, _ ->
-				updateDeviceLocation()
-			}
-			.setNeutralButton(R.string.ip_provider) { _, _ ->
-				addLocationVM.updateIpGeolocation()
-			}
-			.create()
-			.show()
+		if(settingsRepo.useDeviceForLocation) {
+			updateDeviceLocation()
+		} else {
+			addLocationVM.updateIpGeolocation()
+		}
 	}
 
 	private fun updateDeviceLocation() {

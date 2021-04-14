@@ -93,10 +93,6 @@
 	<!--add location-->
 	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
-	<string name="location_provider_picker_title">Choose Location Provider</string>
-	<string name="location_provider_picker_message">Which location provider would you like to use?</string>
-	<string name="device_provider">Device (requires permission)</string>
-	<string name="ip_provider">IP (requires internet)</string>
 	<string name="request_rationale_title">Why we need permission</string>
 	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.</string>
 	<string name="give_permission">Give permission</string>
@@ -117,32 +113,40 @@
     <string name="error_server_error">Server response error. Try a different location or try again later</string>
     <string name="error_unknown">Unknown error</string>
     <!--settings-->
-    <string name="def_value" translatable="false">0</string>
     <string name="cat_header_general">General</string>
     <string name="key_units" translatable="false">units</string>
     <string name="title_units">Unit System</string>
     <string-array name="entries_unit_system">
         <item>Metric</item>
-        <item>Imperial</item>
+	    <item>Imperial</item>
     </string-array>
-    <string-array name="values_unit_system">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-    <string-array name="units_speed">
-        <item>m/s</item>
-        <item>mph</item>
-    </string-array>
-    <string name="cat_header_sync">Sync</string>
-    <string name="key_auto_refresh" translatable="false">auto_refresh</string>
-    <string name="title_auto_refresh">Auto refresh</string>
-    <string-array name="entries_auto_refresh">
-        <item>Never</item>
-        <item>Every 6 hours</item>
-        <item>Every 12 hours</item>
-        <item>Everyday</item>
-    </string-array>
-    <string-array name="values_auto_refresh">
+	<string-array name="values_unit_system">
+		<item>0</item>
+		<item>1</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>m/s</item>
+		<item>mph</item>
+	</string-array>
+	<string name="cat_header_loc">My Location</string>
+	<string name="key_loc_use_device" translatable="false">loc_use_device</string>
+	<string name="title_loc_use_device">Use Device for Location</string>
+	<string name="summary_loc_use_device">Using GPS or Network has more accuracy, but can be slow.</string>
+	<string name="summary_loc_use_ip">Fall back to using IP geolocation. Fast but less accurate.</string>
+	<string name="key_loc_accuracy_high" translatable="false">loc_accuracy_high</string>
+	<string name="title_loc_accuracy_high">High Accuracy Location</string>
+	<string name="summary_loc_accuracy_high">Almost guarantees success, but requires access to accurate location</string>
+	<string name="summary_loc_accuracy_normal">Less accurate, fails in rare cases, but only requires access to approximate location</string>
+	<string name="cat_header_sync">Sync</string>
+	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
+	<string name="title_auto_refresh">Auto refresh</string>
+	<string-array name="entries_auto_refresh">
+		<item>Never</item>
+		<item>Every 6 hours</item>
+		<item>Every 12 hours</item>
+		<item>Everyday</item>
+	</string-array>
+	<string-array name="values_auto_refresh">
         <item>0</item>
         <item>6</item>
         <item>12</item>

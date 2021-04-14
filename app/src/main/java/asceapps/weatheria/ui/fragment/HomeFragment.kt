@@ -26,7 +26,7 @@ import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInsertedFlow
 import asceapps.weatheria.util.onPageSelectedFlow
-import asceapps.weatheria.util.setMetric
+import asceapps.weatheria.util.setFormatSystem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -56,14 +56,14 @@ class HomeFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		// on reinstall or sth, make sure all settings are reapplied
+		// on reinstall or sth, make sure all settings are reapplied, eg. refreshWorker
 		// note: irl, this happens when app settings are auto backed up
 		// settingsRepo.reapply()
 
 		// setup prefs
 		// todo clean up
 		// need to re-read this every time we are back to the fragment in case it changes
-		setMetric(settingsRepo.isMetric, settingsRepo.speedUnit)
+		setFormatSystem(settingsRepo.isMetric, settingsRepo.speedUnit)
 
 		return FragmentHomeBinding.inflate(inflater, container, false).apply {
 			val infoAdapter = WeatherInfoAdapter().apply {

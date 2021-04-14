@@ -7,7 +7,7 @@ import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.util.awaitCurrentLocation
 import com.google.android.gms.location.FusedLocationProviderClient
-import dagger.hilt.android.scopes.ActivityRetainedScoped
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@ActivityRetainedScoped
+@ViewModelScoped
 class LocationRepo @Inject constructor(
 	private val locationProvider: FusedLocationProviderClient,
 	private val ipApi: IPApi,
@@ -35,7 +35,6 @@ class LocationRepo @Inject constructor(
 			withContext(ioDispatcher) {
 				// important (!!) so that our logic catches all anomalies as exceptions, hence error results
 				val location = locationProvider.awaitCurrentLocation()!!
-				//val location = locationProvider.locationUpdates(createLocationRequest(1)).first()
 				_deviceLocation.value = Result.Success(location)
 			}
 		} catch (e: Exception) {

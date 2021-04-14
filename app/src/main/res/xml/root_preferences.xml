@@ -1,12 +1,28 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceCategory app:title="@string/cat_header_general">
 		<ListPreference
 			app:key="@string/key_units"
 			app:title="@string/title_units"
 			app:entries="@array/entries_unit_system"
 			app:entryValues="@array/values_unit_system"
-			app:defaultValue="@string/def_value"
-			app:useSimpleSummaryProvider="true" />
+			app:defaultValue="0"
+			app:useSimpleSummaryProvider="true"/>
+	</PreferenceCategory>
+	<PreferenceCategory app:title="@string/cat_header_loc">
+		<SwitchPreference
+			app:key="@string/key_loc_use_device"
+			app:title="@string/title_loc_use_device"
+			app:summaryOn="@string/summary_loc_use_device"
+			app:summaryOff="@string/summary_loc_use_ip"
+			app:defaultValue="true"/>
+		<SwitchPreference
+			app:key="@string/key_loc_accuracy_high"
+			app:title="@string/title_loc_accuracy_high"
+			app:summaryOn="@string/summary_loc_accuracy_high"
+			app:summaryOff="@string/summary_loc_accuracy_normal"
+			app:defaultValue="false"
+			app:dependency="@string/key_loc_use_device"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_sync">
 		<ListPreference
@@ -14,8 +30,8 @@
 			app:title="@string/title_auto_refresh"
 			app:entries="@array/entries_auto_refresh"
 			app:entryValues="@array/values_auto_refresh"
-			app:defaultValue="@string/def_value"
-			app:useSimpleSummaryProvider="true" />
+			app:defaultValue="0"
+			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_help">
 		<Preference app:title="@string/title_about"/>

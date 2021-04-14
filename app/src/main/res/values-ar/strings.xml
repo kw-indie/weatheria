@@ -92,10 +92,6 @@
 	</string-array>
 	<!--add location-->
 	<string name="action_search">بحث</string>
-	<string name="location_provider_picker_title">اختر مزوّد الموقع</string>
-	<string name="location_provider_picker_message">اختر مزوّد الموقع الذي توداستخدامه</string>
-	<string name="device_provider">الجهاز (يتطلب الإذن)</string>
-	<string name="ip_provider">عنوان IP (يتطلب الإنترنت)</string>
 	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
 	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع فقط هذه اللحظة، للحصول على موقعك الحالي. بإمكانك سحب الإذن بأمان بعدها.</string>
 	<string name="give_permission">أعط الإذن</string>
@@ -126,6 +122,13 @@
 		<item>م/ث</item>
 		<item>ميل/ساعة</item>
 	</string-array>
+	<string name="cat_header_loc">موقعي</string>
+	<string name="title_loc_use_device">طلب الموقع من الجهاز</string>
+	<string name="summary_loc_use_device">استخدام الجهاز (GPS أوالشبكة) يعطي دقة أعلى، لكنه بطيء أحيانًا.</string>
+	<string name="summary_loc_use_ip">الرجوع إلى طلب الموقع عن طريق عنوان الـIP. سريع، لكنه أقل دقة.</string>
+	<string name="title_loc_accuracy_high">طلب دقة عالية للموقع</string>
+	<string name="summary_loc_accuracy_high">نجاح شبه مضمون، لكنه يتطلب إذن الوصول إلى الموقع الدقيق.</string>
+	<string name="summary_loc_accuracy_normal">أقل دقة، يفشل أحيانًا، لكنه يتطلب إذن الوصول إلى الموقع التقريبي فقط.</string>
 	<string name="cat_header_sync">المزامنة</string>
 	<string name="title_auto_refresh">التحديث التلقائي</string>
 	<string-array name="entries_auto_refresh">

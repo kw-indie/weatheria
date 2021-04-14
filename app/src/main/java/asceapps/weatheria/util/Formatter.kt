@@ -11,8 +11,8 @@ import java.time.format.FormatStyle
 private var metric = true
 private var speedUnit = ""
 // todo instead of asking to be set, go and read it from setting repo
-fun setMetric(b: Boolean, speedUnit: String) {
-	metric = b
+fun setFormatSystem(metric: Boolean, speedUnit: String) {
+	asceapps.weatheria.util.metric = metric
 	asceapps.weatheria.util.speedUnit = speedUnit
 }
 

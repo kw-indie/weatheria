@@ -3,7 +3,11 @@ package asceapps.weatheria.data.repo
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
@@ -20,9 +24,12 @@ class SettingsRepo @Inject constructor(
 
 	private val workManager = WorkManager.getInstance(appContext)
 	private val defVal = 0
-	private val defValStr = appContext.getString(R.string.def_value)
+	private val defValStr = "0"
+	private val defValBool = false
 	private val unitsKey = appContext.getString(R.string.key_units)
 	private val speedUnits = appContext.resources.getStringArray(R.array.units_speed)
+	private val locUseDevice = appContext.getString(R.string.key_loc_use_device)
+	private val locAccuracyHigh = appContext.getString(R.string.key_loc_accuracy_high)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
 	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
 	private val selectedLocKey = "selected"
@@ -32,6 +39,12 @@ class SettingsRepo @Inject constructor(
 	// 0 = metric, 1 = imperial
 	private val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
+
+	val useDeviceForLocation: Boolean
+		get() = prefs.getBoolean(locUseDevice, defValBool)
+
+	val isLocationAccuracyHigh: Boolean
+		get() = prefs.getBoolean(locAccuracyHigh, defValBool)
 
 	private val autoRefreshPeriod: String
 		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr

@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -27,30 +28,32 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-private val permissions = arrayOf(
-	// coarse location alone is useless if we wanna guarantee a location update on fresh phones
-	// if we are gonna guarantee a fresh location, might as well just use 1 strong permission for simplicity
-	//Manifest.permission.ACCESS_COARSE_LOCATION,
-	Manifest.permission.ACCESS_FINE_LOCATION
-)
-// needed to be HIGH for guaranteeing a location update on fresh devices
-private const val defaultPriority = LocationRequest.PRIORITY_HIGH_ACCURACY
-
-fun isLocationPermissionGranted(ctx: Context) = permissions.any {
-	ActivityCompat.checkSelfPermission(ctx, it) == PackageManager.PERMISSION_GRANTED
-}
-
-fun shouldShowLocationPermissionRationale(activity: Activity) = permissions.any {
-	ActivityCompat.shouldShowRequestPermissionRationale(activity, it)
-}
-
-inline fun Fragment.createPermissionRequester(crossinline callback: (Boolean) -> Unit) =
-	registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-		callback(it.values.any { granted -> granted }) // true if any  permission was granted
+private const val fineLocation = Manifest.permission.ACCESS_FINE_LOCATION
+private const val coarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION
+private var permission = fineLocation
+private const val highAccuracy = LocationRequest.PRIORITY_HIGH_ACCURACY
+private const val normalAccuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+private var accuracy = highAccuracy
+	set(value) {
+		field = value
+		permission = if(value == highAccuracy) fineLocation else coarseLocation
 	}
+// todo instead of setting, read from repo
+fun setLocationAccuracyHigh(b: Boolean) {
+	accuracy = if(b) highAccuracy else normalAccuracy
+}
 
-fun requestLocationPermission(launcher: ActivityResultLauncher<Array<String>>) {
-	launcher.launch(permissions)
+fun isLocationPermissionGranted(ctx: Context) =
+	ActivityCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
+
+fun shouldShowLocationPermissionRationale(activity: Activity) =
+	ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+
+fun Fragment.createPermissionRequester(callback: ActivityResultCallback<Boolean>) =
+	registerForActivityResult(ActivityResultContracts.RequestPermission(), callback)
+
+fun requestLocationPermission(launcher: ActivityResultLauncher<String>) {
+	launcher.launch(permission)
 }
 
 @SuppressLint("MissingPermission")
@@ -61,7 +64,7 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() = suspendCancella
 	// Anything lower will never get a fresh location when called on a device with no cached location.
 	// Setting it to HIGH guarantees that if GPS is enabled (device only or high accuracy settings),
 	// a fresh location will be fetched.
-	getCurrentLocation(defaultPriority, cts.token)
+	getCurrentLocation(accuracy, cts.token)
 		.addOnSuccessListener { location ->
 			it.resume(location)
 		}.addOnFailureListener { e ->
@@ -75,7 +78,7 @@ suspend fun FusedLocationProviderClient.awaitCurrentLocation() = suspendCancella
 
 fun createLocationRequest(
 	updates: Int = Int.MAX_VALUE,
-	accuracy: Int = defaultPriority
+	accuracy: Int = highAccuracy
 ): LocationRequest = LocationRequest.create().apply {
 	isWaitForAccurateLocation = false
 	numUpdates = updates

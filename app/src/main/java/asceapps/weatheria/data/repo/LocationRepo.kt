@@ -29,7 +29,7 @@ class LocationRepo @Inject constructor(
 	private val _ipGeolocation = MutableStateFlow<Result<String>>(Result.Init)
 	val ipGeolocation: Flow<Result<String>> get() = _ipGeolocation
 
-	suspend fun updateDeviceLocation() {
+	suspend fun awaitDeviceLocation() {
 		_deviceLocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
@@ -37,20 +37,20 @@ class LocationRepo @Inject constructor(
 				val location = locationProvider.awaitCurrentLocation()!!
 				_deviceLocation.value = Result.Success(location)
 			}
-		} catch (e: Exception) {
+		} catch(e: Exception) {
 			e.printStackTrace()
 			_deviceLocation.value = Result.Error(e)
 		}
 	}
 
-	suspend fun updateIpGeolocation() {
+	suspend fun awaitIpGeolocation() {
 		_ipGeolocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
 				val latLng = ipApi.lookup()
 				_ipGeolocation.value = Result.Success(latLng)
 			}
-		} catch (e: Exception) {
+		} catch(e: Exception) {
 			e.printStackTrace()
 			_ipGeolocation.value = Result.Error(e)
 		}

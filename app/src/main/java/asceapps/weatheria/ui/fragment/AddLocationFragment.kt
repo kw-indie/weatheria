@@ -241,46 +241,40 @@ class AddLocationFragment: Fragment() {
 
 	private fun onMyLocationClick() {
 		if(settingsRepo.useDeviceForLocation) {
-			updateDeviceLocation()
+			awaitDeviceLocation()
 		} else {
-			addLocationVM.updateIpGeolocation()
+			addLocationVM.awaitIpGeolocation()
 		}
 	}
 
-	private fun updateDeviceLocation() {
+	private fun awaitDeviceLocation() {
 		when {
-			isLocationPermissionGranted(requireContext()) -> {
-				onPermissionGranted()
-			}
+			isLocationPermissionGranted(requireContext()) -> onPermissionGranted()
 			shouldShowLocationPermissionRationale(requireActivity()) -> {
 				AlertDialog.Builder(requireContext())
 					.setTitle(R.string.request_rationale_title)
 					.setMessage(R.string.location_request_rationale)
-					.setPositiveButton(R.string.give_permission) { _, _ ->
-						// if we are here, it's guaranteed api 23+, no need to check
-						requestPermission()
-					}
+					.setPositiveButton(R.string.give_permission) { _, _ -> requestPermission() }
 					.setNegativeButton(R.string.dismiss, null)
 					.create()
 					.show()
 			}
-			else -> { // does not have permission, not first time, but user still would like to use device
-				requestPermission()
-			}
+			// else: we don't have permission, not first time, but user still wants to use device for location
+			else -> requestPermission()
+		}
+	}
+
+	private fun onPermissionGranted() {
+		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+		if(LocationManagerCompat.isLocationEnabled(lm)) {
+			addLocationVM.awaitDeviceLocation()
+		} else {
+			showMessage(R.string.error_location_disabled)
 		}
 	}
 
 	private fun requestPermission() {
 		// no need to check for android version. this is always only run on M+
 		requestLocationPermission(permissionRequester)
-	}
-
-	private fun onPermissionGranted() {
-		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.updateDeviceLocation()
-		} else {
-			showMessage(R.string.error_location_disabled)
-		}
 	}
 }

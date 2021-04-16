@@ -93,7 +93,7 @@
 	<!--add location-->
 	<string name="action_search">بحث</string>
 	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
-	<string name="location_request_rationale">يحتاج التطبيق لإذن الوصول إلى الموقع فقط هذه اللحظة، للحصول على موقعك الحالي. بإمكانك سحب الإذن بأمان بعدها.</string>
+	<string name="location_request_rationale">يحتاج التطبيق لإذن الحصول على موقعك الحالي للحظة فقط. بإمكانك سحب الإذن بعدها بأمان.\nبإمكانك أيضًا تغيير الإعدادات لاستخدام عنوان الـIP لإيجاد موقعك.</string>
 	<string name="give_permission">أعط الإذن</string>
 	<string name="dismiss">رفض</string>
 	<string name="no_search_result">لا نتائج.\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بشكل كافٍ لتظهر الأماكن القريبة هنا.</string>

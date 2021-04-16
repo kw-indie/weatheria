@@ -94,7 +94,7 @@
 	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
 	<string name="request_rationale_title">Why we need permission</string>
-	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.</string>
+	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.\nYou can also change settings to use IP geolocation instead.</string>
 	<string name="give_permission">Give permission</string>
 	<string name="dismiss">Dismiss</string>
 	<string name="no_search_result">No result.\nUse the search bar above or zoom the map enough to start showing nearby places here.</string>

@@ -27,11 +27,11 @@ class AddLocationViewModel @Inject constructor(
 		query.value = q // already checked for 'same value' internally (in flow)
 	}
 
-	fun updateDeviceLocation() = viewModelScope.launch {
-		locationRepo.updateDeviceLocation()
+	fun awaitDeviceLocation() = viewModelScope.launch {
+		locationRepo.awaitDeviceLocation()
 	}
 
-	fun updateIpGeolocation() = viewModelScope.launch {
-		locationRepo.updateIpGeolocation()
+	fun awaitIpGeolocation() = viewModelScope.launch {
+		locationRepo.awaitIpGeolocation()
 	}
 }

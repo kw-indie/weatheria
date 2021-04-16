@@ -131,12 +131,12 @@
 	<string name="cat_header_loc">My Location</string>
 	<string name="key_loc_use_device" translatable="false">loc_use_device</string>
 	<string name="title_loc_use_device">Use Device for Location</string>
-	<string name="summary_loc_use_device">Using GPS or Network has more accuracy, but can be slow.</string>
-	<string name="summary_loc_use_ip">Fall back to using IP geolocation. Fast but less accurate.</string>
+	<string name="summary_loc_use_device">Enabled: Use Device (GPS or Network). More accurate, but can be slow and requires permission</string>
+	<string name="summary_loc_use_ip">Disabled: Fall back to using IP geolocation. Fast and does not require permission, but less accurate.</string>
 	<string name="key_loc_accuracy_high" translatable="false">loc_accuracy_high</string>
 	<string name="title_loc_accuracy_high">High Accuracy Location</string>
-	<string name="summary_loc_accuracy_high">Almost guarantees success, but requires access to accurate location</string>
-	<string name="summary_loc_accuracy_normal">Less accurate, fails in rare cases, but only requires access to approximate location</string>
+	<string name="summary_loc_accuracy_high">Enabled: Almost guarantees success, but requires access to fine location</string>
+	<string name="summary_loc_accuracy_normal">Disabled: Only requires access to coarse location, but less accurate and fails in rare cases</string>
 	<string name="cat_header_sync">Sync</string>
 	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
 	<string name="title_auto_refresh">Auto refresh</string>

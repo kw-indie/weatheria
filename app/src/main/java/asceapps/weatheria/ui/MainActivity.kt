@@ -12,7 +12,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.onNavDestinationSelected
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.ActivityMainBinding
@@ -83,9 +82,11 @@ class MainActivity: AppCompatActivity() {
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		return item.onNavDestinationSelected(
-			findNavController(R.id.nav_host)
-		) || super.onOptionsItemSelected(item)
+		when(item.itemId) {
+			R.id.settingsFragment -> findNavController(R.id.nav_host).navigate(R.id.action_open_settings)
+			else -> return super.onOptionsItemSelected(item)
+		}
+		return true
 	}
 
 	override fun onSupportNavigateUp(): Boolean {

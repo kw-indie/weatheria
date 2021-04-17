@@ -29,8 +29,6 @@ import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import asceapps.weatheria.util.checkLocationSettings
-import asceapps.weatheria.util.createLocationRequest
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onTextSubmitFlow
@@ -253,11 +251,11 @@ class AddLocationFragment: Fragment() {
 	}
 
 	private fun requestPermission() {
-		val permission = arrayOf(
+		val permissions = arrayOf(
 			if(addLocationVM.useHighAccuracyLocation) Manifest.permission.ACCESS_FINE_LOCATION
 			else Manifest.permission.ACCESS_COARSE_LOCATION
 		)
-		permissionRequester.launch(permission)
+		permissionRequester.launch(permissions)
 	}
 
 	private fun permissionRequestCallback(map: Map<String, Boolean>) {

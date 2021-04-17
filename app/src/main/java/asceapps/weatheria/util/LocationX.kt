@@ -1,6 +1,7 @@
 package asceapps.weatheria.util
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
 import androidx.core.location.LocationManagerCompat
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.channels.awaitClose
@@ -48,6 +50,41 @@ fun createLocationRequest(accuracy: Int, updates: Int = 1): LocationRequest =
 		smallestDisplacement = 5f
 		maxWaitTime = 1000 * 60 * 1
 		setExpirationDuration(1000 * 60 * 1)
+	}
+
+sealed class LocationSettingsStatus {
+	object Ready: LocationSettingsStatus()
+	class Resolvable(val e: ResolvableApiException): LocationSettingsStatus()
+	object Unavailable: LocationSettingsStatus()
+}
+
+// this works, but always requires Google Location Accuracy enabled
+// which is not necessary for most applications
+suspend fun checkLocationSettings(activity: Activity, accuracy: Int) =
+	suspendCancellableCoroutine<LocationSettingsStatus> {
+		val settingsRequest = LocationSettingsRequest.Builder()
+			.addLocationRequest(createLocationRequest(accuracy))
+			.setNeedBle(false)
+			.setAlwaysShow(false)
+			.build()
+		LocationServices.getSettingsClient(activity)
+			.checkLocationSettings(settingsRequest)
+			.addOnSuccessListener { _ ->
+				it.resume(LocationSettingsStatus.Ready)
+			}
+			.addOnFailureListener { e ->
+				if(e is ResolvableApiException) {
+					// Location settings are not satisfied, but could be fixed by showing a dialog.
+					it.resume(LocationSettingsStatus.Resolvable(e))
+				} else { // LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE
+					// Location settings are not satisfied. However, we have no way to fix the
+					// settings so we won't show the dialog.
+					it.resume(LocationSettingsStatus.Unavailable)
+				}
+			}
+
+		// this request is prolly instant, it does not have a cancellation mechanism
+		// dunno what to call in it.invokeOnCancellation {}
 	}
 
 @SuppressWarnings("MissingPermission")

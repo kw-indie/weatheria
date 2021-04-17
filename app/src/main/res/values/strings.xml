@@ -131,7 +131,7 @@
 	<string name="cat_header_loc">My Location</string>
 	<string name="key_loc_use_device" translatable="false">loc_use_device</string>
 	<string name="title_loc_use_device">Use Device for Location</string>
-	<string name="summary_loc_use_device">Enabled: Use Device (GPS or Network). More accurate, but can be slow and requires permission</string>
+	<string name="summary_loc_use_device">Enabled: Use Device (GPS and Network). More accurate, but can be slow and requires permission</string>
 	<string name="summary_loc_use_ip">Disabled: Fall back to using IP geolocation. Fast and does not require permission, but less accurate.</string>
 	<string name="key_loc_accuracy_high" translatable="false">loc_accuracy_high</string>
 	<string name="title_loc_accuracy_high">High Accuracy Location</string>

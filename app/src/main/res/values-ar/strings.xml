@@ -124,7 +124,7 @@
 	</string-array>
 	<string name="cat_header_loc">موقعي</string>
 	<string name="title_loc_use_device">طلب الموقع من الجهاز</string>
-	<string name="summary_loc_use_device">مفعّل: استخدم الجهاز (GPS أوالشبكة). دقة أعلى، لكنه بطيء أحيانًا ويتطلب الأذونات.</string>
+	<string name="summary_loc_use_device">مفعّل: استخدم الجهاز (GPS والشبكة). دقة أعلى، لكنه بطيء أحيانًا ويتطلب الأذونات.</string>
 	<string name="summary_loc_use_ip">معطّل: عد إلى طلب الموقع عن طريق الـIP. سريع ولا يتطلب الأذونات، لكنه أقل دقة.</string>
 	<string name="title_loc_accuracy_high">طلب موقع عالي الدقة</string>
 	<string name="summary_loc_accuracy_high">مفعّل: نجاح شبه مضمون، لكنه يتطلب إذن الوصول إلى الموقع الدقيق.</string>

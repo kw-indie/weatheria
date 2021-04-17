@@ -19,10 +19,10 @@ import javax.inject.Inject
 @ActivityRetainedScoped
 class SettingsRepo @Inject constructor(
 	@ApplicationContext appContext: Context,
-	private val prefs: SharedPreferences
+	private val prefs: SharedPreferences,
+	private val workManager: WorkManager
 ) {
 
-	private val workManager = WorkManager.getInstance(appContext)
 	private val defVal = 0
 	private val defValStr = "0"
 	private val defValBool = false
@@ -43,7 +43,7 @@ class SettingsRepo @Inject constructor(
 	val useDeviceForLocation: Boolean
 		get() = prefs.getBoolean(locUseDevice, defValBool)
 
-	val isLocationAccuracyHigh: Boolean
+	val useHighAccuracyLocation: Boolean
 		get() = prefs.getBoolean(locAccuracyHigh, defValBool)
 
 	private val autoRefreshPeriod: String

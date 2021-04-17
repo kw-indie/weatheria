@@ -1,26 +1,15 @@
 package asceapps.weatheria.util
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.location.LocationManagerCompat
-import androidx.fragment.app.Fragment
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -28,67 +17,38 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-private const val fineLocation = Manifest.permission.ACCESS_FINE_LOCATION
-private const val coarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION
-private var permission = fineLocation
-private const val highAccuracy = LocationRequest.PRIORITY_HIGH_ACCURACY
-private const val normalAccuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-private var accuracy = highAccuracy
-	set(value) {
-		field = value
-		permission = if(value == highAccuracy) fineLocation else coarseLocation
-	}
-// todo instead of setting, read from repo
-fun setLocationAccuracyHigh(b: Boolean) {
-	accuracy = if(b) highAccuracy else normalAccuracy
-}
-
-fun isLocationPermissionGranted(ctx: Context) =
-	ActivityCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
-
-fun shouldShowLocationPermissionRationale(activity: Activity) =
-	ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
-
-fun Fragment.createPermissionRequester(callback: ActivityResultCallback<Boolean>) =
-	registerForActivityResult(ActivityResultContracts.RequestPermission(), callback)
-
-fun requestLocationPermission(launcher: ActivityResultLauncher<String>) {
-	launcher.launch(permission)
-}
-
 @SuppressLint("MissingPermission")
-suspend fun FusedLocationProviderClient.awaitCurrentLocation() = suspendCancellableCoroutine<Location?> {
-	val cts = CancellationTokenSource()
-	// Setting priority to BALANCED may only work on a real device that is also connected to
-	// wifi, cellular, bluetooth, etc.
-	// Anything lower will never get a fresh location when called on a device with no cached location.
-	// Setting it to HIGH guarantees that if GPS is enabled (device only or high accuracy settings),
-	// a fresh location will be fetched.
-	getCurrentLocation(accuracy, cts.token)
-		.addOnSuccessListener { location ->
-			it.resume(location)
-		}.addOnFailureListener { e ->
-			it.resumeWithException(e)
+suspend fun FusedLocationProviderClient.awaitCurrentLocation(accuracy: Int) =
+	suspendCancellableCoroutine<Location?> {
+		val cts = CancellationTokenSource()
+		// Setting priority to BALANCED may only work on a real device that is also connected to
+		// wifi, cellular, bluetooth, etc.
+		// Anything lower will never get a fresh location when called on a device with no cached location.
+		// Setting it to HIGH guarantees that if GPS is enabled (device only or high accuracy settings),
+		// a fresh location will be fetched.
+		getCurrentLocation(accuracy, cts.token)
+			.addOnSuccessListener { location ->
+				it.resume(location)
+			}.addOnFailureListener { e ->
+				it.resumeWithException(e)
+			}
+
+		it.invokeOnCancellation {
+			cts.cancel()
 		}
-
-	it.invokeOnCancellation {
-		cts.cancel()
 	}
-}
 
-fun createLocationRequest(
-	updates: Int = Int.MAX_VALUE,
-	accuracy: Int = highAccuracy
-): LocationRequest = LocationRequest.create().apply {
-	isWaitForAccurateLocation = false
-	numUpdates = updates
-	priority = accuracy
-	interval = 1000 * 20
-	fastestInterval = 1000 * 10
-	smallestDisplacement = 5f
-	maxWaitTime = 1000 * 60 * 1
-	setExpirationDuration(1000 * 60 * 1)
-}
+fun createLocationRequest(accuracy: Int, updates: Int = 1): LocationRequest =
+	LocationRequest.create().apply {
+		isWaitForAccurateLocation = false
+		priority = accuracy
+		numUpdates = updates
+		interval = 1000 * 20
+		fastestInterval = 1000 * 10
+		smallestDisplacement = 5f
+		maxWaitTime = 1000 * 60 * 1
+		setExpirationDuration(1000 * 60 * 1)
+	}
 
 @SuppressWarnings("MissingPermission")
 fun FusedLocationProviderClient.locationUpdates(request: LocationRequest) = callbackFlow<Location> {

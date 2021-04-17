@@ -29,12 +29,12 @@ class LocationRepo @Inject constructor(
 	private val _ipGeolocation = MutableStateFlow<Result<String>>(Result.Init)
 	val ipGeolocation: Flow<Result<String>> get() = _ipGeolocation
 
-	suspend fun awaitDeviceLocation() {
+	suspend fun awaitDeviceLocation(accuracy: Int) {
 		_deviceLocation.value = Result.Loading
 		try {
 			withContext(ioDispatcher) {
-				// important (!!) so that our logic catches all anomalies as exceptions, hence error results
-				val location = locationProvider.awaitCurrentLocation()!!
+				// important (!!) so that NPE is caught as Result.Error
+				val location = locationProvider.awaitCurrentLocation(accuracy)!!
 				_deviceLocation.value = Result.Success(location)
 			}
 		} catch(e: Exception) {

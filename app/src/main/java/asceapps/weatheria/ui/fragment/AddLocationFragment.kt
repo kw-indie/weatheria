@@ -1,5 +1,6 @@
 package asceapps.weatheria.ui.fragment
 
+import android.Manifest
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
@@ -10,8 +11,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,18 +25,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
-import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import asceapps.weatheria.util.*
+import asceapps.weatheria.util.checkLocationSettings
+import asceapps.weatheria.util.createLocationRequest
+import asceapps.weatheria.util.hideKeyboard
+import asceapps.weatheria.util.observe
+import asceapps.weatheria.util.onTextSubmitFlow
+import com.google.android.gms.location.LocationRequest
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 // todo move to util or sth
 private const val latLngFormat = "%1$.3f,%2$.3f"
@@ -43,8 +49,6 @@ class AddLocationFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 	private val addLocationVM: AddLocationViewModel by viewModels()
-	@Inject
-	lateinit var settingsRepo: SettingsRepo
 
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
@@ -52,7 +56,10 @@ class AddLocationFragment: Fragment() {
 	private lateinit var googleMap: GoogleMap
 
 	// need to register this anywhere before onCreateView
-	private val permissionRequester = createPermissionRequester { if(it) onPermissionGranted() }
+	private val permissionRequester = registerForActivityResult(
+		ActivityResultContracts.RequestMultiplePermissions(),
+		::permissionRequestCallback
+	)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -64,8 +71,6 @@ class AddLocationFragment: Fragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		setLocationAccuracyHigh(settingsRepo.isLocationAccuracyHigh)
-
 		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
 		val searchAdapter = SearchAdapter {
@@ -240,17 +245,28 @@ class AddLocationFragment: Fragment() {
 	}
 
 	private fun onMyLocationClick() {
-		if(settingsRepo.useDeviceForLocation) {
-			awaitDeviceLocation()
+		if(addLocationVM.useDeviceForLocation) {
+			requestPermission()
 		} else {
 			addLocationVM.awaitIpGeolocation()
 		}
 	}
 
-	private fun awaitDeviceLocation() {
+	private fun requestPermission() {
+		val permission = arrayOf(
+			if(addLocationVM.useHighAccuracyLocation) Manifest.permission.ACCESS_FINE_LOCATION
+			else Manifest.permission.ACCESS_COARSE_LOCATION
+		)
+		permissionRequester.launch(permission)
+	}
+
+	private fun permissionRequestCallback(map: Map<String, Boolean>) {
+		val response = map.entries.first()
+		val permission = response.key
+		val isGranted = response.value
 		when {
-			isLocationPermissionGranted(requireContext()) -> onPermissionGranted()
-			shouldShowLocationPermissionRationale(requireActivity()) -> {
+			isGranted -> onPermissionGranted()
+			ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission) ->
 				AlertDialog.Builder(requireContext())
 					.setTitle(R.string.request_rationale_title)
 					.setMessage(R.string.location_request_rationale)
@@ -258,23 +274,20 @@ class AddLocationFragment: Fragment() {
 					.setNegativeButton(R.string.dismiss, null)
 					.create()
 					.show()
-			}
-			// else: we don't have permission, not first time, but user still wants to use device for location
-			else -> requestPermission()
+			// permission permanently denied, ask user to manually enable from settings
+			else -> showMessage(R.string.error_location_denied)
 		}
 	}
 
 	private fun onPermissionGranted() {
 		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+		val accuracy =
+			if(addLocationVM.useHighAccuracyLocation) LocationRequest.PRIORITY_HIGH_ACCURACY
+			else LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.awaitDeviceLocation()
+			addLocationVM.awaitDeviceLocation(accuracy)
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}
-	}
-
-	private fun requestPermission() {
-		// no need to check for android version. this is always only run on M+
-		requestLocationPermission(permissionRequester)
 	}
 }

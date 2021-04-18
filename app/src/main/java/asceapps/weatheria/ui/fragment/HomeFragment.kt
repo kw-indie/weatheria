@@ -1,6 +1,5 @@
 package asceapps.weatheria.ui.fragment
 
-import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -39,19 +38,19 @@ class HomeFragment: Fragment() {
 	@Inject
 	lateinit var settingsRepo: SettingsRepo
 
-	private lateinit var contentView: ViewGroup
-	private lateinit var bg: GradientDrawable
+	private lateinit var init: IntArray
+	private lateinit var dawn: IntArray
+	private lateinit var day: IntArray
+	private lateinit var dusk: IntArray
+	private lateinit var night: IntArray
+	private lateinit var gradientEvaluator: TypeEvaluator<IntArray>
+	private lateinit var animator: ObjectAnimator
 
 	private var selectedLocation = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setHasOptionsMenu(true)
-
-		val activity = requireActivity()
-		val window = activity.window
-		contentView = window.findViewById(android.R.id.content)
-		bg = ResourcesCompat.getDrawable(resources, R.drawable.bg_sky, activity.theme) as GradientDrawable
 	}
 
 	override fun onCreateView(
@@ -67,66 +66,56 @@ class HomeFragment: Fragment() {
 		// need to re-read this every time we are back to the fragment in case it changes
 		setFormatSystem(settingsRepo.isMetric, settingsRepo.speedUnit)
 
-		return FragmentHomeBinding.inflate(inflater, container, false).apply {
-			val infoAdapter = WeatherInfoAdapter().apply {
-				onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
-					// animate to newly added item
-					pager.currentItem = pos
-				}
-			}
+		setUpBackgroundStuff()
 
-			val (init, dawn, day, dusk, night) = getDayPartsColors(requireContext())
-			val evaluator = getGradientEvaluator()
-			val animator = ObjectAnimator.ofObject(bg, "colors", evaluator, init).apply {
-				duration = 1000L
-			}
-			// todo we could merge home + savedLocations fragments with help from a
-			//  recyclerView + different layout managers/adapters
-			pager.apply {
-				adapter = infoAdapter
-				offscreenPageLimit = 1
-				onPageSelectedFlow().observe(viewLifecycleOwner) { pos ->
-					selectedLocation = pos
-					updateColors(
-						infoAdapter.getItem(pos),
-						dawn,
-						day,
-						dusk,
-						night,
-						evaluator,
-						animator
-					)
-				}
-			}
+		val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-			swipeRefresh.apply {
-				setOnRefreshListener {
-					mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
-				}
+		val pager = binding.pager
+		val infoAdapter = WeatherInfoAdapter().apply {
+			onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
+				// animate to newly added item
+				pager.currentItem = pos
 			}
+		}
+		// todo we could merge home + locations fragments with help from a
+		//  recyclerView + different layout managers/adapters
+		pager.apply {
+			adapter = infoAdapter
+			offscreenPageLimit = 1
+			onPageSelectedFlow().observe(viewLifecycleOwner) { pos ->
+				selectedLocation = pos
+				updateColors(infoAdapter.getItem(pos))
+			}
+		}
 
-			selectedLocation = settingsRepo.selectedLocation
-			mainVM.weatherInfoList.observe(viewLifecycleOwner) {
-				when (it) {
-					is Result.Loading -> {
-						swipeRefresh.isRefreshing = true
-					}
-					is Result.Success -> {
-						swipeRefresh.isRefreshing = false
-						val list = it.data
-						infoAdapter.submitList(list)
-						pager.setCurrentItem(selectedLocation, false)
-						val isEmpty = list.isEmpty()
-						tvEmptyPager.isVisible = isEmpty
-						swipeRefresh.isVisible = !isEmpty
-					}
-					is Result.Error -> {
-						swipeRefresh.isRefreshing = false
-						// todo does this ever happen?
-					}
+		val swipeRefresh = binding.swipeRefresh.apply {
+			setOnRefreshListener {
+				mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
+			}
+		}
+		selectedLocation = settingsRepo.selectedLocation
+		mainVM.weatherInfoList.observe(viewLifecycleOwner) {
+			when(it) {
+				is Result.Loading -> {
+					swipeRefresh.isRefreshing = true
+				}
+				is Result.Success -> {
+					swipeRefresh.isRefreshing = false
+					val list = it.data
+					infoAdapter.submitList(list)
+					pager.setCurrentItem(selectedLocation, false)
+					val isEmpty = list.isEmpty()
+					binding.tvEmptyPager.isVisible = isEmpty
+					swipeRefresh.isVisible = !isEmpty
+				}
+				is Result.Error -> {
+					swipeRefresh.isRefreshing = false
+					// todo does this ever happen?
 				}
 			}
-		}.root
+		}
+
+		return binding.root
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -142,63 +131,64 @@ class HomeFragment: Fragment() {
 		return true
 	}
 
-	override fun onPause() {
-		super.onPause()
-
-		settingsRepo.selectedLocation = selectedLocation
-	}
-
-	override fun onStart() {
-		super.onStart()
-		contentView.background = bg
-	}
-
 	override fun onStop() {
 		super.onStop()
 
-		// todo animate out?
-		contentView.background = null
+		settingsRepo.selectedLocation = selectedLocation
+		updateColors(null)
 	}
 
-	// todo move to settings?
-	private fun getDayPartsColors(context: Context) = arrayOf(
-		intArrayOf(0, 0, 0, 0), // transparent, init colors
-		intArrayOf(
-			ContextCompat.getColor(context, R.color.dawn_1),
-			ContextCompat.getColor(context, R.color.dawn_2),
-			ContextCompat.getColor(context, R.color.dawn_3)
-		),
-		intArrayOf(
-			ContextCompat.getColor(context, R.color.day_1),
-			ContextCompat.getColor(context, R.color.day_2),
-			ContextCompat.getColor(context, R.color.day_3)
-		),
-		intArrayOf(
-			ContextCompat.getColor(context, R.color.dusk_1),
-			ContextCompat.getColor(context, R.color.dusk_2),
-			ContextCompat.getColor(context, R.color.dusk_3)
-		),
-		intArrayOf(
-			ContextCompat.getColor(context, R.color.night_1),
-			ContextCompat.getColor(context, R.color.night_2),
-			ContextCompat.getColor(context, R.color.night_3)
-		)
-	)
-
-	private fun getGradientEvaluator() = TypeEvaluator<IntArray> {fraction, from, to ->
-		val argbEvaluator = ArgbEvaluator.getInstance()
-		val newColors = IntArray(from.size)
-		for(i in newColors.indices) {
-			newColors[i] = argbEvaluator.evaluate(fraction, from[i], to[i])
+	private fun setUpBackgroundStuff() {
+		val activity = requireActivity()
+		val window = activity.window
+		val bg = ResourcesCompat.getDrawable(resources, R.drawable.bg_sky, activity.theme) as GradientDrawable
+		window.findViewById<ViewGroup>(android.R.id.content).apply {
+			background = bg
 		}
-		newColors
+
+		// todo move to settings?
+		// region init colors
+		init = intArrayOf(0, 0, 0, 0) // transparent, init colors
+		dawn = intArrayOf(
+			ContextCompat.getColor(activity, R.color.dawn_1),
+			ContextCompat.getColor(activity, R.color.dawn_2),
+			ContextCompat.getColor(activity, R.color.dawn_3)
+		)
+		day = intArrayOf(
+			ContextCompat.getColor(activity, R.color.day_1),
+			ContextCompat.getColor(activity, R.color.day_2),
+			ContextCompat.getColor(activity, R.color.day_3)
+		)
+		dusk = intArrayOf(
+			ContextCompat.getColor(activity, R.color.dusk_1),
+			ContextCompat.getColor(activity, R.color.dusk_2),
+			ContextCompat.getColor(activity, R.color.dusk_3)
+		)
+		night = intArrayOf(
+			ContextCompat.getColor(activity, R.color.night_1),
+			ContextCompat.getColor(activity, R.color.night_2),
+			ContextCompat.getColor(activity, R.color.night_3)
+		)
+		// endregion
+
+		gradientEvaluator = TypeEvaluator<IntArray> { fraction, from, to ->
+			val argbEvaluator = ArgbEvaluator.getInstance()
+			IntArray(from.size) { i -> argbEvaluator.evaluate(fraction, from[i], to[i]) }
+		}
+		animator = ObjectAnimator.ofObject(bg, "colors", gradientEvaluator, init).apply {
+			duration = 1000L
+		}
 	}
 
-	private fun updateColors(
-		info: WeatherInfo,
-		dawn: IntArray, day: IntArray, dusk: IntArray, night: IntArray,
-		evaluator: TypeEvaluator<IntArray>, animator: ObjectAnimator
-	) {
+	private fun updateColors(info: WeatherInfo?) {
+		if(info == null) {
+			animator.apply {
+				cancel()
+				setObjectValues(init)
+				start()
+			}
+			return
+		}
 		val daySeconds = 24 * 60 * 60f
 		// fraction of now in real today at this location
 		val dayFraction = info.secondOfToday / daySeconds
@@ -215,21 +205,21 @@ class HomeFragment: Fragment() {
 			dayFraction < riseFraction -> {
 				val head = riseFraction - deltaFraction
 				val localFraction = (dayFraction - head) / (riseFraction - head)
-				evaluator.evaluate(localFraction, night, dawn)
+				gradientEvaluator.evaluate(localFraction, night, dawn)
 			}
 			dayFraction < riseFraction + deltaFraction -> {
 				val localFraction = (dayFraction - riseFraction) / deltaFraction
-				evaluator.evaluate(localFraction, dawn, day)
+				gradientEvaluator.evaluate(localFraction, dawn, day)
 			}
 			dayFraction < setFraction - deltaFraction -> day
 			dayFraction < setFraction -> {
 				val head = setFraction - deltaFraction
 				val localFraction = (dayFraction - head) / (setFraction - head)
-				evaluator.evaluate(localFraction, day, dusk)
+				gradientEvaluator.evaluate(localFraction, day, dusk)
 			}
 			dayFraction < setFraction + deltaFraction -> {
 				val localFraction = (dayFraction - setFraction) / deltaFraction
-				evaluator.evaluate(localFraction, dusk, night)
+				gradientEvaluator.evaluate(localFraction, dusk, night)
 			}
 			else -> night
 		}

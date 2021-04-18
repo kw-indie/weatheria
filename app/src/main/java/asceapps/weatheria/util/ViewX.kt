@@ -64,29 +64,31 @@ fun SearchView.onTextSubmitFlow() = callbackFlow<String> {
 	}
 }
 
-fun RecyclerView.Adapter<*>.onItemInsertedFlow() = callbackFlow<Int> {
+fun ViewPager2.onItemInsertedFlow() = callbackFlow<Int> {
 	val observer = object: RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
 			if(itemCount == 1)
 				offer(positionStart)
 		}
 	}
-	registerAdapterDataObserver(observer)
+	adapter?.registerAdapterDataObserver(observer)
 
 	awaitClose {
-		unregisterAdapterDataObserver(observer)
+		adapter?.unregisterAdapterDataObserver(observer)
 	}
 }
 
-fun ViewPager2.onPageSelectedFlow() = callbackFlow<Int> {
-	val callback = object: ViewPager2.OnPageChangeCallback() {
-		override fun onPageSelected(position: Int) {
-			offer(position)
+inline fun ViewPager2.onPageSelectedFlow(crossinline onClose: (currentPos: Int) -> Unit) =
+	callbackFlow<Int> {
+		val callback = object: ViewPager2.OnPageChangeCallback() {
+			override fun onPageSelected(position: Int) {
+				offer(position)
+			}
+		}
+		registerOnPageChangeCallback(callback)
+
+		awaitClose {
+			onClose(currentItem)
+			unregisterOnPageChangeCallback(callback)
 		}
 	}
-	registerOnPageChangeCallback(callback)
-
-	awaitClose {
-		unregisterOnPageChangeCallback(callback)
-	}
-}

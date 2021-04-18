@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.model.Location
 import asceapps.weatheria.util.asyncPing
@@ -33,31 +34,36 @@ import kotlin.time.minutes
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	@ApplicationContext appContext: Context,
-	private val infoRepo: WeatherInfoRepo
-) : ViewModel() {
+	private val infoRepo: WeatherInfoRepo,
+	private val settingsRepo: SettingsRepo
+): ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
 		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(1.minutes), 1)
 
-	// todo add selectedLocation here and init it from settingsRepo
-
 	private val _error = MutableLiveData<Throwable>()
 	val error: LiveData<Throwable> = _error
 
-	private val onlineManualCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
-	val onlineStatus = merge(onlineManualCheck, appContext.onlineStatusFlow())
+	private val manualOnlineCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
+	val onlineStatus = merge(manualOnlineCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
 		.debounce(1000)
 
 	fun checkOnline() = viewModelScope.launch {
-		onlineManualCheck.value = Result.Loading
-		onlineManualCheck.value = asyncPing()
+		manualOnlineCheck.value = Result.Loading
+		manualOnlineCheck.value = asyncPing()
 	}
+
+	fun setSelectedLocation(pos: Int) {
+		settingsRepo.selectedLocation = pos
+	}
+
+	fun getSelectedLocation() = settingsRepo.selectedLocation
 
 	fun addNewLocation(l: FindResponse.Location) = viewModelScope.launch {
 		try {
 			infoRepo.add(l)
-		} catch (e: Exception) {
+		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e
 		}
@@ -68,7 +74,7 @@ class MainViewModel @Inject constructor(
 			with(l) {
 				infoRepo.refresh(id, lat, lng)
 			}
-		} catch (e: Exception) {
+		} catch(e: Exception) {
 			e.printStackTrace()
 			_error.value = e
 		}
@@ -110,13 +116,13 @@ class MainViewModel @Inject constructor(
 			tFormatter.format(instant.atOffset(offset))
 
 		fun temp(deg: Int, metric: Boolean) =
-			nFormat.format((if (metric) deg - 273.15f else deg * 1.8f - 459.67f).toInt()) + '°'
+			nFormat.format((if(metric) deg - 273.15f else deg * 1.8f - 459.67f).toInt()) + '°'
 
 		fun minMax(min: Int, max: Int, metric: Boolean) =
 			temp(min, metric).padEnd(5) + '|' + temp(max, metric).padStart(5)
 
 		fun speed(mps: Float, metric: Boolean, speedUnit: String) =
-			nFormat.format(if (metric) mps else mps * 2.237f) + ' ' + speedUnit
+			nFormat.format(if(metric) mps else mps * 2.237f) + ' ' + speedUnit
 
 		// our ratios are already from 0-100, this formatter expects fractions from 0-1
 		fun percent(ratio: Int): String = pFormat.format(ratio / 100f)

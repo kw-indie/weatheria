@@ -70,30 +70,30 @@ class HomeFragment: Fragment() {
 
 		val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-		val pager = binding.pager
-		val infoAdapter = WeatherInfoAdapter().apply {
-			onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
-				// animate to newly added item
-				pager.currentItem = pos
-			}
-		}
+		val infoAdapter = WeatherInfoAdapter()
 		// todo we could merge home + locations fragments with help from a
 		//  recyclerView + different layout managers/adapters
-		pager.apply {
+		val pager = binding.pager.apply {
 			adapter = infoAdapter
 			offscreenPageLimit = 1
-			onPageSelectedFlow().observe(viewLifecycleOwner) { pos ->
-				selectedLocation = pos
+			onPageSelectedFlow(onClose = { currentPos ->
+				mainVM.setSelectedLocation(currentPos)
+			}).observe(viewLifecycleOwner) { pos ->
 				updateColors(infoAdapter.getItem(pos))
+			}
+			onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
+				// animate to newly added item
+				currentItem = pos
 			}
 		}
 
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
+				// fixme no better way? we now have settingsRepo in mainVM
 				mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
 			}
 		}
-		selectedLocation = settingsRepo.selectedLocation
+
 		mainVM.weatherInfoList.observe(viewLifecycleOwner) {
 			when(it) {
 				is Result.Loading -> {
@@ -103,7 +103,7 @@ class HomeFragment: Fragment() {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					infoAdapter.submitList(list)
-					pager.setCurrentItem(selectedLocation, false)
+					pager.setCurrentItem(mainVM.getSelectedLocation(), false)
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
@@ -134,7 +134,6 @@ class HomeFragment: Fragment() {
 	override fun onStop() {
 		super.onStop()
 
-		settingsRepo.selectedLocation = selectedLocation
 		updateColors(null)
 	}
 
@@ -176,7 +175,7 @@ class HomeFragment: Fragment() {
 			IntArray(from.size) { i -> argbEvaluator.evaluate(fraction, from[i], to[i]) }
 		}
 		animator = ObjectAnimator.ofObject(bg, "colors", gradientEvaluator, init).apply {
-			duration = 1000L
+			duration = 500L
 		}
 	}
 

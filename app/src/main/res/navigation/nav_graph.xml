@@ -13,18 +13,18 @@
 			android:id="@+id/action_open_add_location"
 			app:destination="@id/addLocationFragment"
 			app:launchSingleTop="true"
-			app:enterAnim="@anim/nav_default_enter_anim"
-			app:exitAnim="@anim/nav_default_exit_anim"
-			app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-			app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+			app:enterAnim="@anim/enter_anim"
+			app:exitAnim="@anim/exit_anim"
+			app:popEnterAnim="@anim/enter_anim"
+			app:popExitAnim="@anim/exit_anim"/>
 		<action
 			android:id="@+id/action_open_saved_locations"
 			app:destination="@id/locationsFragment"
 			app:launchSingleTop="true"
-			app:enterAnim="@anim/nav_default_enter_anim"
-			app:exitAnim="@anim/nav_default_exit_anim"
-			app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-			app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+			app:enterAnim="@anim/enter_anim"
+			app:exitAnim="@anim/exit_anim"
+			app:popEnterAnim="@anim/enter_anim"
+			app:popExitAnim="@anim/exit_anim"/>
 	</fragment>
 	<fragment
 		android:id="@+id/locationsFragment"
@@ -44,8 +44,8 @@
 		android:id="@+id/action_open_settings"
 		app:destination="@id/settingsFragment"
 		app:launchSingleTop="true"
-		app:enterAnim="@anim/nav_default_enter_anim"
-		app:exitAnim="@anim/nav_default_exit_anim"
-		app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-		app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+		app:enterAnim="@anim/enter_anim"
+		app:exitAnim="@anim/exit_anim"
+		app:popEnterAnim="@anim/enter_anim"
+		app:popExitAnim="@anim/exit_anim"/>
 </navigation>

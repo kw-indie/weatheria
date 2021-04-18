@@ -13,6 +13,6 @@ class Location(
 	val pos: Int
 ) : IDed {
 
-	// for HashCallback
+	// for HashItemCallback
 	override fun hashCode() = id
 }

@@ -27,7 +27,8 @@ class AddLocationViewModel @Inject constructor(
 		.flatMapLatest { q -> locationRepo.search(q) }
 
 	fun search(q: String) {
-		query.value = q // already checked for 'same value' internally (in flow)
+		// already checked for 'same value' internally (in flow)
+		query.value = q
 	}
 
 	fun getDeviceLocation(accuracy: Int) = locationRepo.getDeviceLocation(accuracy)

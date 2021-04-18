@@ -1,6 +1,5 @@
 package asceapps.weatheria.data.repo
 
-import android.text.format.DateUtils
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherApi
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -31,8 +29,6 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.chrono.HijrahDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -135,40 +131,6 @@ class WeatherInfoRepo @Inject constructor(
 	}
 
 	companion object {
-
-		// region formatting
-		// prints at least 1 digit, sep each 3 digits, 0 to 2 decimal digits, rounds to nearest
-		private val nFormat = NumberFormat.getInstance().apply {
-			minimumFractionDigits = 0
-			maximumFractionDigits = 2
-		}
-
-		// adds localized percent char
-		private val pFormat = NumberFormat.getPercentInstance()
-		private val dtFormatter = DateTimeFormatter.ofPattern("EEE, d MMMM, h:mm a (xxx)")
-		private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-
-		// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build()
-		// for testing arabic numbering locale
-		fun relativeTime(millis: Int): CharSequence =
-			DateUtils.getRelativeTimeSpanString(millis.toLong())
-
-		fun nowDateTime(offset: ZoneOffset): String = dtFormatter.format(OffsetDateTime.now(offset))
-		fun time(instant: Instant, offset: ZoneOffset): String =
-			tFormatter.format(instant.atOffset(offset))
-
-		fun temp(deg: Int, metric: Boolean) =
-			nFormat.format((if(metric) deg - 273.15f else deg * 1.8f - 459.67f).toInt()) + '°'
-
-		fun minMax(min: Int, max: Int, metric: Boolean) =
-			temp(min, metric).padEnd(5) + '|' + temp(max, metric).padStart(5)
-
-		fun speed(mps: Float, metric: Boolean, speedUnit: String) =
-			nFormat.format(if(metric) mps else mps * 2.237f) + ' ' + speedUnit
-
-		// our ratios are already from 0-100, this formatter expects fractions from 0-1
-		fun percent(ratio: Int): String = pFormat.format(ratio / 100f)
-		// endregion
 
 		private fun responsesToEntity(l: FindResponse.Location, ocr: OneCallResponse): WeatherInfoEntity {
 			val location = with(l) {
@@ -305,6 +267,7 @@ class WeatherInfoRepo @Inject constructor(
 				elapsedTime.toHours() < 1 -> { // fresh
 					with(info.current) {
 						Current(
+							toInstant(dt),
 							conditionIndex(conditionId),
 							conditionIcon(conditionId, now in first3DaysDaytime[0]),
 							temp,
@@ -323,10 +286,9 @@ class WeatherInfoRepo @Inject constructor(
 				elapsedTime.toHours() < info.hourly.size -> { // approximate from hourly
 					with(info.hourly.last { it.dt < now.epochSecond }) {
 						Current(
+							toInstant(dt),
 							conditionIndex(conditionId),
-							conditionIcon(
-								conditionId,
-								first3DaysDaytime.any { daytime -> now in daytime }),
+							conditionIcon(conditionId, first3DaysDaytime.any { daytime -> now in daytime }),
 							temp,
 							feelsLike,
 							pressure,
@@ -349,25 +311,26 @@ class WeatherInfoRepo @Inject constructor(
 					val eve = LocalTime.of(18, 0)
 					with(day) {
 						Current(
+							toInstant(dt),
 							conditionIndex(conditionId),
 							conditionIcon(conditionId, now.epochSecond in sunrise..sunset),
 							when {
-								nowTime.isBefore(morn) -> mornTemp
-								nowTime.isBefore(noon) -> dayTemp
-								nowTime.isBefore(eve) -> eveTemp
+								nowTime < morn -> mornTemp
+								nowTime < noon -> dayTemp
+								nowTime < eve -> eveTemp
 								else -> nightTemp
 							},
 							when {
-								nowTime.isBefore(morn) -> mornFeel
-								nowTime.isBefore(noon) -> dayFeel
-								nowTime.isBefore(eve) -> eveFeel
+								nowTime < morn -> mornFeel
+								nowTime < noon -> dayFeel
+								nowTime < eve -> eveFeel
 								else -> nightFeel
 							},
 							pressure,
 							humidity,
 							dewPoint,
-							clouds,
-							info.hourly.last().visibility, // no visibility in daily, use last hour's
+							clouds, // no visibility in daily, use last hour's
+							info.hourly.last().visibility,
 							windSpeed,
 							dirIndex(windDir),
 							2 // low
@@ -375,7 +338,7 @@ class WeatherInfoRepo @Inject constructor(
 					}
 				}
 			}
-			return WeatherInfo(location, lastUpdate, current, hourly, daily)
+			return WeatherInfo(location, current, hourly, daily)
 		}
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())

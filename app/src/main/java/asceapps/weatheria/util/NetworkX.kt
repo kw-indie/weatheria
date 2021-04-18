@@ -30,7 +30,8 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 
 		override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) = refresh()
 
-		//do NOT offer(error), since we may have lost one network, but not the others
+		// do NOT offer(error), since we may have lost one network, but not the others
+		// for some reason, the OS calls this many times on each event (at least 4 times)
 		override fun onLost(network: Network) = refresh()
 
 		private fun refresh() {

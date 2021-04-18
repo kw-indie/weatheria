@@ -20,7 +20,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Result
-import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfo
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
@@ -28,20 +27,16 @@ import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInsertedFlow
 import asceapps.weatheria.util.onPageSelectedFlow
-import asceapps.weatheria.util.setFormatSystem
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
 import java.io.IOException
 import java.io.InterruptedIOException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
-	@Inject
-	lateinit var settingsRepo: SettingsRepo
 
 	private lateinit var init: IntArray
 	private lateinit var dawn: IntArray
@@ -50,8 +45,6 @@ class HomeFragment: Fragment() {
 	private lateinit var night: IntArray
 	private lateinit var gradientEvaluator: TypeEvaluator<IntArray>
 	private lateinit var animator: ObjectAnimator
-
-	private var selectedLocation = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -62,15 +55,6 @@ class HomeFragment: Fragment() {
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
-		// on reinstall or sth, make sure all settings are reapplied, eg. refreshWorker
-		// note: irl, this happens when app settings are auto backed up
-		// settingsRepo.reapply()
-
-		// setup prefs
-		// todo clean up
-		// need to re-read this every time we are back to the fragment in case it changes
-		setFormatSystem(settingsRepo.isMetric, settingsRepo.speedUnit)
-
 		val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
 		setUpBackgroundStuff()

@@ -9,6 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
+import asceapps.weatheria.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,11 +35,24 @@ class SettingsRepo @Inject constructor(
 	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
 	private val selectedLocKey = "selected"
 
+	init {
+		// on reinstall or sth, make sure all settings are reapplied, eg. refreshWorker.
+		// irl, this happens when app settings are auto backed up
+		updateUnits()
+		updateAutoRefresh()
+	}
+
 	val changesFlow = prefs.onChangeFlow()
 
 	// 0 = metric, 1 = imperial
 	private val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
+
+	private val isMetric: Boolean
+		get() = units == 0
+
+	private val speedUnit: String
+		get() = speedUnits[units]
 
 	val useDeviceForLocation: Boolean
 		get() = prefs.getBoolean(locUseDevice, defValBool)
@@ -49,31 +63,30 @@ class SettingsRepo @Inject constructor(
 	private val autoRefreshPeriod: String
 		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr
 
-	val isMetric: Boolean
-		get() = units == 0
-
-	val speedUnit: String
-		get() = speedUnits[units]
-
-	var selectedLocation = prefs.getInt(selectedLocKey, defVal)
+	var selectedLocation = 0
 		get() = prefs.getInt(selectedLocKey, defVal)
 		set(value) {
-			if (field != value) {
+			if(field != value) {
 				field = value
 				prefs.edit { putInt(selectedLocKey, value) }
 			}
 		}
 
 	fun update(key: String) {
-		when (key) {
+		when(key) {
+			unitsKey -> updateUnits()
 			autoRefreshKey -> updateAutoRefresh()
 		}
+	}
+
+	private fun updateUnits() {
+		WeatherInfo.setFormatSystem(isMetric, speedUnit)
 	}
 
 	private fun updateAutoRefresh() {
 		val autoRefreshWorkName = AutoRefreshWorker::class.qualifiedName!!
 		val never = autoRefreshValues[0]
-		if (autoRefreshPeriod == never) {
+		if(autoRefreshPeriod == never) {
 			workManager.cancelUniqueWork(autoRefreshWorkName)
 			return
 		}

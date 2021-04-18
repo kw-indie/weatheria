@@ -18,7 +18,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -28,7 +27,6 @@ import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
-import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onTextSubmitFlow
@@ -39,19 +37,20 @@ import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 
-// todo move to util or sth
-private const val latLngFormat = "%1$.3f,%2$.3f"
-
 @AndroidEntryPoint
 class AddLocationFragment: Fragment() {
 
-	private val mainVM: MainViewModel by activityViewModels()
 	private val addLocationVM: AddLocationViewModel by viewModels()
 
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
 	private lateinit var mapView: MapView
 	private lateinit var googleMap: GoogleMap
+
+	// todo move to util or sth
+	private val latLngFormat = "%1$.3f,%2$.3f"
+	private val maxZoom = 13f
+	private val searchZoom = 10f
 
 	// need to register this anywhere before onCreateView
 	private val permissionRequester = registerForActivityResult(
@@ -71,10 +70,22 @@ class AddLocationFragment: Fragment() {
 	): View {
 		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
-		val searchAdapter = SearchAdapter {
-			mainVM.addNewLocation(it)
-			findNavController().navigateUp()
-		}
+		val searchAdapter = SearchAdapter(onItemClick = { loc ->
+			addLocationVM.add(loc).observe(viewLifecycleOwner) {
+				when(it) {
+					is Result.Loading -> {
+						// todo show loading anim
+					}
+					is Result.Success -> {
+						findNavController().navigateUp()
+					}
+					is Result.Error -> {
+						// todo cover actual reasons
+						showMessage(R.string.error_unknown)
+					}
+				}
+			}
+		})
 		binding.rvResults.apply {
 			adapter = searchAdapter
 			val layoutManager = layoutManager as LinearLayoutManager
@@ -83,8 +94,6 @@ class AddLocationFragment: Fragment() {
 			setHasFixedSize(true)
 		}
 
-		val maxZoom = 13f
-		val searchZoom = 11f
 		mapView = binding.map.apply {
 			onCreate(savedInstanceState)
 			getMapAsync { map ->
@@ -134,52 +143,11 @@ class AddLocationFragment: Fragment() {
 					val isEmpty = list.isEmpty()
 					binding.tvNoResult.isVisible = isEmpty
 					binding.rvResults.isVisible = !isEmpty
-					if(!isEmpty)
-						binding.rvResults.smoothScrollToPosition(0)
+					if(!isEmpty) binding.rvResults.smoothScrollToPosition(0)
 				}
 				is Result.Error -> {
-					// this shouldn't happen
-				}
-			}
-		}
-		addLocationVM.deviceLocation.observe(viewLifecycleOwner) {
-			when(it) {
-				is Result.Loading -> {
-					// todo show loading anim
-				}
-				is Result.Success -> {
-					with(it.data) {
-						googleMap.animateCamera(
-							CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), maxZoom)
-						)
-					}
-				}
-				is Result.Error -> {
-					showMessage(
-						// todo did we cover other reasons?
-						when(it.t) {
-							is NullPointerException -> R.string.error_location_not_found
-							else -> R.string.error_unknown
-						}
-					)
-				}
-			}
-		}
-		addLocationVM.ipGeolocation.observe(viewLifecycleOwner) {
-			when(it) {
-				is Result.Loading -> {
-					// todo show loading anim
-				}
-				is Result.Success -> {
-					val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
-					googleMap.animateCamera(
-						// todo move zoom to const
-						CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), maxZoom)
-					)
-				}
-				is Result.Error -> {
-					// todo retrofit errors from mainActivity
-					//showMessage(R.string.error_unknown)
+					// todo cover actual reasons
+					showMessage(R.string.error_unknown)
 				}
 			}
 		}
@@ -194,7 +162,7 @@ class AddLocationFragment: Fragment() {
 			setIconifiedByDefault(false)
 			queryHint = getString(R.string.hint_search)
 			onTextSubmitFlow().observe(viewLifecycleOwner) {
-				addLocationVM.setQuery(it)
+				addLocationVM.search(it)
 			}
 		}
 	}
@@ -246,7 +214,24 @@ class AddLocationFragment: Fragment() {
 		if(addLocationVM.useDeviceForLocation) {
 			requestPermission()
 		} else {
-			addLocationVM.awaitIpGeolocation()
+			addLocationVM.getIpGeolocation().observe(viewLifecycleOwner) {
+				when(it) {
+					is Result.Loading -> {
+						// todo show loading anim
+					}
+					is Result.Success -> {
+						val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
+						googleMap.animateCamera(
+							// todo move zoom to const
+							CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), maxZoom)
+						)
+					}
+					is Result.Error -> {
+						// todo retrofit errors from homeFragment
+						//showMessage(R.string.error_unknown)
+					}
+				}
+			}
 		}
 	}
 
@@ -283,7 +268,29 @@ class AddLocationFragment: Fragment() {
 			if(addLocationVM.useHighAccuracyLocation) LocationRequest.PRIORITY_HIGH_ACCURACY
 			else LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.awaitDeviceLocation(accuracy)
+			addLocationVM.getDeviceLocation(accuracy).observe(viewLifecycleOwner) {
+				when(it) {
+					is Result.Loading -> {
+						// todo show loading anim
+					}
+					is Result.Success -> {
+						with(it.data) {
+							googleMap.animateCamera(
+								CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), maxZoom)
+							)
+						}
+					}
+					is Result.Error -> {
+						showMessage(
+							// todo did we cover other reasons?
+							when(it.t) {
+								is NullPointerException -> R.string.error_location_not_found
+								else -> R.string.error_unknown
+							}
+						)
+					}
+				}
+			}
 		} else {
 			showMessage(R.string.error_location_disabled)
 		}

@@ -1,6 +1,5 @@
 package asceapps.weatheria.data.repo
 
-import android.location.Location
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
@@ -9,11 +8,8 @@ import asceapps.weatheria.util.awaitCurrentLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ViewModelScoped
@@ -24,58 +20,54 @@ class LocationRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	private val _deviceLocation = MutableStateFlow<Result<Location>>(Result.Init)
-	val deviceLocation: Flow<Result<Location>> get() = _deviceLocation
-	private val _ipGeolocation = MutableStateFlow<Result<String>>(Result.Init)
-	val ipGeolocation: Flow<Result<String>> get() = _ipGeolocation
-
-	suspend fun awaitDeviceLocation(accuracy: Int) {
-		_deviceLocation.value = Result.Loading
+	fun getDeviceLocation(accuracy: Int) = flow {
+		emit(Result.Loading)
 		try {
-			withContext(ioDispatcher) {
-				// important (!!) so that NPE is caught as Result.Error
-				val location = locationProvider.awaitCurrentLocation(accuracy)!!
-				_deviceLocation.value = Result.Success(location)
-			}
+			// important (!!) so that NPE is caught as Result.Error
+			val location = locationProvider.awaitCurrentLocation(accuracy)!!
+			emit(Result.Success(location))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			_deviceLocation.value = Result.Error(e)
+			emit(Result.Error(e))
 		}
 	}
 
-	suspend fun awaitIpGeolocation() {
-		_ipGeolocation.value = Result.Loading
+	fun getIpGeolocation() = flow {
+		emit(Result.Loading)
 		try {
-			withContext(ioDispatcher) {
-				val latLng = ipApi.lookup()
-				_ipGeolocation.value = Result.Success(latLng)
-			}
+			val latLng = ipApi.lookup()
+			emit(Result.Success(latLng))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			_ipGeolocation.value = Result.Error(e)
+			emit(Result.Error(e))
 		}
-	}
+	}.flowOn(ioDispatcher)
 
 	fun search(query: String) = flow {
 		emit(Result.Loading)
-		// todo catch errors
-		when {
-			query.isEmpty() -> emit(Result.Success(emptyList<FindResponse.Location>()))
-			query.matches(coordinateRegex) -> {
-				val (lat, lng) = query.split(',')
-				val list = weatherApi.find(lat, lng).list
-				emit(Result.Success(list))
+		try {
+			when {
+				query.isEmpty() -> emit(Result.Success(emptyList<FindResponse.Location>()))
+				query.matches(coordinateRegex) -> {
+					val (lat, lng) = query.split(',')
+					val list = weatherApi.find(lat, lng).list
+					emit(Result.Success(list))
+				}
+				else -> {
+					val list = weatherApi.find(query).list
+					emit(Result.Success(list))
+				}
 			}
-			else -> {
-				val list = weatherApi.find(query).list
-				emit(Result.Success(list))
-			}
+		} catch(e: Exception) {
+			e.printStackTrace()
+			emit(Result.Error(e))
 		}
 	}.flowOn(ioDispatcher)
 
 	companion object {
 
-		private val coordinateRegex =
-			Regex("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$")
+		private val coordinateRegex = Regex(
+			"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
+		)
 	}
 }

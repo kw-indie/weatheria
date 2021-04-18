@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.animation.TypeEvaluator
@@ -28,7 +29,11 @@ import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInsertedFlow
 import asceapps.weatheria.util.onPageSelectedFlow
 import asceapps.weatheria.util.setFormatSystem
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import retrofit2.HttpException
+import java.io.IOException
+import java.io.InterruptedIOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,9 +71,10 @@ class HomeFragment: Fragment() {
 		// need to re-read this every time we are back to the fragment in case it changes
 		setFormatSystem(settingsRepo.isMetric, settingsRepo.speedUnit)
 
-		setUpBackgroundStuff()
-
 		val binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+		setUpBackgroundStuff()
+		setUpOnlineStatusStuff(binding.root)
 
 		val infoAdapter = WeatherInfoAdapter()
 		// todo we could merge home + locations fragments with help from a
@@ -90,7 +96,27 @@ class HomeFragment: Fragment() {
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
 				// fixme no better way? we now have settingsRepo in mainVM
-				mainVM.refresh(infoAdapter.getItem(pager.currentItem).location)
+				val location = infoAdapter.getItem(pager.currentItem).location
+				mainVM.refresh(location).observe(viewLifecycleOwner) {
+					if(it is Result.Loading) {
+						isRefreshing = true
+					} else {
+						isRefreshing = false
+						if(it is Result.Error) {
+							showMessage(
+								when(it) {
+									// obvious timeout
+									is InterruptedIOException -> R.string.error_timed_out
+									// others like UnknownHostException when it can't resolve hostname
+									is IOException -> R.string.error_no_internet
+									// others like http error codes (400, 404, etc.)
+									is HttpException -> R.string.error_server_error
+									else -> R.string.error_unknown
+								}
+							)
+						}
+					}
+				}
 			}
 		}
 
@@ -135,6 +161,11 @@ class HomeFragment: Fragment() {
 		super.onStop()
 
 		updateColors(null)
+	}
+
+	// todo share
+	private fun showMessage(resId: Int) {
+		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
 	}
 
 	private fun setUpBackgroundStuff() {
@@ -226,6 +257,28 @@ class HomeFragment: Fragment() {
 			cancel()
 			setObjectValues(newColors)
 			start()
+		}
+	}
+
+	private fun setUpOnlineStatusStuff(anyView: View) {
+		val snackbar = Snackbar.make(anyView, R.string.error_no_internet, Snackbar.LENGTH_INDEFINITE)
+			.apply {
+				animationMode = Snackbar.ANIMATION_MODE_SLIDE
+				setAction(R.string.retry) { mainVM.checkOnline() }
+			}
+		mainVM.onlineStatus.observe(this) {
+			when(it) {
+				is Result.Loading -> {
+					// todo show loading anim
+				}
+				is Result.Success -> {
+					// todo cancel loading anim
+					snackbar.dismiss()
+				}
+				is Result.Error -> {
+					snackbar.show()
+				}
+			}
 		}
 	}
 }

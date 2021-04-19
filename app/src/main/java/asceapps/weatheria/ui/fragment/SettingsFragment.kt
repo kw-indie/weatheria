@@ -1,6 +1,7 @@
 package asceapps.weatheria.ui.fragment
 
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
 import androidx.preference.PreferenceFragmentCompat
 import asceapps.weatheria.R
@@ -15,6 +16,11 @@ class SettingsFragment: PreferenceFragmentCompat() {
 	@Inject
 	lateinit var repo: SettingsRepo
 
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setHasOptionsMenu(true)
+	}
+
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.root_preferences, rootKey)
 	}
@@ -25,5 +31,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
 		repo.changesFlow.observe(viewLifecycleOwner) { key ->
 			repo.update(key)
 		}
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu) {
+		super.onPrepareOptionsMenu(menu)
+		menu.findItem(R.id.settingsFragment).isVisible = false
 	}
 }

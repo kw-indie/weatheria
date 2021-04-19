@@ -1,11 +1,11 @@
 package asceapps.weatheria.data.repo
 
+import android.content.Context
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.util.awaitCurrentLocation
-import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flow
@@ -14,17 +14,15 @@ import javax.inject.Inject
 
 @ViewModelScoped
 class LocationRepo @Inject constructor(
-	private val locationProvider: FusedLocationProviderClient,
 	private val ipApi: IPApi,
 	private val weatherApi: WeatherApi,
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	fun getDeviceLocation(accuracy: Int) = flow {
+	fun getDeviceLocation(ctx: Context, accuracy: Int) = flow {
 		emit(Result.Loading)
 		try {
-			// important (!!) so that NPE is caught as Result.Error
-			val location = locationProvider.awaitCurrentLocation(accuracy)!!
+			val location = ctx.awaitCurrentLocation(accuracy)
 			emit(Result.Success(location))
 		} catch(e: Exception) {
 			e.printStackTrace()

@@ -10,19 +10,19 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.IDed
 import asceapps.weatheria.databinding.ItemLocationBinding
-import asceapps.weatheria.model.Location
+import asceapps.weatheria.model.WeatherInfo
 import java.util.*
 
 class LocationsAdapter(
-	private val onDeleteClick: (Location) -> Unit,
-	private val onItemClick: (Location) -> Unit,
+	private val onDeleteClick: (WeatherInfo) -> Unit,
+	private val onItemClick: (WeatherInfo, Int) -> Unit,
 	private val onStartDrag: (View) -> Unit,
 	private val onEndDrag: (View) -> Unit,
-	private val onReorder: (Location, Int) -> Unit
-) : RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
+	private val onReorder: (WeatherInfo, Int) -> Unit
+): RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
 
-	private val list = mutableListOf<Location>()
-	private val callback = HashCallback<Location>()
+	private val list = mutableListOf<WeatherInfo>()
+	private val callback = HashCallback<WeatherInfo>()
 	private val touchHelper = ItemTouchHelper(ReorderCallback())
 
 	init {
@@ -44,8 +44,8 @@ class LocationsAdapter(
 	override fun getItemCount() = list.size
 
 	fun reorder(fromPos: Int, toPos: Int) {
-		if (fromPos == toPos) return
-		if (fromPos < toPos) {
+		if(fromPos == toPos) return
+		if(fromPos < toPos) {
 			Collections.rotate(list.subList(fromPos, toPos + 1), -1)
 		} else {
 			Collections.rotate(list.subList(toPos, fromPos + 1), 1)
@@ -53,7 +53,7 @@ class LocationsAdapter(
 		notifyItemMoved(fromPos, toPos)
 	}
 
-	fun submitList(newList: List<Location>) {
+	fun submitList(newList: List<WeatherInfo>) {
 		callback.newList = newList
 		val diffResult = DiffUtil.calculateDiff(callback)
 		list.clear()
@@ -70,13 +70,13 @@ class LocationsAdapter(
 		).apply {
 			holder = ViewHolder(this)
 			ibDelete.setOnClickListener {
-				onDeleteClick(location!!)
+				onDeleteClick(info!!)
 			}
 			tvName.setOnClickListener {
-				onItemClick(location!!)
+				onItemClick(info!!, holder.bindingAdapterPosition)
 			}
 			ivDragHandle.setOnTouchListener { _, e ->
-				if (e.action == MotionEvent.ACTION_DOWN) {
+				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
 					return@setOnTouchListener true
 				}
@@ -90,19 +90,17 @@ class LocationsAdapter(
 		holder.bind(getItem(position))
 	}
 
-	class ViewHolder(
-		private val binding: ItemLocationBinding
-	) : RecyclerView.ViewHolder(binding.root) {
+	class ViewHolder(private val binding: ItemLocationBinding): RecyclerView.ViewHolder(binding.root) {
 
-		fun bind(l: Location) {
+		fun bind(i: WeatherInfo) {
 			with(binding) {
-				location = l
+				info = i
 				executePendingBindings()
 			}
 		}
 	}
 
-	class HashCallback<T : IDed> : DiffUtil.Callback() {
+	class HashCallback<T: IDed>: DiffUtil.Callback() {
 
 		var oldList: List<T> = emptyList()
 		var newList: List<T> = emptyList()
@@ -115,7 +113,7 @@ class LocationsAdapter(
 			oldPos.hashCode() == newPos.hashCode()
 	}
 
-	private inner class ReorderCallback : ItemTouchHelper.SimpleCallback(
+	private inner class ReorderCallback: ItemTouchHelper.SimpleCallback(
 		ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
 	) {
 
@@ -126,8 +124,8 @@ class LocationsAdapter(
 
 		override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
 			super.onSelectedChanged(viewHolder, actionState)
-			if (viewHolder == null) return
-			if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) onStartDrag(viewHolder.itemView)
+			if(viewHolder == null) return
+			if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) onStartDrag(viewHolder.itemView)
 		}
 
 		override fun onMove(
@@ -135,7 +133,7 @@ class LocationsAdapter(
 			target: RecyclerView.ViewHolder
 		): Boolean {
 			val newMove = viewHolder.bindingAdapterPosition to target.bindingAdapterPosition
-			if (lastMove != newMove && System.currentTimeMillis() > lastMoveMillis + debounce) {
+			if(lastMove != newMove && System.currentTimeMillis() > lastMoveMillis + debounce) {
 				lastMove = newMove
 				lastMoveMillis = System.currentTimeMillis()
 				reorder(lastMove.first, lastMove.second)

@@ -1,5 +1,6 @@
 package asceapps.weatheria.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.repo.LocationRepo
@@ -31,7 +32,7 @@ class AddLocationViewModel @Inject constructor(
 		query.value = q
 	}
 
-	fun getDeviceLocation(accuracy: Int) = locationRepo.getDeviceLocation(accuracy)
+	fun getDeviceLocation(ctx: Context, accuracy: Int) = locationRepo.getDeviceLocation(ctx, accuracy)
 
 	fun getIpGeolocation() = locationRepo.getIpGeolocation()
 

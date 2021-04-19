@@ -338,7 +338,7 @@ class WeatherInfoRepo @Inject constructor(
 					}
 				}
 			}
-			return WeatherInfo(location, current, hourly, daily)
+			return WeatherInfo(location, lastUpdate, current, hourly, daily)
 		}
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
@@ -37,10 +38,11 @@ class LocationsFragment : Fragment() {
 		val binding = FragmentLocationsBinding.inflate(inflater, container, false)
 		val locationsAdapter = LocationsAdapter(
 			onDeleteClick = {
-				mainVM.delete(it)
+				mainVM.delete(it.location)
 			},
-			onItemClick = {
-				// todo
+			onItemClick = { _, pos ->
+				mainVM.setSelectedLocation(pos)
+				findNavController().navigateUp()
 			},
 			onStartDrag = {
 				val scale = 1.05f
@@ -54,8 +56,8 @@ class LocationsFragment : Fragment() {
 					.scaleX(scale)
 					.scaleY(scale)
 			},
-			onReorder = { location, to ->
-				mainVM.reorder(location, to)
+			onReorder = { info, to ->
+				mainVM.reorder(info.location, to)
 			}
 		)
 		binding.rvLocations.apply {
@@ -72,12 +74,12 @@ class LocationsFragment : Fragment() {
 				}
 				is Result.Success -> {
 					// todo cancel loading anim
-					val list = it.data.map { e -> e.location }
+					val list = it.data
 					locationsAdapter.submitList(list)
 					val isEmpty = list.isEmpty()
 					binding.tvNoLocations.isVisible = isEmpty
 					binding.rvLocations.isVisible = !isEmpty
-					if (emptyList != isEmpty) {
+					if(emptyList != isEmpty) {
 						emptyList = isEmpty
 						requireActivity().invalidateOptionsMenu()
 					}

@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,8 +21,4 @@ class AppModule {
 	@Provides
 	fun provideWorkManager(@ApplicationContext appContext: Context): WorkManager =
 		WorkManager.getInstance(appContext)
-
-	@Provides
-	fun provideLocationProviderClient(@ApplicationContext appContext: Context): FusedLocationProviderClient =
-		LocationServices.getFusedLocationProviderClient(appContext)
 }

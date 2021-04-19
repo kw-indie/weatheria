@@ -9,10 +9,11 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import java.time.format.DecimalStyle
 
 class WeatherInfo(
 	val location: Location,
+	private val lastUpdateInstant: Instant,
 	val current: Current,
 	val hourly: List<Hourly>,
 	val daily: List<Daily>
@@ -32,17 +33,17 @@ class WeatherInfo(
 	val secondOfSunriseToday get() = localSecondOfDay(today.sunrise, location.zoneOffset)
 	val secondOfSunsetToday get() = localSecondOfDay(today.sunset, location.zoneOffset)
 
-	private val lastUpdateInstant get() = current.time
-	val lastUpdate get() = relativeTime(lastUpdateInstant.toEpochMilli())
-	val now get() = nowDateTime(location.zoneOffset)
-	val todaySunrise get() = time(today.sunrise, location.zoneOffset)
-	val todaySunset get() = time(today.sunset, location.zoneOffset)
-	val todayMinMax get() = minMax(today.min, today.max)
+	val locationName get() = commaSep(location.name, location.country)
+	val localNow get() = localDateTime(location.zoneOffset)
+	val lastUpdate get() = relativeTime(lastUpdateInstant)
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
 	val currentWindSpeed get() = speed(current.windSpeed)
 	val currentWindDirIndex get() = current.windDirIndex
 	val currentHumidity get() = percent(current.humidity)
+	val todayMinMax get() = minMax(today.min, today.max)
+	val todaySunrise get() = time(today.sunrise, location.zoneOffset)
+	val todaySunset get() = time(today.sunset, location.zoneOffset)
 
 	companion object {
 
@@ -67,14 +68,18 @@ class WeatherInfo(
 
 		// adds localized percent char
 		private val pFormat = NumberFormat.getPercentInstance()
+		// trash java never localizes the xxx part
 		private val dtFormatter = DateTimeFormatter.ofPattern("EEE, d MMMM, h:mm a (xxx)")
-		private val tFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
+		private val tFormatter = DateTimeFormatter.ofPattern("h:mm a")
+			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
 
+		private fun commaSep(vararg str: String) = str.joinToString()
 		// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build() for arabic numbers
-		private fun relativeTime(millis: Long): CharSequence =
-			DateUtils.getRelativeTimeSpanString(millis)
+		private fun relativeTime(instant: Instant): CharSequence =
+			DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
 
-		private fun nowDateTime(offset: ZoneOffset): String =
+		private fun localDateTime(offset: ZoneOffset): String =
 			dtFormatter.format(OffsetDateTime.now(offset))
 
 		private fun time(instant: Instant, offset: ZoneOffset): String =

@@ -14,6 +14,9 @@ import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
+import java.time.Duration
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -102,10 +105,17 @@ class SettingsRepo @Inject constructor(
 			.setRequiredNetworkType(NetworkType.UNMETERED)
 			.setRequiresBatteryNotLow(true)
 			.build()
+		val now = Instant.now()
+		val lastMidnight = now.truncatedTo(ChronoUnit.DAYS)
+		var nextSection = lastMidnight
+		do {
+			nextSection = nextSection.plus(periodL, ChronoUnit.HOURS)
+		} while(nextSection < now)
+		val secondsUntilNextSection = Duration.between(now, nextSection).seconds
 		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(periodL, TimeUnit.HOURS)
 			.addTag(autoRefreshPeriod)
 			.setConstraints(constraints)
-			.setInitialDelay(periodL, TimeUnit.HOURS)
+			.setInitialDelay(secondsUntilNextSection, TimeUnit.SECONDS)
 			.build()
 		workManager.enqueueUniquePeriodicWork(
 			autoRefreshWorkName,

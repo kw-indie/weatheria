@@ -4,8 +4,8 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<data>
 		<variable
-			name="location"
-			type="asceapps.weatheria.model.Location"/>
+			name="info"
+			type="asceapps.weatheria.model.WeatherInfo"/>
 	</data>
 	<FrameLayout
 		android:layout_width="match_parent"
@@ -15,8 +15,8 @@
 			android:id="@+id/tv_name"
 			android:layout_width="match_parent"
 			android:layout_height="?attr/listPreferredItemHeight"
-			android:paddingStart="?attr/listPreferredItemHeight"
-			android:text="@{@string/f_comma_sep(location.name, location.country)}"
+			android:paddingHorizontal="?attr/listPreferredItemHeight"
+			android:text="@{info.locationName}"
 			tools:text="@tools:sample/cities"/>
 		<ImageButton
 			style="@style/Widget.MaterialComponents.Button.OutlinedButton"

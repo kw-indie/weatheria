@@ -36,6 +36,7 @@ import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.MapView
 import com.google.android.libraries.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 @AndroidEntryPoint
 class AddLocationFragment: Fragment() {
@@ -114,7 +115,8 @@ class AddLocationFragment: Fragment() {
 					setOnCameraIdleListener {
 						val query = if(cameraPosition.zoom >= searchZoom) {
 							with(cameraPosition.target) {
-								latLngFormat.format(latitude, longitude)
+								// if numbers aren't in arabic (1234..) api doesn't understand
+								latLngFormat.format(Locale.US, latitude, longitude)
 							}
 						} else {
 							searchAdapter.submitList(emptyList())
@@ -222,7 +224,6 @@ class AddLocationFragment: Fragment() {
 					is Result.Success -> {
 						val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
 						googleMap.animateCamera(
-							// todo move zoom to const
 							CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), maxZoom)
 						)
 					}
@@ -263,12 +264,13 @@ class AddLocationFragment: Fragment() {
 	}
 
 	private fun onPermissionGranted() {
-		val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+		val ctx = requireContext()
+		val lm = ctx.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 		val accuracy =
 			if(addLocationVM.useHighAccuracyLocation) LocationRequest.PRIORITY_HIGH_ACCURACY
 			else LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
-			addLocationVM.getDeviceLocation(accuracy).observe(viewLifecycleOwner) {
+			addLocationVM.getDeviceLocation(ctx, accuracy).observe(viewLifecycleOwner) {
 				when(it) {
 					is Result.Loading -> {
 						// todo show loading anim

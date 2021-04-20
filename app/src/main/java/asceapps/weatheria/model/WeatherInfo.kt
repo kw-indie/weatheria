@@ -39,7 +39,6 @@ class WeatherInfo(
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
 	val currentWindSpeed get() = speed(current.windSpeed)
-	val currentWindDirIndex get() = current.windDirIndex
 	val currentHumidity get() = percent(current.humidity)
 	val todayMinMax get() = minMax(today.min, today.max)
 	val todaySunrise get() = time(today.sunrise, location.zoneOffset)

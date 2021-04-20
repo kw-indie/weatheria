@@ -252,9 +252,7 @@ class WeatherInfoRepo @Inject constructor(
 					// hourly data are only from first 48 hours, starting from this hour not 00:00
 					Hourly(
 						hour,
-						conditionIcon(
-							conditionId,
-							first3DaysDaytime.any { daytime -> hour in daytime }),
+						conditionIcon(conditionId, first3DaysDaytime.any { daytime -> hour in daytime }),
 						temp,
 						pop
 					)
@@ -278,7 +276,7 @@ class WeatherInfoRepo @Inject constructor(
 							clouds,
 							visibility,
 							windSpeed,
-							dirIndex(windDir),
+							windDir,
 							0 // high
 						)
 					}
@@ -297,7 +295,7 @@ class WeatherInfoRepo @Inject constructor(
 							clouds,
 							visibility,
 							windSpeed,
-							dirIndex(windDir),
+							windDir,
 							1 // medium
 						)
 					}
@@ -329,10 +327,11 @@ class WeatherInfoRepo @Inject constructor(
 							pressure,
 							humidity,
 							dewPoint,
-							clouds, // no visibility in daily, use last hour's
+							clouds,
+							// no visibility in daily, use last hour's
 							info.hourly.last().visibility,
 							windSpeed,
-							dirIndex(windDir),
+							windDir,
 							2 // low
 						)
 					}
@@ -373,21 +372,8 @@ class WeatherInfoRepo @Inject constructor(
 			}
 		// endregion
 
-		private fun dirIndex(deg: Int) = when((deg + 22) % 360) {
-			in 0..44 -> 0 // E
-			in 45..89 -> 1 // NE
-			in 90..134 -> 2 // N
-			in 135..179 -> 3 // NW
-			in 180..224 -> 4 // W
-			in 225..269 -> 5 // SW
-			in 270..314 -> 6 // S
-			else -> 7 // SE
-		}
-
 		private fun moonPhase(instant: Instant, offset: ZoneOffset): Int {
-			val day = HijrahDate.from(
-				OffsetDateTime.ofInstant(instant, offset)
-			)[ChronoField.DAY_OF_MONTH]
+			val day = HijrahDate.from(OffsetDateTime.ofInstant(instant, offset))[ChronoField.DAY_OF_MONTH]
 			val phase = when(day) {
 				in 2..6 -> 0 //"Waxing Crescent Moon"
 				in 6..8 -> 1 //"Quarter Moon"

@@ -162,7 +162,7 @@ class HomeFragment: Fragment() {
 
 		// todo move to settings?
 		// region init colors
-		init = intArrayOf(0, 0, 0, 0) // transparent, init colors
+		init = intArrayOf(0, 0, 0) // transparent, init colors
 		dawn = intArrayOf(
 			ContextCompat.getColor(activity, R.color.dawn_1),
 			ContextCompat.getColor(activity, R.color.dawn_2),
@@ -191,13 +191,13 @@ class HomeFragment: Fragment() {
 		}
 		animator = ObjectAnimator.ofObject(bg, "colors", gradientEvaluator, init).apply {
 			duration = 500L
+			setAutoCancel(true)
 		}
 	}
 
 	private fun updateColors(info: WeatherInfo?) {
 		if(info == null) {
 			animator.apply {
-				cancel()
 				setObjectValues(init)
 				start()
 			}
@@ -238,7 +238,6 @@ class HomeFragment: Fragment() {
 			else -> night
 		}
 		animator.run {
-			cancel()
 			setObjectValues(newColors)
 			start()
 		}

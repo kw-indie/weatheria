@@ -6,23 +6,12 @@
 	<string name="action_settings">الإعدادات</string>
 	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
-	<string name="f_comma_sep">%1$s، %2$s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
 	<string name="cd_weather_icon">أيقونة حالة الطقس</string>
 	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
 	<string name="cd_humidity">الرطوبة</string>
 	<string name="cd_sunrise">وقت شروق الشمس</string>
 	<string name="cd_sunset">وقت غروب الشمس</string>
-	<string-array name="dir_letters">
-		<item>ق</item>
-		<item>شق</item>
-		<item>ش</item>
-		<item>شغ</item>
-		<item>غ</item>
-		<item>جغ</item>
-		<item>ج</item>
-		<item>جق</item>
-	</string-array>
 	<string-array name="weather_conditions">
 		<item>عاصفة رعدية وأمطار خفيفة</item>
 		<item>عاصفة رعدية وأمطار</item>

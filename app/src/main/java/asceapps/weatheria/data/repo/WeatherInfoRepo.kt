@@ -43,11 +43,11 @@ class WeatherInfoRepo @Inject constructor(
 ) {
 
 	fun getAll() = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		val flow = dao.loadAll()
 			.map { list ->
 				val modList = list.map { e -> entityToModel(e) }
-				Result.Success(modList)
+				Success(modList)
 			}
 			.flowOn(ioDispatcher)
 		emitAll(flow)
@@ -55,24 +55,24 @@ class WeatherInfoRepo @Inject constructor(
 
 	// todo remove unused
 	fun getAllIds() = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		val flow = dao.loadAllIds()
 			.distinctUntilChanged()
-			.map { Result.Success(it) }
+			.map { Success(it) }
 		emitAll(flow)
 	}
 
 	fun get(locationId: Int) = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		val flow = dao.load(locationId)
 			.distinctUntilChanged()
-			.map { Result.Success(it) }
+			.map { Success(it) }
 		emitAll(flow)
 	}
 
 	// todo shorten param type or convert to model FoundLocation
 	fun add(l: FindResponse.Location) = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		try {
 			val oneCallResp = withContext(ioDispatcher) {
 				val coord = l.coord
@@ -82,21 +82,21 @@ class WeatherInfoRepo @Inject constructor(
 			with(infoEntity) {
 				dao.insert(location, current, hourly, daily)
 			}
-			emit(Result.Success(Unit))
+			emit(Success(Unit))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			emit(Result.Error(e))
+			emit(Error(e))
 		}
 	}
 
 	fun refresh(id: Int, lat: Float, lng: Float) = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		try {
 			internalRefresh(id, lat, lng)
-			emit(Result.Success(Unit))
+			emit(Success(Unit))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			emit(Result.Error(e))
+			emit(Error(e))
 		}
 	}
 

@@ -14,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
-import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.Error
+import asceapps.weatheria.data.repo.Loading
+import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentLocationsBinding
 import asceapps.weatheria.ui.adapter.LocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
@@ -68,11 +70,11 @@ class LocationsFragment : Fragment() {
 			setHasFixedSize(true)
 		}
 		mainVM.weatherInfoList.observe(viewLifecycleOwner) {
-			when (it) {
-				is Result.Loading -> {
+			when(it) {
+				is Loading -> {
 					// todo show loading anim
 				}
-				is Result.Success -> {
+				is Success -> {
 					// todo cancel loading anim
 					val list = it.data
 					locationsAdapter.submitList(list)
@@ -84,7 +86,7 @@ class LocationsFragment : Fragment() {
 						requireActivity().invalidateOptionsMenu()
 					}
 				}
-				is Result.Error -> {
+				is Error -> {
 					// todo does this ever happen?
 				}
 			}

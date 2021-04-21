@@ -7,7 +7,10 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.annotation.RequiresPermission
+import asceapps.weatheria.data.repo.Error
+import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -35,13 +38,13 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 		override fun onLost(network: Network) = refresh()
 
 		private fun refresh() {
-			offer(Result.Loading)
+			offer(Loading)
 			offer(blockingPing())
 		}
 	}
 
 	// fire initial value
-	offer(Result.Loading)
+	offer(Loading)
 	offer(asyncPing())
 
 	cm.registerNetworkCallback(request, callback)
@@ -64,9 +67,9 @@ private fun blockingPing(): Result<Unit> {
 			val socketAddress = InetSocketAddress("8.8.8.8", 53)
 			it.connect(socketAddress, 1500)
 		}
-		Result.Success(Unit)
+		Success(Unit)
 	} catch(e: Exception) {
 		e.printStackTrace()
-		Result.Error(e)
+		Error(e)
 	}
 }

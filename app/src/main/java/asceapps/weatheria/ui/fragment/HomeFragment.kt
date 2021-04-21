@@ -19,7 +19,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
-import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.Error
+import asceapps.weatheria.data.repo.Loading
+import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.model.WeatherInfo
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
@@ -82,11 +84,11 @@ class HomeFragment: Fragment() {
 				// fixme no better way? we now have settingsRepo in mainVM
 				val location = infoAdapter.getItem(pager.currentItem).location
 				mainVM.refresh(location).observe(viewLifecycleOwner) {
-					if(it is Result.Loading) {
+					if(it is Loading) {
 						isRefreshing = true
 					} else {
 						isRefreshing = false
-						if(it is Result.Error) {
+						if(it is Error) {
 							showMessage(
 								when(it) {
 									// obvious timeout
@@ -106,10 +108,10 @@ class HomeFragment: Fragment() {
 
 		mainVM.weatherInfoList.observe(viewLifecycleOwner) {
 			when(it) {
-				is Result.Loading -> {
+				is Loading -> {
 					swipeRefresh.isRefreshing = true
 				}
-				is Result.Success -> {
+				is Success -> {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					infoAdapter.submitList(list)
@@ -118,7 +120,7 @@ class HomeFragment: Fragment() {
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 				}
-				is Result.Error -> {
+				is Error -> {
 					swipeRefresh.isRefreshing = false
 					// todo does this ever happen?
 				}
@@ -251,14 +253,14 @@ class HomeFragment: Fragment() {
 			}
 		mainVM.onlineStatus.observe(this) {
 			when(it) {
-				is Result.Loading -> {
+				is Loading -> {
 					// todo show loading anim
 				}
-				is Result.Success -> {
+				is Success -> {
 					// todo cancel loading anim
 					snackbar.dismiss()
 				}
-				is Result.Error -> {
+				is Error -> {
 					snackbar.show()
 				}
 			}

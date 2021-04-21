@@ -23,7 +23,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
-import asceapps.weatheria.data.repo.Result
+import asceapps.weatheria.data.repo.Error
+import asceapps.weatheria.data.repo.Loading
+import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
 import asceapps.weatheria.ui.adapter.SearchAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
@@ -74,13 +76,13 @@ class AddLocationFragment: Fragment() {
 		val searchAdapter = SearchAdapter(onItemClick = { loc ->
 			addLocationVM.add(loc).observe(viewLifecycleOwner) {
 				when(it) {
-					is Result.Loading -> {
+					is Loading -> {
 						// todo show loading anim
 					}
-					is Result.Success -> {
+					is Success -> {
 						findNavController().navigateUp()
 					}
-					is Result.Error -> {
+					is Error -> {
 						// todo cover actual reasons
 						showMessage(R.string.error_unknown)
 					}
@@ -136,10 +138,10 @@ class AddLocationFragment: Fragment() {
 
 		addLocationVM.searchResult.observe(viewLifecycleOwner) {
 			when(it) {
-				is Result.Loading -> {
+				is Loading -> {
 					// todo show loading anim
 				}
-				is Result.Success -> {
+				is Success -> {
 					val list = it.data
 					searchAdapter.submitList(list)
 					val isEmpty = list.isEmpty()
@@ -147,7 +149,7 @@ class AddLocationFragment: Fragment() {
 					binding.rvResults.isVisible = !isEmpty
 					if(!isEmpty) binding.rvResults.smoothScrollToPosition(0)
 				}
-				is Result.Error -> {
+				is Error -> {
 					// todo cover actual reasons
 					showMessage(R.string.error_unknown)
 				}
@@ -218,16 +220,16 @@ class AddLocationFragment: Fragment() {
 		} else {
 			addLocationVM.getIpGeolocation().observe(viewLifecycleOwner) {
 				when(it) {
-					is Result.Loading -> {
+					is Loading -> {
 						// todo show loading anim
 					}
-					is Result.Success -> {
+					is Success -> {
 						val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
 						googleMap.animateCamera(
 							CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), maxZoom)
 						)
 					}
-					is Result.Error -> {
+					is Error -> {
 						// todo retrofit errors from homeFragment
 						//showMessage(R.string.error_unknown)
 					}
@@ -272,17 +274,17 @@ class AddLocationFragment: Fragment() {
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
 			addLocationVM.getDeviceLocation(ctx, accuracy).observe(viewLifecycleOwner) {
 				when(it) {
-					is Result.Loading -> {
+					is Loading -> {
 						// todo show loading anim
 					}
-					is Result.Success -> {
+					is Success -> {
 						with(it.data) {
 							googleMap.animateCamera(
 								CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), maxZoom)
 							)
 						}
 					}
-					is Result.Error -> {
+					is Error -> {
 						showMessage(
 							// todo did we cover other reasons?
 							when(it.t) {

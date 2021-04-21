@@ -20,45 +20,45 @@ class LocationRepo @Inject constructor(
 ) {
 
 	fun getDeviceLocation(ctx: Context, accuracy: Int) = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		try {
 			val location = ctx.awaitCurrentLocation(accuracy)
-			emit(Result.Success(location))
+			emit(Success(location))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			emit(Result.Error(e))
+			emit(Error(e))
 		}
 	}
 
 	fun getIpGeolocation() = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		try {
 			val latLng = ipApi.lookup()
-			emit(Result.Success(latLng))
+			emit(Success(latLng))
 		} catch(e: Exception) {
 			e.printStackTrace()
-			emit(Result.Error(e))
+			emit(Error(e))
 		}
 	}.flowOn(ioDispatcher)
 
 	fun search(query: String) = flow {
-		emit(Result.Loading)
+		emit(Loading)
 		try {
 			when {
-				query.isEmpty() -> emit(Result.Success(emptyList<FindResponse.Location>()))
+				query.isEmpty() -> emit(Success(emptyList<FindResponse.Location>()))
 				query.matches(coordinateRegex) -> {
 					val (lat, lng) = query.split(',')
 					val list = weatherApi.find(lat, lng).list
-					emit(Result.Success(list))
+					emit(Success(list))
 				}
 				else -> {
 					val list = weatherApi.find(query).list
-					emit(Result.Success(list))
+					emit(Success(list))
 				}
 			}
 		} catch(e: Exception) {
 			e.printStackTrace()
-			emit(Result.Error(e))
+			emit(Error(e))
 		}
 	}.flowOn(ioDispatcher)
 

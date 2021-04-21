@@ -3,6 +3,7 @@ package asceapps.weatheria.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.data.repo.WeatherInfoRepo
@@ -31,13 +32,13 @@ class MainViewModel @Inject constructor(
 	val weatherInfoList = infoRepo.getAll()
 		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(1.minutes), 1)
 
-	private val manualOnlineCheck = MutableStateFlow<Result<Unit>>(Result.Loading)
+	private val manualOnlineCheck = MutableStateFlow<Result<Unit>>(Loading)
 	val onlineStatus = merge(manualOnlineCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
 		.debounce(1000)
 
 	fun checkOnline() = viewModelScope.launch {
-		manualOnlineCheck.value = Result.Loading
+		manualOnlineCheck.value = Loading
 		manualOnlineCheck.value = asyncPing()
 	}
 

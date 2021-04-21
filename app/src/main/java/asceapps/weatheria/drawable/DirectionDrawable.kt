@@ -1,57 +1,86 @@
 package asceapps.weatheria.drawable
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PixelFormat
+import android.content.res.ColorStateList
+import android.graphics.*
 import android.graphics.drawable.Drawable
 
+// todo lots of additions need to be made to make this fully integrated drawable like any other, including:
+//  - support for api 24+
+//  - custom-view-like xml (styleable attrs, etc.)
+//  - drawable specific overrides (look at ColorDrawable & VectorDrawable for inspiration)
 class DirectionDrawable: Drawable() {
 
-	var rotation: Float = 0f
+	companion object {
 
-	private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-		color = Color.WHITE
-	}
-	private val path = Path().apply {
-		moveTo(20f, 12f)
-		lineTo(4.6f, 7f)
-		lineTo(4f, 7.475f)
-		lineTo(6.526f, 12f)
-		lineTo(4f, 16.526f)
-		lineTo(4.6f, 17f)
-		close()
-	}
-
-	override fun draw(canvas: Canvas) {
-		val w = bounds.width()
-		val h = bounds.height()
-		val cx = w / 2f
-		val cy = h / 2f
-		val sx = w / 24f
-		val sy = h / 24f
-
-		canvas.run {
-			save()
-			rotate(-rotation, cx, cy)
-			// scale so our path points are correct regardless of drawable size
-			scale(sx, sy)
-			drawPath(path, paint)
-			restore()
+		private const val DEFAULT_COLOR = Color.BLACK
+		private val PATH = Path().apply {
+			moveTo(8f, 12f)
+			lineTo(5f, 6f)
+			lineTo(19f, 12f)
+			lineTo(5f, 18f)
+			close()
 		}
 	}
 
-	override fun setAlpha(alpha: Int) {
-		paint.alpha = alpha
+	private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+		color = DEFAULT_COLOR
+		style = Paint.Style.STROKE
+		strokeWidth = 2.4f
+	}
+	private val path = Path().apply { set(PATH) }
+
+	var deg = 0
+		set(value) {
+			if(field != value) {
+				field = value
+				updatePath()
+			}
+		}
+
+	override fun onBoundsChange(bounds: Rect) {
+		updatePath()
+	}
+
+	private fun updatePath() {
+		path.rewind()
+		val c = 12f
+		val size = 24f
+		val sx = bounds.right / size
+		val sy = bounds.bottom / size
+		Matrix().apply {
+			setRotate(deg.toFloat(), c, c)
+			postScale(sx, sy)
+			PATH.transform(this, path)
+		}
 		invalidateSelf()
 	}
+
+	override fun draw(canvas: Canvas) {
+		canvas.drawPath(path, paint)
+	}
+
+	override fun setAlpha(alpha: Int) {
+		if(paint.alpha != alpha) {
+			paint.alpha = alpha
+			invalidateSelf()
+		}
+	}
+
+	override fun getAlpha() = paint.alpha
 
 	override fun setColorFilter(colorFilter: ColorFilter?) {
 		paint.colorFilter = colorFilter
-		invalidateSelf()
 	}
 
+	override fun getColorFilter(): ColorFilter? = paint.colorFilter
+
 	override fun getOpacity() = PixelFormat.TRANSLUCENT
+
+	override fun setTintList(tint: ColorStateList?) {
+		val newColor = tint?.defaultColor ?: DEFAULT_COLOR
+		if(paint.color != newColor) {
+			paint.color = newColor
+			invalidateSelf()
+		}
+	}
 }

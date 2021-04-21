@@ -140,7 +140,7 @@
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_weather"
-				tools:text="150 m/s, SW"/>
+				tools:text="150 m/s"/>
 			<TextView
 				android:id="@+id/tv_humidity"
 				android:layout_width="@dimen/_120sdp"

@@ -3,6 +3,7 @@ package asceapps.weatheria.ui.adapter
 import android.graphics.Rect
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
 import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.drawable.DirectionDrawable
@@ -19,16 +20,13 @@ fun loadIconFromUrl(view: ImageView, icon: String) {
 }
 
 @BindingAdapter("windDirection")
-fun addWindDirectionDrawable(view: TextView, deg: Int) {
-	val compDs = view.compoundDrawablesRelative
+fun setWindDirectionDrawable(tv: TextView, deg: Int) {
+	val compDs = tv.compoundDrawablesRelative
 	val d = compDs[2] as? DirectionDrawable ?: DirectionDrawable().apply {
 		val size = compDs[0].intrinsicHeight
 		bounds = Rect(0, 0, size, size)
-		view.setCompoundDrawablesRelative(compDs[0], null, this, null)
+		setTintList(TextViewCompat.getCompoundDrawableTintList(tv))
+		tv.setCompoundDrawablesRelative(compDs[0], null, this, null)
 	}
-	d.apply {
-		colorFilter = compDs[0].colorFilter
-		rotation = deg.toFloat()
-	}
-	view.invalidateDrawable(d)
+	d.deg = deg
 }

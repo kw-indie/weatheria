@@ -2,10 +2,10 @@ package asceapps.weatheria.ui.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.repo.LocationRepo
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.model.FoundLocation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -36,5 +36,5 @@ class AddLocationViewModel @Inject constructor(
 
 	fun getIpGeolocation() = locationRepo.getIpGeolocation()
 
-	fun add(l: FindResponse.Location) = infoRepo.add(l)
+	fun add(fl: FoundLocation) = infoRepo.add(fl)
 }

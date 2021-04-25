@@ -3,12 +3,12 @@ package asceapps.weatheria.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.databinding.ItemSearchResultBinding
+import asceapps.weatheria.model.FoundLocation
 
 class SearchAdapter(
-	private val onItemClick: (FindResponse.Location) -> Unit
-) : BaseAdapter<FindResponse.Location, SearchAdapter.ViewHolder>() {
+	private val onItemClick: (FoundLocation) -> Unit
+): BaseAdapter<FoundLocation, SearchAdapter.ViewHolder>() {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val binding = ItemSearchResultBinding.inflate(
@@ -31,9 +31,9 @@ class SearchAdapter(
 		private val binding: ItemSearchResultBinding
 	) : RecyclerView.ViewHolder(binding.root) {
 
-		fun bind(l: FindResponse.Location) {
+		fun bind(fl: FoundLocation) {
 			with(binding) {
-				location = l
+				location = fl
 				executePendingBindings()
 			}
 		}

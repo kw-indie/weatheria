@@ -1,7 +1,15 @@
 package asceapps.weatheria.data.dao
 
-import androidx.room.*
-import asceapps.weatheria.data.entity.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import asceapps.weatheria.data.entity.CurrentEntity
+import asceapps.weatheria.data.entity.DailyEntity
+import asceapps.weatheria.data.entity.HourlyEntity
+import asceapps.weatheria.data.entity.LocationEntity
+import asceapps.weatheria.data.entity.WeatherInfoEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -35,6 +43,7 @@ abstract class WeatherInfoDao {
 		insertDaily(d)
 	}
 
+	// todo turns out zoneOffset in LocationEntity can also change
 	@Transaction
 	open suspend fun update(c: CurrentEntity, h: List<HourlyEntity>, d: List<DailyEntity>) {
 		insertCurrent(c) // no need to delete old, it will always replace it

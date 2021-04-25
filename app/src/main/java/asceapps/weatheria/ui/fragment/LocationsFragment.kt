@@ -100,8 +100,9 @@ class LocationsFragment : Fragment() {
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when (item.itemId) {
+		when(item.itemId) {
 			R.id.action_delete_all -> mainVM.deleteAll()
+			// todo add refresh all
 			else -> return super.onOptionsItemSelected(item)
 		}
 		return true

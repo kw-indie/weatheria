@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.data.IDed
 import asceapps.weatheria.databinding.ItemLocationBinding
+import asceapps.weatheria.model.IDed
 import asceapps.weatheria.model.WeatherInfo
 import java.util.*
 

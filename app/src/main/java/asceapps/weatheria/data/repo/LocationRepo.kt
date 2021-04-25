@@ -5,6 +5,7 @@ import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.di.IoDispatcher
+import asceapps.weatheria.model.FoundLocation
 import asceapps.weatheria.util.awaitCurrentLocation
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,14 +46,16 @@ class LocationRepo @Inject constructor(
 		emit(Loading)
 		try {
 			when {
-				query.isEmpty() -> emit(Success(emptyList<FindResponse.Location>()))
+				query.isEmpty() -> emit(Success(emptyList<FoundLocation>()))
 				query.matches(coordinateRegex) -> {
 					val (lat, lng) = query.split(',')
-					val list = weatherApi.find(lat, lng).list
+					val resp = weatherApi.find(lat, lng)
+					val list = responseToModelList(resp)
 					emit(Success(list))
 				}
 				else -> {
-					val list = weatherApi.find(query).list
+					val resp = weatherApi.find(query)
+					val list = responseToModelList(resp)
 					emit(Success(list))
 				}
 			}
@@ -67,5 +70,23 @@ class LocationRepo @Inject constructor(
 		private val coordinateRegex = Regex(
 			"^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
 		)
+
+		private fun responseToModelList(fr: FindResponse) = fr.list.map {
+			with(it) {
+				FoundLocation(
+					id,
+					coord.lat,
+					coord.lon,
+					name,
+					sys.country,
+					main.temp,
+					main.feels_like,
+					main.pressure,
+					main.humidity,
+					wind.speed,
+					wind.deg
+				)
+			}
+		}
 	}
 }

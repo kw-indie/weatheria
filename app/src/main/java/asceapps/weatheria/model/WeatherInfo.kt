@@ -1,7 +1,6 @@
 package asceapps.weatheria.model
 
 import android.text.format.DateUtils
-import asceapps.weatheria.data.IDed
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDateTime
@@ -21,7 +20,6 @@ class WeatherInfo(
 
 	override val id = location.id
 
-	// for HashItemCallback
 	override fun hashCode() = id + lastUpdateInstant.epochSecond.toInt()
 
 	// if daily includes today, get it, else, get last day
@@ -33,13 +31,16 @@ class WeatherInfo(
 	val secondOfSunriseToday get() = localSecondOfDay(today.sunrise, location.zoneOffset)
 	val secondOfSunsetToday get() = localSecondOfDay(today.sunset, location.zoneOffset)
 
+	// todo make most of these properties value classes in kotlin 1.5
 	val locationName get() = commaSep(location.name, location.country)
 	val localNow get() = localDateTime(location.zoneOffset)
 	val lastUpdate get() = relativeTime(lastUpdateInstant)
+
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
 	val currentWindSpeed get() = speed(current.windSpeed)
 	val currentHumidity get() = percent(current.humidity)
+	val currentDewPoint get() = temp(current.dewPoint)
 	val todayMinMax get() = minMax(today.min, today.max)
 	val todaySunrise get() = time(today.sunrise, location.zoneOffset)
 	val todaySunset get() = time(today.sunset, location.zoneOffset)

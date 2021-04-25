@@ -3,7 +3,7 @@
 buildscript {
 	ext {
 		kotlinVer = '1.4.32'
-		hiltVer = '2.34-beta'
+		hiltVer = '2.35'
 	}
 
 	repositories {

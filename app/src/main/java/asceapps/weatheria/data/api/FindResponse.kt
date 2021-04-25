@@ -1,15 +1,19 @@
 package asceapps.weatheria.data.api
 
 import androidx.annotation.Keep
-import asceapps.weatheria.data.IDed
 
 @Keep
 class FindResponse(
 	val list: List<Location>
 ) {
 
+	/**
+	 * @param id location id
+	 * @param dt time and date of weather info, UTC, unix seconds
+	 */
+	@Keep
 	class Location(
-		override val id: Int,
+		val id: Int,
 		val dt: Int,
 		val name: String,
 		val coord: Coord,
@@ -17,13 +21,15 @@ class FindResponse(
 		val wind: Wind,
 		val sys: Sys,
 		val weather: List<OneCallResponse.Weather>
-	) : IDed
+	)
 
+	@Keep
 	class Coord(
 		val lat: Float,
 		val lon: Float
 	)
 
+	@Keep
 	class Main(
 		val temp: Float,
 		val feels_like: Float,
@@ -31,11 +37,13 @@ class FindResponse(
 		val humidity: Int
 	)
 
+	@Keep
 	class Wind(
 		val speed: Float,
 		val deg: Int
 	)
 
+	@Keep
 	class Sys(
 		val country: String
 	)

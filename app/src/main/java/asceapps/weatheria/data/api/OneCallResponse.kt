@@ -11,13 +11,15 @@ import com.google.gson.annotations.SerializedName
  * @param current current weather
  * @param hourly forecast of 48 hours, starting this hour
  * @param daily forecast of 8 days, starting next hour? (not midnight)
+ * @param alerts weather alerts from major national weather warning systems
  * */
 @Keep
 class OneCallResponse(
 	val timezone_offset: Int,
 	val current: BaseData.Current,
 	val hourly: List<BaseData.Hourly>,
-	val daily: List<BaseData.Daily>
+	val daily: List<BaseData.Daily>,
+	val alerts: List<Alert>?
 ) {
 
 	/**
@@ -136,4 +138,18 @@ class OneCallResponse(
 	 */
 	@Keep
 	class Precipitation(@SerializedName("1h") val _1h: Float)
+
+	/**
+	 * @param sender_name name of alert source
+	 * @param event alert event name
+	 * @param start dt
+	 */
+	@Keep
+	class Alert(
+		val sender_name: String,
+		val event: String,
+		val start: Int,
+		val end: Int,
+		val description: String
+	)
 }

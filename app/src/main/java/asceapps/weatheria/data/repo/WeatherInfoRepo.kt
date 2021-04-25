@@ -1,6 +1,5 @@
 package asceapps.weatheria.data.repo
 
-import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.data.dao.WeatherInfoDao
@@ -12,6 +11,7 @@ import asceapps.weatheria.data.entity.WeatherInfoEntity
 import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.model.Current
 import asceapps.weatheria.model.Daily
+import asceapps.weatheria.model.FoundLocation
 import asceapps.weatheria.model.Hourly
 import asceapps.weatheria.model.Location
 import asceapps.weatheria.model.WeatherInfo
@@ -70,15 +70,14 @@ class WeatherInfoRepo @Inject constructor(
 		emitAll(flow)
 	}
 
-	// todo shorten param type or convert to model FoundLocation
-	fun add(l: FindResponse.Location) = flow {
+	// todo move to locationRepo? add location there, then when this repo does not find info, make it fetch
+	fun add(fl: FoundLocation) = flow {
 		emit(Loading)
 		try {
 			val oneCallResp = withContext(ioDispatcher) {
-				val coord = l.coord
-				api.oneCall(coord.lat.toString(), coord.lon.toString())
+				api.oneCall(fl.lat.toString(), fl.lng.toString())
 			}
-			val infoEntity = responsesToEntity(l, oneCallResp)
+			val infoEntity = responsesToEntity(fl, oneCallResp)
 			with(infoEntity) {
 				dao.insert(location, current, hourly, daily)
 			}
@@ -132,13 +131,13 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun responsesToEntity(l: FindResponse.Location, ocr: OneCallResponse): WeatherInfoEntity {
-			val location = with(l) {
-				LocationEntity(id, coord.lat, coord.lon, name, sys.country, ocr.timezone_offset)
+		private fun responsesToEntity(fl: FoundLocation, ocr: OneCallResponse): WeatherInfoEntity {
+			val location = with(fl) {
+				LocationEntity(id, lat, lng, name, country, ocr.timezone_offset)
 			}
-			val current = extractCurrentEntity(l.id, ocr)
-			val hourly = extractHourlyEntity(l.id, ocr)
-			val daily = extractDailyEntity(l.id, ocr)
+			val current = extractCurrentEntity(fl.id, ocr)
+			val hourly = extractHourlyEntity(fl.id, ocr)
+			val daily = extractDailyEntity(fl.id, ocr)
 			return WeatherInfoEntity(location, current, hourly, daily)
 		}
 

@@ -5,14 +5,13 @@
 	<data>
 		<variable
 			name="location"
-			type="asceapps.weatheria.data.api.FindResponse.Location" />
+			type="asceapps.weatheria.model.FoundLocation"/>
 	</data>
-
 	<TextView
 		style="@style/ListItem"
 		android:layout_width="match_parent"
 		android:layout_height="?attr/listPreferredItemHeight"
-		android:text="@{location.name + `, ` + location.sys.country}"
+		android:text="@{location.name + `, ` + location.country}"
 		app:drawableStartCompat="@drawable/ic_add_location"
 		tools:text="@tools:sample/cities"/>
 </layout>

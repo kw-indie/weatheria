@@ -21,8 +21,7 @@
 		<item name="android:paddingRight">@dimen/_8sdp</item>
 		<item name="android:paddingTop">@dimen/_8sdp</item>
 		<item name="android:paddingBottom">@dimen/_8sdp</item>
-		<item name="android:foreground">?attr/selectableItemBackground</item>
-		<item name="android:background">?attr/colorSurface</item>
+		<item name="android:background">?attr/selectableItemBackground</item>
 		<item name="android:gravity">center_vertical</item>
 		<item name="android:singleLine">true</item>
 		<item name="android:ellipsize">marquee</item>

@@ -47,16 +47,14 @@ fun View.edgeToEdge(
 	}
 }
 
-fun SearchView.onTextSubmitFlow() = callbackFlow<String> {
+fun SearchView.onTextSubmitFlow() = callbackFlow {
 	setOnQueryTextListener(object: SearchView.OnQueryTextListener {
 		override fun onQueryTextSubmit(query: String): Boolean {
-			offer(query)
+			trySend(query)
 			return true
 		}
 
-		override fun onQueryTextChange(newText: String): Boolean {
-			return true
-		}
+		override fun onQueryTextChange(newText: String) = true
 	})
 
 	awaitClose {
@@ -64,11 +62,11 @@ fun SearchView.onTextSubmitFlow() = callbackFlow<String> {
 	}
 }
 
-fun ViewPager2.onItemInsertedFlow() = callbackFlow<Int> {
+fun ViewPager2.onItemInsertedFlow() = callbackFlow {
 	val observer = object: RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
 			if(itemCount == 1)
-				offer(positionStart)
+				trySend(positionStart)
 		}
 	}
 	adapter?.registerAdapterDataObserver(observer)
@@ -78,17 +76,16 @@ fun ViewPager2.onItemInsertedFlow() = callbackFlow<Int> {
 	}
 }
 
-inline fun ViewPager2.onPageSelectedFlow(crossinline onClose: (currentPos: Int) -> Unit) =
-	callbackFlow<Int> {
-		val callback = object: ViewPager2.OnPageChangeCallback() {
-			override fun onPageSelected(position: Int) {
-				offer(position)
-			}
-		}
-		registerOnPageChangeCallback(callback)
-
-		awaitClose {
-			onClose(currentItem)
-			unregisterOnPageChangeCallback(callback)
+inline fun ViewPager2.onPageSelectedFlow(crossinline onClose: (currentPos: Int) -> Unit) = callbackFlow {
+	val callback = object: ViewPager2.OnPageChangeCallback() {
+		override fun onPageSelected(position: Int) {
+			trySend(position)
 		}
 	}
+	registerOnPageChangeCallback(callback)
+
+	awaitClose {
+		onClose(currentItem)
+		unregisterOnPageChangeCallback(callback)
+	}
+}

@@ -1,5 +1,7 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
+	<string name="noti_def_channel_name">Default channel</string>
+	<string name="noti_def_channel_desc">All app notifications use this channel</string>
 	<!--home-->
 	<string name="action_locations">Locations</string>
 	<string name="action_add_location">Add location</string>

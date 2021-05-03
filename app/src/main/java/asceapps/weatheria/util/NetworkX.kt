@@ -38,14 +38,14 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 		override fun onLost(network: Network) = refresh()
 
 		private fun refresh() {
-			offer(Loading)
-			offer(blockingPing())
+			trySend(Loading)
+			trySend(blockingPing())
 		}
 	}
 
 	// fire initial value
-	offer(Loading)
-	offer(asyncPing())
+	trySend(Loading)
+	trySend(asyncPing())
 
 	cm.registerNetworkCallback(request, callback)
 

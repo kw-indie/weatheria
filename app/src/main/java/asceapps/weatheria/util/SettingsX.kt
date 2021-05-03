@@ -6,11 +6,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 fun SharedPreferences.onChangeFlow() = callbackFlow<String> {
 	val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-		try {
-			offer(key)
-		} catch(e: Exception) {
-			close(e)
-		}
+		trySend(key)
 	}
 	registerOnSharedPreferenceChangeListener(changeListener)
 

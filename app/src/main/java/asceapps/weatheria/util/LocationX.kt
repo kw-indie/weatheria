@@ -131,14 +131,8 @@ suspend fun checkLocationSettings(activity: Activity, accuracy: Int) =
 fun FusedLocationProviderClient.locationUpdates(request: LocationRequest) = callbackFlow<Location> {
 	val callback = object: LocationCallback() {
 		override fun onLocationResult(result: LocationResult?) {
-			result ?: return
-			for(location in result.locations) {
-				try {
-					offer(location)
-				} catch(e: Exception) {
-					close(e)
-				}
-			}
+			if(result == null) return
+			trySend(result.lastLocation) // i think if this fails, it auto closes channel
 		}
 	}
 
@@ -163,11 +157,7 @@ fun Context.locationAvailabilityChanges(lm: LocationManager) = callbackFlow<Bool
 	val receiver = object: BroadcastReceiver() {
 		fun emitChange() {
 			val enabled = LocationManagerCompat.isLocationEnabled(lm)
-			try {
-				offer(enabled)
-			} catch(e: Exception) {
-				close(e)
-			}
+			trySend(enabled)
 		}
 
 		override fun onReceive(context: Context, intent: Intent) {
@@ -194,11 +184,7 @@ fun Context.locationProviderChanges(lm: LocationManager) = callbackFlow<Location
 				lm.isProviderEnabled(LocationManager.GPS_PROVIDER),
 				lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 			)
-			try {
-				offer(change)
-			} catch(e: Exception) {
-				close(e)
-			}
+			trySend(change)
 		}
 
 		override fun onReceive(context: Context, intent: Intent) {

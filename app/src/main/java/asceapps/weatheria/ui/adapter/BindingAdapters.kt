@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
 import asceapps.weatheria.data.api.WeatherApi
-import asceapps.weatheria.drawable.DirectionDrawable
+import asceapps.weatheria.ui.drawable.DirectionDrawable
 import coil.load
 
 @BindingAdapter("icon")

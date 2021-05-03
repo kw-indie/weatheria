@@ -76,7 +76,7 @@ fun ViewPager2.onItemInsertedFlow() = callbackFlow {
 	}
 }
 
-inline fun ViewPager2.onPageSelectedFlow(crossinline onClose: (currentPos: Int) -> Unit) = callbackFlow {
+fun ViewPager2.onPageSelectedFlow() = callbackFlow {
 	val callback = object: ViewPager2.OnPageChangeCallback() {
 		override fun onPageSelected(position: Int) {
 			trySend(position)
@@ -85,7 +85,6 @@ inline fun ViewPager2.onPageSelectedFlow(crossinline onClose: (currentPos: Int) 
 	registerOnPageChangeCallback(callback)
 
 	awaitClose {
-		onClose(currentItem)
 		unregisterOnPageChangeCallback(callback)
 	}
 }

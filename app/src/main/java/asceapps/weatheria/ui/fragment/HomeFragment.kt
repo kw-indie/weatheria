@@ -70,9 +70,8 @@ class HomeFragment: Fragment() {
 		val pager = binding.pager.apply {
 			adapter = infoAdapter
 			offscreenPageLimit = 1
-			onPageSelectedFlow(onClose = { lastPos ->
-				mainVM.setSelectedLocation(lastPos)
-			}).observe(viewLifecycleOwner) { selectedPos ->
+			onPageSelectedFlow().observe(viewLifecycleOwner) { selectedPos ->
+				mainVM.selectedLocation = selectedPos
 				updateColors(infoAdapter.getItem(selectedPos))
 			}
 			onItemInsertedFlow().observe(viewLifecycleOwner) { insertedPos ->
@@ -115,7 +114,7 @@ class HomeFragment: Fragment() {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					infoAdapter.submitList(list)
-					pager.setCurrentItem(mainVM.getSelectedLocation(), false)
+					pager.setCurrentItem(mainVM.selectedLocation, false)
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty

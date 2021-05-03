@@ -28,22 +28,22 @@ class MainViewModel @Inject constructor(
 
 	val weatherInfoList = infoRepo.getAll()
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(Duration.minutes(1)), Loading)
+	var selectedLocation = settingsRepo.selectedLocation
 
 	private val manualOnlineCheck = MutableStateFlow<Result<Unit>>(Loading)
 	val onlineStatus = merge(manualOnlineCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
 		.debounce(1000)
 
+	override fun onCleared() {
+		settingsRepo.selectedLocation = selectedLocation
+		super.onCleared()
+	}
+
 	fun checkOnline() = viewModelScope.launch {
 		manualOnlineCheck.value = Loading
 		manualOnlineCheck.value = asyncPing()
 	}
-
-	fun setSelectedLocation(pos: Int) {
-		settingsRepo.selectedLocation = pos
-	}
-
-	fun getSelectedLocation() = settingsRepo.selectedLocation
 
 	fun refresh(pos: Int): Flow<Result<Unit>> {
 		val infoList = weatherInfoList.value as Success<List<WeatherInfo>>

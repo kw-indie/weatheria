@@ -43,7 +43,7 @@ class LocationsFragment : Fragment() {
 				mainVM.delete(it.location)
 			},
 			onItemClick = { _, pos ->
-				mainVM.setSelectedLocation(pos)
+				mainVM.selectedLocation = pos
 				findNavController().navigateUp()
 			},
 			onStartDrag = {

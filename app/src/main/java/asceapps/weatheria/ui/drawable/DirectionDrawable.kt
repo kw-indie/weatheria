@@ -15,9 +15,9 @@ class DirectionDrawable: Drawable() {
 		private const val DEFAULT_COLOR = Color.BLACK
 		private val PATH = Path().apply {
 			moveTo(8f, 12f)
-			lineTo(5f, 6f)
+			lineTo(5f, 7f)
 			lineTo(19f, 12f)
-			lineTo(5f, 18f)
+			lineTo(5f, 17f)
 			close()
 		}
 	}

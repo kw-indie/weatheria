@@ -2,6 +2,7 @@ package asceapps.weatheria.data.repo
 
 import asceapps.weatheria.data.api.OneCallResponse
 import asceapps.weatheria.data.api.WeatherApi
+import asceapps.weatheria.data.base.BaseLocation
 import asceapps.weatheria.data.dao.WeatherInfoDao
 import asceapps.weatheria.data.entity.CurrentEntity
 import asceapps.weatheria.data.entity.DailyEntity
@@ -77,10 +78,8 @@ class WeatherInfoRepo @Inject constructor(
 			val oneCallResp = withContext(ioDispatcher) {
 				api.oneCall(fl.lat.toString(), fl.lng.toString())
 			}
-			val infoEntity = responsesToEntity(fl, oneCallResp)
-			with(infoEntity) {
-				dao.insert(location, current, hourly, daily)
-			}
+			val infoEntity = responseToEntity(fl, oneCallResp)
+			dao.insert(infoEntity)
 			emit(Success(Unit))
 		} catch(e: Exception) {
 			e.printStackTrace()
@@ -88,10 +87,10 @@ class WeatherInfoRepo @Inject constructor(
 		}
 	}
 
-	fun refresh(id: Int, lat: Float, lng: Float) = flow {
+	fun refresh(info: WeatherInfo) = flow {
 		emit(Loading)
 		try {
-			internalRefresh(id, lat, lng)
+			internalRefresh(info.location)
 			emit(Success(Unit))
 		} catch(e: Exception) {
 			e.printStackTrace()
@@ -99,22 +98,16 @@ class WeatherInfoRepo @Inject constructor(
 		}
 	}
 
-	private suspend fun internalRefresh(id: Int, lat: Float, lng: Float) {
-		val (current, hourly, daily) = withContext(ioDispatcher) {
-			val oneCallResp = api.oneCall(lat.toString(), lng.toString())
-			Triple(
-				extractCurrentEntity(id, oneCallResp),
-				extractHourlyEntity(id, oneCallResp),
-				extractDailyEntity(id, oneCallResp)
-			)
+	private suspend fun internalRefresh(loc: BaseLocation) {
+		val updatedInfo = withContext(ioDispatcher) {
+			val ocr = with(loc) { api.oneCall(lat.toString(), lng.toString()) }
+			responseToEntity(loc, ocr)
 		}
-		dao.update(current, hourly, daily)
+		dao.update(updatedInfo)
 	}
 
 	suspend fun refreshAll() {
-		dao.getLocations().forEach {
-			with(it) { internalRefresh(id, lat, lng) }
-		}
+		dao.getLocations().forEach { internalRefresh(it) }
 	}
 
 	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
@@ -131,15 +124,13 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun responsesToEntity(fl: FoundLocation, ocr: OneCallResponse): WeatherInfoEntity {
-			val location = with(fl) {
-				LocationEntity(id, lat, lng, name, country, ocr.timezone_offset)
-			}
-			val current = extractCurrentEntity(fl.id, ocr)
-			val hourly = extractHourlyEntity(fl.id, ocr)
-			val daily = extractDailyEntity(fl.id, ocr)
-			return WeatherInfoEntity(location, current, hourly, daily)
-		}
+		private fun responseToEntity(l: BaseLocation, ocr: OneCallResponse) =
+			WeatherInfoEntity(
+				with(l) { LocationEntity(id, lat, lng, name, country, ocr.timezone_offset) },
+				extractCurrentEntity(l.id, ocr),
+				extractHourlyEntity(l.id, ocr),
+				extractDailyEntity(l.id, ocr)
+			)
 
 		private fun extractCurrentEntity(locationId: Int, resp: OneCallResponse) = with(resp.current) {
 			CurrentEntity(
@@ -220,11 +211,7 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
 			val location = with(info.location) {
-				Location(
-					id, lat, lng, name, country,
-					ZoneOffset.ofTotalSeconds(info.location.zoneOffset),
-					pos
-				)
+				Location(id, lat, lng, name, country, ZoneOffset.ofTotalSeconds(zoneOffset), pos)
 			}
 			val daily = info.daily.map {
 				with(it) {

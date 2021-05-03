@@ -1,16 +1,18 @@
 package asceapps.weatheria.data.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import asceapps.weatheria.data.base.BaseLocation
 
-@Entity(tableName = "locations")
+@Entity(
+	tableName = "locations",
+	primaryKeys = ["id"]
+)
 class LocationEntity(
-	@PrimaryKey val id: Int,
-	val lat: Float,
-	val lng: Float,
-	@ColumnInfo(collate = ColumnInfo.UNICODE) val name: String,
-	val country: String,
+	id: Int,
+	lat: Float,
+	lng: Float,
+	name: String,
+	country: String,
 	val zoneOffset: Int,
 	var pos: Int = 0
-)
+): BaseLocation(id, lat, lng, name, country)

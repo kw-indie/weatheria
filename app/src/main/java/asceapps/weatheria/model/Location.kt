@@ -1,13 +1,14 @@
 package asceapps.weatheria.model
 
+import asceapps.weatheria.data.base.BaseLocation
 import java.time.ZoneOffset
 
 class Location(
-	val id: Int,
-	val lat: Float,
-	val lng: Float,
-	val name: String,
-	val country: String,
+	id: Int,
+	lat: Float,
+	lng: Float,
+	name: String,
+	country: String,
 	val zoneOffset: ZoneOffset,
 	val pos: Int
-)
+): BaseLocation(id, lat, lng, name, country)

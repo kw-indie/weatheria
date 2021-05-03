@@ -30,32 +30,32 @@ abstract class WeatherInfoDao {
 	abstract suspend fun getLocations(): List<LocationEntity>
 
 	@Transaction
-	open suspend fun insert(
-		l: LocationEntity,
-		c: CurrentEntity,
-		h: List<HourlyEntity>,
-		d: List<DailyEntity>
-	) {
-		l.pos = getLocationsCount()
-		insertLocation(l)
-		insertCurrent(c)
-		insertHourly(h)
-		insertDaily(d)
+	open suspend fun insert(info: WeatherInfoEntity) {
+		with(info) {
+			location.pos = getLocationsCount()
+			upsertLocation(location)
+			upsertCurrent(current)
+			upsertHourly(hourly)
+			upsertDaily(daily)
+		}
 	}
 
-	// todo turns out zoneOffset in LocationEntity can also change
 	@Transaction
-	open suspend fun update(c: CurrentEntity, h: List<HourlyEntity>, d: List<DailyEntity>) {
-		insertCurrent(c) // no need to delete old, it will always replace it
-		deleteHourly(h[0].locationId) // delete old
-		insertHourly(h)
-		deleteDaily(d[0].locationId) // delete old
-		insertDaily(d)
+	open suspend fun update(info: WeatherInfoEntity) {
+		with(info) {
+			upsertLocation(location)
+			upsertCurrent(current)
+			deleteHourly(hourly[0].locationId) // delete old
+			upsertHourly(hourly)
+			deleteDaily(daily[0].locationId) // delete old
+			upsertDaily(daily)
+		}
 	}
 
 	@Transaction
 	open suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
 		if(fromPos == toPos) return
+		// BETWEEN operator is inclusive-inclusive
 		//setPos(l.id, -1) // since pos column is not unique, we can skip this
 		if(fromPos < toPos) // from small index to bigger (move down in list)
 			decPos(fromPos + 1, toPos) // dec pos of items in between (move up in list)
@@ -76,17 +76,17 @@ abstract class WeatherInfoDao {
 	@Query("SELECT COUNT(*) FROM locations")
 	abstract suspend fun getLocationsCount(): Int
 
-	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	protected abstract suspend fun insertLocation(l: LocationEntity)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	protected abstract suspend fun upsertLocation(l: LocationEntity)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	protected abstract suspend fun insertCurrent(c: CurrentEntity)
+	protected abstract suspend fun upsertCurrent(c: CurrentEntity)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	protected abstract suspend fun insertHourly(h: List<HourlyEntity>)
+	protected abstract suspend fun upsertHourly(h: List<HourlyEntity>)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	protected abstract suspend fun insertDaily(d: List<DailyEntity>)
+	protected abstract suspend fun upsertDaily(d: List<DailyEntity>)
 
 	// rely on FK cascade to delete related info
 	@Query("DELETE FROM locations WHERE id = :locationId")

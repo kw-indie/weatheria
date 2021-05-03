@@ -62,28 +62,28 @@ class HomeFragment: Fragment() {
 		setUpBackgroundStuff()
 		setUpOnlineStatusStuff(binding.root)
 
+		// todo use xml dataBinding with stateFlow and bindingAdapters
+
 		val infoAdapter = WeatherInfoAdapter()
 		// todo we could merge home + locations fragments with help from a
 		//  recyclerView + different layout managers/adapters
 		val pager = binding.pager.apply {
 			adapter = infoAdapter
 			offscreenPageLimit = 1
-			onPageSelectedFlow(onClose = { currentPos ->
-				mainVM.setSelectedLocation(currentPos)
-			}).observe(viewLifecycleOwner) { pos ->
-				updateColors(infoAdapter.getItem(pos))
+			onPageSelectedFlow(onClose = { lastPos ->
+				mainVM.setSelectedLocation(lastPos)
+			}).observe(viewLifecycleOwner) { selectedPos ->
+				updateColors(infoAdapter.getItem(selectedPos))
 			}
-			onItemInsertedFlow().observe(viewLifecycleOwner) { pos ->
+			onItemInsertedFlow().observe(viewLifecycleOwner) { insertedPos ->
 				// animate to newly added item
-				currentItem = pos
+				currentItem = insertedPos
 			}
 		}
 
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
-				// fixme no better way? we now have settingsRepo in mainVM
-				val location = infoAdapter.getItem(pager.currentItem).location
-				mainVM.refresh(location).observe(viewLifecycleOwner) {
+				mainVM.refresh(pager.currentItem).observe(viewLifecycleOwner) {
 					if(it is Loading) {
 						isRefreshing = true
 					} else {

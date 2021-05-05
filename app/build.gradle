@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-apply plugin: "kotlin-android" // for kotlin lang support
+apply plugin: "kotlin-android" // for kotlin support
 apply plugin: "kotlin-kapt" // for annotations: data binding, etc
 apply plugin: "dagger.hilt.android.plugin"
 
@@ -75,8 +75,7 @@ android {
 
 	kotlinOptions {
 		jvmTarget = javaVer
-		// new kotlin compiler backend (supposedly faster, also for jetpack compose, and default in future)
-		useIR = true
+		// IR compiler: default (since AS 4.2) kotlin compiler backend (supposedly faster, needed for Compose)
 		freeCompilerArgs += [
 			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
 			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
@@ -148,6 +147,8 @@ dependencies {
 	// maps & location
 	implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
 	implementation "com.google.android.gms:play-services-location:18.0.0"
+	// manually specified the version available in mavenCentral instead of clinging to jcenter
+	implementation "com.android.volley:volley:1.2.0"
 
 	// work manager
 	implementation 'androidx.work:work-runtime-ktx:2.7.0-alpha03'
@@ -157,11 +158,10 @@ dependencies {
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
 	// hilt with jetpack (viewModel, workManager)
-	def hiltCompilerVer = '1.0.0-beta01'
+	def hiltCompilerVer = '1.0.0-alpha03'
 	kapt "androidx.hilt:hilt-compiler:$hiltCompilerVer"
 	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
-	def hiltLifecycleVer = '1.0.0-alpha03' // could be a 1-time mismatch with above
-	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltLifecycleVer"
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltCompilerVer"
 
 	// coil
 	implementation 'io.coil-kt:coil:1.2.1'

@@ -22,12 +22,6 @@ allprojects {
 	repositories {
 		google()
 		mavenCentral()
-		jcenter() {
-			content {
-				// prolly used by google maps. remove if removed
-				includeModule("com.android.volley", "volley")
-			}
-		}
 	}
 }
 

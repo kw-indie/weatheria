@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import asceapps.weatheria.data.base.BaseLocation
 
 @Entity(tableName = "locations")
-class LocationEntity constructor(
+class LocationEntity(
 	@PrimaryKey override val id: Int,
 	override val lat: Float,
 	override val lng: Float,

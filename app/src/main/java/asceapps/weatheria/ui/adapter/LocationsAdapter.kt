@@ -22,13 +22,11 @@ class LocationsAdapter(
 ): RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
 
 	private val list = mutableListOf<WeatherInfo>()
-	private val callback = HashCallback<WeatherInfo>()
+	private val callback = HashCallback(list)
 	private val touchHelper = ItemTouchHelper(ReorderCallback())
 
 	init {
 		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-		callback.oldList = list
 	}
 
 	override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -64,17 +62,10 @@ class LocationsAdapter(
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val holder: ViewHolder
-		ItemLocationBinding.inflate(
-			LayoutInflater.from(parent.context),
-			parent, false
-		).apply {
+		ItemLocationBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
 			holder = ViewHolder(this)
-			ibDelete.setOnClickListener {
-				onDeleteClick(info!!)
-			}
-			tvName.setOnClickListener {
-				onItemClick(info!!, holder.bindingAdapterPosition)
-			}
+			ibDelete.setOnClickListener { onDeleteClick(info!!) }
+			tvName.setOnClickListener { onItemClick(info!!, holder.bindingAdapterPosition) }
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
@@ -100,17 +91,14 @@ class LocationsAdapter(
 		}
 	}
 
-	class HashCallback<T: IDed>: DiffUtil.Callback() {
+	class HashCallback<T: IDed>(private val list: List<T>): DiffUtil.Callback() {
 
-		var oldList: List<T> = emptyList()
 		var newList: List<T> = emptyList()
 
-		override fun getOldListSize() = oldList.size
+		override fun getOldListSize() = list.size
 		override fun getNewListSize() = newList.size
-
-		override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldList[oldPos] == newList[newPos]
-		override fun areContentsTheSame(oldPos: Int, newPos: Int) =
-			oldPos.hashCode() == newPos.hashCode()
+		override fun areItemsTheSame(oldPos: Int, newPos: Int) = list[oldPos].id == newList[newPos].id
+		override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldPos.hashCode() == newPos.hashCode()
 	}
 
 	private inner class ReorderCallback: ItemTouchHelper.SimpleCallback(

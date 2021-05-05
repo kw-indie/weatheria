@@ -5,8 +5,9 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
@@ -62,29 +63,70 @@ fun SearchView.onTextSubmitFlow() = callbackFlow {
 	}
 }
 
-fun ViewPager2.onItemInsertedFlow() = callbackFlow {
+fun RecyclerView.Adapter<*>.onItemInsertedFlow() = callbackFlow {
 	val observer = object: RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
 			if(itemCount == 1)
 				trySend(positionStart)
 		}
 	}
-	adapter?.registerAdapterDataObserver(observer)
+	registerAdapterDataObserver(observer)
 
 	awaitClose {
-		adapter?.unregisterAdapterDataObserver(observer)
+		unregisterAdapterDataObserver(observer)
 	}
 }
 
-fun ViewPager2.onPageSelectedFlow() = callbackFlow {
-	val callback = object: ViewPager2.OnPageChangeCallback() {
-		override fun onPageSelected(position: Int) {
-			trySend(position)
+class PagerHelper(private val rv: RecyclerView): PagerSnapHelper() {
+
+	private val lm = LinearLayoutManager(rv.context, LinearLayoutManager.HORIZONTAL, false)
+	var isEnabled: Boolean = false
+		set(value) {
+			if(field != value) {
+				field = value
+				if(field) {
+					attachToRecyclerView(rv)
+					rv.layoutManager = lm
+				} else {
+					attachToRecyclerView(null)
+					rv.layoutManager = null
+				}
+			}
+		}
+
+	init {
+		isEnabled = true
+	}
+
+	var currentPage: Int
+		get() {
+			val lm = rv.layoutManager ?: return RecyclerView.NO_POSITION
+			val snapView = findSnapView(lm) ?: return RecyclerView.NO_POSITION
+			return lm.getPosition(snapView)
+		}
+		set(value) {
+			setCurrentPage(value)
+		}
+
+	val pageSelectedFlow = callbackFlow {
+		val callback = object: RecyclerView.OnScrollListener() {
+			var snapPos = RecyclerView.NO_POSITION
+			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+				val snapPos = currentPage
+				if(this.snapPos != snapPos) {
+					this.snapPos = snapPos
+					trySend(snapPos)
+				}
+			}
+		}
+		rv.addOnScrollListener(callback)
+
+		awaitClose {
+			rv.removeOnScrollListener(callback)
 		}
 	}
-	registerOnPageChangeCallback(callback)
 
-	awaitClose {
-		unregisterOnPageChangeCallback(callback)
+	fun setCurrentPage(pos: Int, smooth: Boolean = true) {
+		if(smooth) rv.smoothScrollToPosition(pos) else rv.scrollToPosition(pos)
 	}
 }

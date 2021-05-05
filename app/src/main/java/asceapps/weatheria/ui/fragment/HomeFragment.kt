@@ -26,9 +26,9 @@ import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.PagerHelper
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInsertedFlow
-import asceapps.weatheria.util.onPageSelectedFlow
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
@@ -69,20 +69,22 @@ class HomeFragment: Fragment() {
 		//  recyclerView + different layout managers/adapters
 		val pager = binding.pager.apply {
 			adapter = infoAdapter
-			offscreenPageLimit = 1
-			onPageSelectedFlow().observe(viewLifecycleOwner) { selectedPos ->
+			// todo offscreen page limit
+		}
+		val pagerHelper = PagerHelper(pager).apply {
+			pageSelectedFlow.observe(viewLifecycleOwner) { selectedPos ->
 				mainVM.selectedLocation = selectedPos
 				updateColors(infoAdapter.getItem(selectedPos))
 			}
-			onItemInsertedFlow().observe(viewLifecycleOwner) { insertedPos ->
-				// animate to newly added item
-				currentItem = insertedPos
-			}
+		}
+		infoAdapter.onItemInsertedFlow().observe(viewLifecycleOwner) { insertedPos ->
+			// animate to newly added item
+			pagerHelper.currentPage = insertedPos
 		}
 
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
-				mainVM.refresh(pager.currentItem).observe(viewLifecycleOwner) {
+				mainVM.refresh(pagerHelper.currentPage).observe(viewLifecycleOwner) {
 					if(it is Loading) {
 						isRefreshing = true
 					} else {
@@ -114,7 +116,7 @@ class HomeFragment: Fragment() {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					infoAdapter.submitList(list)
-					pager.setCurrentItem(mainVM.selectedLocation, false)
+					pagerHelper.setCurrentPage(mainVM.selectedLocation, false)
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty

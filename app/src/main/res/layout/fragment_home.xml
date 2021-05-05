@@ -21,11 +21,10 @@
 			android:id="@+id/swipe_refresh"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
-
-			<androidx.viewpager2.widget.ViewPager2
+			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/pager"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent" />
+				android:layout_height="match_parent"/>
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 	</FrameLayout>
 </layout>

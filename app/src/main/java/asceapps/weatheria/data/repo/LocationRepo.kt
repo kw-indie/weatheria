@@ -4,8 +4,8 @@ import android.content.Context
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
+import asceapps.weatheria.data.model.FoundLocation
 import asceapps.weatheria.di.IoDispatcher
-import asceapps.weatheria.model.FoundLocation
 import asceapps.weatheria.util.awaitCurrentLocation
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher

@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// todo use me
 @Singleton
 class Notifier @Inject constructor(@ApplicationContext context: Context) {
 

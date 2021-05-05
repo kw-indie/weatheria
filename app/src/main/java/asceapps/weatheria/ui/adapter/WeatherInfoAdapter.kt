@@ -3,8 +3,8 @@ package asceapps.weatheria.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
-import asceapps.weatheria.model.WeatherInfo
 
 class WeatherInfoAdapter : BaseAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder>() {
 

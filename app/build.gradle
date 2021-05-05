@@ -77,9 +77,9 @@ android {
 		jvmTarget = javaVer
 		// IR compiler: default (since AS 4.2) kotlin compiler backend (supposedly faster, needed for Compose)
 		freeCompilerArgs += [
-			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // todo find out what for
 			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
-			"-Xopt-in=kotlin.time.ExperimentalTime" // for 1.minutes
+			"-Xopt-in=kotlin.time.ExperimentalTime" // for kotlin duration
 		]
 	}
 

@@ -9,13 +9,13 @@ import asceapps.weatheria.data.entity.DailyEntity
 import asceapps.weatheria.data.entity.HourlyEntity
 import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.data.entity.WeatherInfoEntity
+import asceapps.weatheria.data.model.Current
+import asceapps.weatheria.data.model.Daily
+import asceapps.weatheria.data.model.FoundLocation
+import asceapps.weatheria.data.model.Hourly
+import asceapps.weatheria.data.model.Location
+import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.di.IoDispatcher
-import asceapps.weatheria.model.Current
-import asceapps.weatheria.model.Daily
-import asceapps.weatheria.model.FoundLocation
-import asceapps.weatheria.model.Hourly
-import asceapps.weatheria.model.Location
-import asceapps.weatheria.model.WeatherInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
@@ -124,40 +124,15 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun responseToEntity(l: BaseLocation, ocr: OneCallResponse) =
-			WeatherInfoEntity(
-				with(l) { LocationEntity(id, lat, lng, name, country, ocr.timezone_offset) },
-				extractCurrentEntity(l.id, ocr),
-				extractHourlyEntity(l.id, ocr),
-				extractDailyEntity(l.id, ocr)
-			)
-
-		private fun extractCurrentEntity(locationId: Int, resp: OneCallResponse) = with(resp.current) {
-			CurrentEntity(
-				locationId,
-				dt,
-				weather[0].id,
-				wind_speed,
-				wind_deg,
-				pressure,
-				humidity,
-				dew_point.roundToInt(),
-				clouds,
-				temp.roundToInt(),
-				feels_like.roundToInt(),
-				visibility,
-				rain?._1h,
-				snow?._1h
-			)
-		}
-
-		private fun extractHourlyEntity(locationId: Int, resp: OneCallResponse) = resp.hourly.map {
-			with(it) {
-				val weather = weather[0]
-				HourlyEntity(
-					locationId,
+		private fun responseToEntity(l: BaseLocation, ocr: OneCallResponse): WeatherInfoEntity {
+			val location = with(l) {
+				LocationEntity(id, lat, lng, name, country, ocr.timezone_offset)
+			}
+			val current = with(ocr.current) {
+				CurrentEntity(
+					l.id,
 					dt,
-					weather.id,
+					weather[0].id,
 					wind_speed,
 					wind_deg,
 					pressure,
@@ -167,46 +142,67 @@ class WeatherInfoRepo @Inject constructor(
 					temp.roundToInt(),
 					feels_like.roundToInt(),
 					visibility,
-					(pop * 100).roundToInt(),
 					rain?._1h,
 					snow?._1h
 				)
 			}
-		}
-
-		private fun extractDailyEntity(locationId: Int, resp: OneCallResponse) = resp.daily.map {
-			with(it) {
-				val weather = weather[0]
-				val temp = it.temp
-				val feel = it.feels_like
-				DailyEntity(
-					locationId,
-					dt,
-					weather.id,
-					wind_speed,
-					wind_deg,
-					pressure,
-					humidity,
-					dew_point.roundToInt(),
-					clouds,
-					temp.min.roundToInt(),
-					temp.max.roundToInt(),
-					temp.morn.roundToInt(),
-					temp.day.roundToInt(),
-					temp.eve.roundToInt(),
-					temp.night.roundToInt(),
-					feel.morn.roundToInt(),
-					feel.day.roundToInt(),
-					feel.eve.roundToInt(),
-					feel.night.roundToInt(),
-					sunrise,
-					sunset,
-					(pop * 100).roundToInt(),
-					uvi,
-					rain,
-					snow
-				)
+			val hourly = ocr.hourly.map {
+				with(it) {
+					val weather = weather[0]
+					HourlyEntity(
+						l.id,
+						dt,
+						weather.id,
+						wind_speed,
+						wind_deg,
+						pressure,
+						humidity,
+						dew_point.roundToInt(),
+						clouds,
+						temp.roundToInt(),
+						feels_like.roundToInt(),
+						visibility,
+						(pop * 100).roundToInt(),
+						rain?._1h,
+						snow?._1h
+					)
+				}
 			}
+			val daily = ocr.daily.map {
+				with(it) {
+					val weather = weather[0]
+					val temp = it.temp
+					val feel = it.feels_like
+					DailyEntity(
+						l.id,
+						dt,
+						weather.id,
+						wind_speed,
+						wind_deg,
+						pressure,
+						humidity,
+						dew_point.roundToInt(),
+						clouds,
+						temp.min.roundToInt(),
+						temp.max.roundToInt(),
+						temp.morn.roundToInt(),
+						temp.day.roundToInt(),
+						temp.eve.roundToInt(),
+						temp.night.roundToInt(),
+						feel.morn.roundToInt(),
+						feel.day.roundToInt(),
+						feel.eve.roundToInt(),
+						feel.night.roundToInt(),
+						sunrise,
+						sunset,
+						(pop * 100).roundToInt(),
+						uvi,
+						rain,
+						snow
+					)
+				}
+			}
+			return WeatherInfoEntity(location, current, hourly, daily)
 		}
 
 		private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
@@ -290,9 +286,10 @@ class WeatherInfoRepo @Inject constructor(
 					val day = info.daily.last { it.dt < now.epochSecond }
 					// we can push all times to offset, but we'll get the same result with default offset
 					val nowTime = LocalTime.now()
+					// these times are all subjective, we could mean one thing but the api could mean another
 					val morn = LocalTime.of(6, 0)
-					val noon = LocalTime.of(12, 0)
-					val eve = LocalTime.of(18, 0)
+					val noon = morn.plusHours(6)
+					val eve = noon.plusHours(6)
 					with(day) {
 						Current(
 							toInstant(dt),

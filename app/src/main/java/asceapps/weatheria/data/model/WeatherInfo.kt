@@ -1,6 +1,7 @@
-package asceapps.weatheria.model
+package asceapps.weatheria.data.model
 
 import android.text.format.DateUtils
+import asceapps.weatheria.data.base.IDed
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDateTime

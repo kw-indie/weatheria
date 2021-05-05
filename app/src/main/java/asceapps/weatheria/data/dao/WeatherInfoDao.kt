@@ -67,13 +67,13 @@ abstract class WeatherInfoDao {
 	@Transaction
 	open suspend fun delete(locationId: Int, locationPos: Int) {
 		delete(locationId)
-		pullPosDown(locationPos + 1) // shift down all rows with bigger pos
+		decPos(locationPos + 1) // shift down all rows with bigger pos
 	}
 
 	@Query("DELETE FROM locations")
 	abstract suspend fun deleteAll()
 
-	@Query("SELECT COUNT(*) FROM locations")
+	@Query("SELECT COUNT() FROM locations")
 	abstract suspend fun getLocationsCount(): Int
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -96,16 +96,16 @@ abstract class WeatherInfoDao {
 	protected abstract suspend fun setPos(locationId: Int, pos: Int)
 
 	@Query("UPDATE locations SET pos = pos+1 WHERE pos >= :fromPos")
-	protected abstract suspend fun pushPosUp(fromPos: Int)
+	protected abstract suspend fun incPos(fromPos: Int)
 
 	@Query("UPDATE locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun incPos(fromPos: Int, toPos: Int)
 
+	@Query("UPDATE locations SET pos = pos-1 WHERE pos >= :fromPos")
+	protected abstract suspend fun decPos(fromPos: Int)
+
 	@Query("UPDATE locations SET pos = pos-1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun decPos(fromPos: Int, toPos: Int)
-
-	@Query("UPDATE locations SET pos = pos-1 WHERE pos >= :fromPos")
-	protected abstract suspend fun pullPosDown(fromPos: Int)
 
 	@Query("DELETE FROM hourly WHERE locationId = :locationId")
 	protected abstract suspend fun deleteHourly(locationId: Int)

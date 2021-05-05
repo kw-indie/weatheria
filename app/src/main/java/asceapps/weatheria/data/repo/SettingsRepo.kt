@@ -9,7 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
-import asceapps.weatheria.model.WeatherInfo
+import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext

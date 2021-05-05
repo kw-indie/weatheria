@@ -6,7 +6,7 @@
 	<data>
 		<variable
 			name="info"
-			type="asceapps.weatheria.model.WeatherInfo"/>
+			type="asceapps.weatheria.data.model.WeatherInfo"/>
 	</data>
 	<androidx.core.widget.NestedScrollView
 		android:layout_width="match_parent"

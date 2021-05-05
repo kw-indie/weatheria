@@ -3,8 +3,8 @@ package asceapps.weatheria.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.data.model.FoundLocation
 import asceapps.weatheria.databinding.ItemSearchResultBinding
-import asceapps.weatheria.model.FoundLocation
 
 class SearchAdapter(
 	private val onItemClick: (FoundLocation) -> Unit

@@ -16,9 +16,9 @@ import com.google.gson.annotations.SerializedName
 @Keep
 class OneCallResponse(
 	val timezone_offset: Int,
-	val current: BaseData.Current,
-	val hourly: List<BaseData.Hourly>,
-	val daily: List<BaseData.Daily>,
+	val current: Current,
+	val hourly: List<Hourly>,
+	val daily: List<Daily>,
 	val alerts: List<Alert>?
 ) {
 
@@ -41,91 +41,89 @@ class OneCallResponse(
 		val dew_point: Float,
 		val clouds: Int,
 		val weather: List<Weather>
-	) {
+	)
 
-		/**
-		 * @param dt time when this data was collected
-		 * @param visibility avg, in meters
-		 */
-		@Keep
-		class Current(
-			dt: Int,
-			pressure: Int,
-			humidity: Int,
-			dew_point: Float,
-			clouds: Int,
-			wind_speed: Float,
-			wind_deg: Int,
-			weather: List<Weather>,
-			val temp: Float,
-			val feels_like: Float,
-			val visibility: Int,
-			val rain: Precipitation? = null,
-			val snow: Precipitation? = null
-		): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather)
+	/**
+	 * @param dt time when this data was collected
+	 * @param visibility avg, in meters
+	 */
+	@Keep
+	class Current(
+		dt: Int,
+		pressure: Int,
+		humidity: Int,
+		dew_point: Float,
+		clouds: Int,
+		wind_speed: Float,
+		wind_deg: Int,
+		weather: List<Weather>,
+		val temp: Float,
+		val feels_like: Float,
+		val visibility: Int,
+		val rain: Precipitation? = null,
+		val snow: Precipitation? = null
+	): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather)
 
-		/**
-		 * @param dt beginning of forecast data hour
-		 * @param pop probability of precipitation (0-1)
-		 */
-		@Keep
-		class Hourly(
-			dt: Int,
-			pressure: Int,
-			humidity: Int,
-			dew_point: Float,
-			clouds: Int,
-			wind_speed: Float,
-			wind_deg: Int,
-			weather: List<Weather>,
-			val temp: Float,
-			val feels_like: Float,
-			val visibility: Int,
-			val pop: Float,
-			val rain: Precipitation? = null,
-			val snow: Precipitation? = null
-		): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather)
+	/**
+	 * @param dt beginning of forecast data hour
+	 * @param pop probability of precipitation (0-1)
+	 */
+	@Keep
+	class Hourly(
+		dt: Int,
+		pressure: Int,
+		humidity: Int,
+		dew_point: Float,
+		clouds: Int,
+		wind_speed: Float,
+		wind_deg: Int,
+		weather: List<Weather>,
+		val temp: Float,
+		val feels_like: Float,
+		val visibility: Int,
+		val pop: Float,
+		val rain: Precipitation? = null,
+		val snow: Precipitation? = null
+	): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather)
 
-		/**
-		 * @param dt beginning of forecast data day
-		 * @param uvi midday uv index
-		 * @param rain precipitation volume in mm
-		 * @param snow same
-		 */
-		@Keep
-		class Daily(
-			dt: Int,
-			pressure: Int,
-			humidity: Int,
-			dew_point: Float,
-			clouds: Int,
-			wind_speed: Float,
-			wind_deg: Int,
-			weather: List<Weather>,
-			val sunrise: Int,
-			val sunset: Int,
-			val temp: Temp,
-			val feels_like: Feel,
-			val uvi: Float,
-			val pop: Float,
-			val rain: Float? = null,
-			val snow: Float? = null
-		): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather) {
+	/**
+	 * @param dt beginning of forecast data day
+	 * @param uvi midday uv index
+	 * @param rain precipitation volume in mm
+	 * @param snow same
+	 */
+	@Keep
+	class Daily(
+		dt: Int,
+		pressure: Int,
+		humidity: Int,
+		dew_point: Float,
+		clouds: Int,
+		wind_speed: Float,
+		wind_deg: Int,
+		weather: List<Weather>,
+		val sunrise: Int,
+		val sunset: Int,
+		val temp: Temp,
+		val feels_like: Feel,
+		val uvi: Float,
+		val pop: Float,
+		val rain: Float? = null,
+		val snow: Float? = null
+	): BaseData(dt, wind_speed, wind_deg, pressure, humidity, dew_point, clouds, weather)
 
-			@Keep
-			class Temp(
-				val morn: Float,
-				val day: Float,
-				val eve: Float,
-				val night: Float,
-				val min: Float,
-				val max: Float
-			)
+	@Keep
+	class Temp(
+		val morn: Float,
+		val day: Float,
+		val eve: Float,
+		val night: Float,
+		val min: Float,
+		val max: Float
+	)
 
-			@Keep
-			class Feel(val morn: Float, val day: Float, val eve: Float, val night: Float)
-		}
-	}
+	@Keep
+	class Feel(val morn: Float, val day: Float, val eve: Float, val night: Float)
 
 	/**
 	 * @param id condition id

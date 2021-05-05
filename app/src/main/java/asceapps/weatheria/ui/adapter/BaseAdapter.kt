@@ -3,7 +3,7 @@ package asceapps.weatheria.ui.adapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.model.IDed
+import asceapps.weatheria.data.base.IDed
 
 abstract class BaseAdapter<T: IDed, VH: RecyclerView.ViewHolder>:
 	ListAdapter<T, VH>(IDedItemCallback()) {

@@ -2,10 +2,11 @@
 <resources>
 	<string name="noti_def_channel_name">القناة الافتراضية</string>
 	<string name="noti_def_channel_desc">جميع إشعارات التطبيق تستخدم هذه القناة</string>
+	<!--main-->
+	<string name="action_settings">الإعدادات</string>
 	<!--home-->
 	<string name="action_locations">المواقع</string>
 	<string name="action_add_location">أضف موقعًا</string>
-	<string name="action_settings">الإعدادات</string>
 	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
@@ -90,9 +91,9 @@
 	<string name="no_search_result">لا نتائج.\n\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بقدر كافٍ، ثم اضغط زر البحث لإظهار النتائج.</string>
 	<string name="hint_search">ابحث بالاسم أو الإحداثيات</string>
 	<!--locations-->
-	<string name="action_delete_all">احذف جميع المواقع</string>
-	<string name="cd_delete_location">احذف الموقع</string>
-	<string name="cd_reorder">إعادة ترتيب</string>
+	<string name="action_delete_all">حذف جميع المواقع</string>
+	<string name="cd_delete">حذف</string>
+	<string name="cd_reorder">ترتيب</string>
 	<!--errors-->
 	<string name="retry">أعد المحاولة</string>
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>

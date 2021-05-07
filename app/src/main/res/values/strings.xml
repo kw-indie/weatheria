@@ -2,10 +2,11 @@
 	<string name="app_name" translatable="false">Weatheria</string>
 	<string name="noti_def_channel_name">Default channel</string>
 	<string name="noti_def_channel_desc">All app notifications use this channel</string>
+	<!--main-->
+	<string name="action_settings">Settings</string>
 	<!--home-->
 	<string name="action_locations">Locations</string>
 	<string name="action_add_location">Add location</string>
-	<string name="action_settings">Settings</string>
 	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
 	<string name="f_last_update">Last update: %s</string>
 	<string name="f_feels_like">Feels like %s</string>
@@ -92,17 +93,17 @@
 	<string name="hint_search">Search by name or coordinates</string>
 	<!--locations-->
 	<string name="action_delete_all">Delete all locations</string>
-	<string name="cd_delete_location">Delete location</string>
+	<string name="cd_delete">Delete</string>
 	<string name="cd_reorder">Reorder</string>
 	<!--errors-->
 	<string name="retry">Retry</string>
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Please enable location service, then try again</string>
 	<string name="error_location_not_found">Location not found. Try enabling GPS then moving the phone a bit.</string>
-    <string name="error_no_internet">No Internet connection</string>
-    <string name="error_timed_out">Request timed out</string>
-    <string name="error_server_error">Server response error. Try a different location or try again later</string>
-    <string name="error_unknown">Unknown error</string>
+	<string name="error_no_internet">No Internet connection</string>
+	<string name="error_timed_out">Request timed out</string>
+	<string name="error_server_error">Server response error. Try a different location or try again later</string>
+	<string name="error_unknown">Unknown error</string>
     <!--settings-->
     <string name="cat_header_general">General</string>
     <string name="key_units" translatable="false">units</string>

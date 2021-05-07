@@ -24,7 +24,7 @@
 			android:layout_width="?attr/listPreferredItemHeight"
 			android:layout_height="?attr/listPreferredItemHeight"
 			android:scaleType="center"
-			android:contentDescription="@string/cd_delete_location"
+			android:contentDescription="@string/cd_delete"
 			app:srcCompat="@drawable/ic_clear"/>
 		<ImageButton
 			style="@style/Widget.MaterialComponents.Button.OutlinedButton"

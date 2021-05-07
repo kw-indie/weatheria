@@ -150,7 +150,7 @@ class AddLocationFragment: Fragment() {
 					if(!isEmpty) binding.rvResults.smoothScrollToPosition(0)
 				}
 				is Error -> {
-					// todo cover actual reasons
+					// todo copy actual reasons from 'refresh' in HomeFragment
 					showMessage(R.string.error_unknown)
 				}
 			}

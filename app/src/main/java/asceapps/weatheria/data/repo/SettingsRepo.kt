@@ -66,13 +66,10 @@ class SettingsRepo @Inject constructor(
 	private val autoRefreshPeriod: String
 		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr
 
-	var selectedLocation = 0
+	var selectedLocation
 		get() = prefs.getInt(selectedLocKey, defVal)
 		set(value) {
-			if(field != value) {
-				field = value
-				prefs.edit { putInt(selectedLocKey, value) }
-			}
+			prefs.edit { putInt(selectedLocKey, value) }
 		}
 
 	fun update(key: String) {

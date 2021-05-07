@@ -26,9 +26,7 @@ import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import asceapps.weatheria.util.PagerHelper
 import asceapps.weatheria.util.observe
-import asceapps.weatheria.util.onItemInsertedFlow
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
@@ -40,13 +38,14 @@ class HomeFragment: Fragment() {
 
 	private val mainVM: MainViewModel by activityViewModels()
 
-	private lateinit var init: IntArray
+	private val init = intArrayOf(0, 0, 0)
 	private lateinit var dawn: IntArray
 	private lateinit var day: IntArray
 	private lateinit var dusk: IntArray
 	private lateinit var night: IntArray
 	private lateinit var gradientEvaluator: TypeEvaluator<IntArray>
 	private lateinit var animator: ObjectAnimator
+	private var currentSky = init
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -63,28 +62,22 @@ class HomeFragment: Fragment() {
 		setUpOnlineStatusStuff(binding.root)
 
 		// todo use xml dataBinding with stateFlow and bindingAdapters
-
-		val infoAdapter = WeatherInfoAdapter()
-		// todo we could merge home + locations fragments with help from a
-		//  recyclerView + different layout managers/adapters
-		val pager = binding.pager.apply {
-			adapter = infoAdapter
-			// todo offscreen page limit
-		}
-		val pagerHelper = PagerHelper(pager).apply {
-			pageSelectedFlow.observe(viewLifecycleOwner) { selectedPos ->
-				mainVM.selectedLocation = selectedPos
-				updateColors(infoAdapter.getItem(selectedPos))
+		val pager = binding.pager
+		// todo assign offscreen page limit
+		val adapter = WeatherInfoAdapter(
+			onItemInserted = { pos ->
+				pager.smoothScrollToPosition(pos)
+			},
+			onPosChanged = { pos, info ->
+				mainVM.selectedLocation = pos
+				updateColors(info)
 			}
-		}
-		infoAdapter.onItemInsertedFlow().observe(viewLifecycleOwner) { insertedPos ->
-			// animate to newly added item
-			pagerHelper.currentPage = insertedPos
-		}
+		)
+		pager.adapter = adapter
 
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
-				mainVM.refresh(pagerHelper.currentPage).observe(viewLifecycleOwner) {
+				mainVM.refresh(mainVM.selectedLocation).observe(viewLifecycleOwner) {
 					if(it is Loading) {
 						isRefreshing = true
 					} else {
@@ -115,11 +108,16 @@ class HomeFragment: Fragment() {
 				is Success -> {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
-					infoAdapter.submitList(list)
-					pagerHelper.setCurrentPage(mainVM.selectedLocation, false)
+					adapter.submitList(list)
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
+					if(!isEmpty) {
+						val selectedPos = mainVM.selectedLocation
+						// since this is not animated, onPosChanged -> updateColors aren't triggered
+						pager.scrollToPosition(selectedPos)
+						updateColors(adapter.currentList[selectedPos])
+					}
 				}
 				is Error -> {
 					swipeRefresh.isRefreshing = false
@@ -165,7 +163,6 @@ class HomeFragment: Fragment() {
 
 		// todo move to settings?
 		// region init colors
-		init = intArrayOf(0, 0, 0) // transparent, init colors
 		dawn = intArrayOf(
 			ContextCompat.getColor(activity, R.color.dawn_1),
 			ContextCompat.getColor(activity, R.color.dawn_2),
@@ -199,50 +196,50 @@ class HomeFragment: Fragment() {
 	}
 
 	private fun updateColors(info: WeatherInfo?) {
-		if(info == null) {
-			animator.apply {
-				setObjectValues(init)
+		val newSky = if(info == null) init
+		else {
+			val daySeconds = 24 * 60 * 60f
+			// fraction of now in real today at this location
+			val dayFraction = info.secondOfToday / daySeconds
+			// fraction of sun rise/set in real OR approx. today
+			val riseFraction = info.secondOfSunriseToday / daySeconds
+			val setFraction = info.secondOfSunsetToday / daySeconds
+			// 'delta' = time to transition between day/night, passing through dawn/dusk
+			// user .coerceIn(1 / 24f / 60, abs(setFraction - riseFraction) / 2) to coerce value
+			// between 1 min and half day/night
+			val deltaFraction = 1 / 24f // transition takes 2 hours, 1 hour before/after dawn/dusk
+			// new colors to animate to
+			when {
+				dayFraction < riseFraction - deltaFraction -> night
+				dayFraction < riseFraction -> {
+					val head = riseFraction - deltaFraction
+					val localFraction = (dayFraction - head) / (riseFraction - head)
+					gradientEvaluator.evaluate(localFraction, night, dawn)
+				}
+				dayFraction < riseFraction + deltaFraction -> {
+					val localFraction = (dayFraction - riseFraction) / deltaFraction
+					gradientEvaluator.evaluate(localFraction, dawn, day)
+				}
+				dayFraction < setFraction - deltaFraction -> day
+				dayFraction < setFraction -> {
+					val head = setFraction - deltaFraction
+					val localFraction = (dayFraction - head) / (setFraction - head)
+					gradientEvaluator.evaluate(localFraction, day, dusk)
+				}
+				dayFraction < setFraction + deltaFraction -> {
+					val localFraction = (dayFraction - setFraction) / deltaFraction
+					gradientEvaluator.evaluate(localFraction, dusk, night)
+				}
+				else -> night
+			}
+		}
+		// don't animate if same colors
+		if(currentSky != newSky) { // this equality is intended
+			currentSky = newSky
+			animator.run {
+				setObjectValues(newSky)
 				start()
 			}
-			return
-		}
-		val daySeconds = 24 * 60 * 60f
-		// fraction of now in real today at this location
-		val dayFraction = info.secondOfToday / daySeconds
-		// fraction of sun rise/set in real OR approx. today
-		val riseFraction = info.secondOfSunriseToday / daySeconds
-		val setFraction = info.secondOfSunsetToday / daySeconds
-		// 'delta' = time to transition between day/night, passing through dawn/dusk
-		// user .coerceIn(1 / 24f / 60, abs(setFraction - riseFraction) / 2) to coerce value
-		// between 1 min and half day/night
-		val deltaFraction = 1 / 24f // transition takes 2 hours, 1 hour before/after dawn/dusk
-		// new colors to animate to
-		val newColors = when {
-			dayFraction < riseFraction - deltaFraction -> night
-			dayFraction < riseFraction -> {
-				val head = riseFraction - deltaFraction
-				val localFraction = (dayFraction - head) / (riseFraction - head)
-				gradientEvaluator.evaluate(localFraction, night, dawn)
-			}
-			dayFraction < riseFraction + deltaFraction -> {
-				val localFraction = (dayFraction - riseFraction) / deltaFraction
-				gradientEvaluator.evaluate(localFraction, dawn, day)
-			}
-			dayFraction < setFraction - deltaFraction -> day
-			dayFraction < setFraction -> {
-				val head = setFraction - deltaFraction
-				val localFraction = (dayFraction - head) / (setFraction - head)
-				gradientEvaluator.evaluate(localFraction, day, dusk)
-			}
-			dayFraction < setFraction + deltaFraction -> {
-				val localFraction = (dayFraction - setFraction) / deltaFraction
-				gradientEvaluator.evaluate(localFraction, dusk, night)
-			}
-			else -> night
-		}
-		animator.run {
-			setObjectValues(newColors)
-			start()
 		}
 	}
 

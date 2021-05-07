@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.data.base.IDed
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemLocationBinding
 import java.util.*
@@ -21,8 +20,7 @@ class LocationsAdapter(
 	private val onReorder: (WeatherInfo, Int) -> Unit
 ): RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
 
-	private val list = mutableListOf<WeatherInfo>()
-	private val callback = HashCallback(list)
+	private val list = Callback.list
 	private val touchHelper = ItemTouchHelper(ReorderCallback())
 
 	init {
@@ -52,11 +50,7 @@ class LocationsAdapter(
 	}
 
 	fun submitList(newList: List<WeatherInfo>) {
-		callback.newList = newList
-		val diffResult = DiffUtil.calculateDiff(callback)
-		list.clear()
-		list.addAll(newList)
-		diffResult.dispatchUpdatesTo(this)
+		Callback.diffResult(newList).dispatchUpdatesTo(this)
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -91,9 +85,18 @@ class LocationsAdapter(
 		}
 	}
 
-	class HashCallback<T: IDed>(private val list: List<T>): DiffUtil.Callback() {
+	private object Callback: DiffUtil.Callback() {
 
-		var newList: List<T> = emptyList()
+		val list = mutableListOf<WeatherInfo>()
+		private var newList = emptyList<WeatherInfo>()
+
+		fun diffResult(l: List<WeatherInfo>): DiffUtil.DiffResult {
+			newList = l
+			val diffResult = DiffUtil.calculateDiff(this)
+			list.clear()
+			list.addAll(l)
+			return diffResult
+		}
 
 		override fun getOldListSize() = list.size
 		override fun getNewListSize() = newList.size

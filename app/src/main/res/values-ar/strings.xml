@@ -5,7 +5,7 @@
 	<!--main-->
 	<string name="action_settings">الإعدادات</string>
 	<!--home-->
-	<string name="action_locations">المواقع</string>
+	<string name="action_my_locations">مواقعي</string>
 	<string name="action_add_location">أضف موقعًا</string>
 	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>

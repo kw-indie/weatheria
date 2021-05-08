@@ -24,7 +24,7 @@ import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
-import asceapps.weatheria.ui.adapter.WeatherInfoAdapter
+import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
 import com.google.android.material.snackbar.Snackbar
@@ -61,39 +61,35 @@ class HomeFragment: Fragment() {
 		setUpBackgroundStuff()
 		setUpOnlineStatusStuff(binding.root)
 
-		// todo use xml dataBinding with stateFlow and bindingAdapters
-		val pager = binding.pager
 		// todo assign offscreen page limit
-		val adapter = WeatherInfoAdapter(
-			onItemInserted = { pos ->
-				pager.smoothScrollToPosition(pos)
-			},
-			onPosChanged = { pos, info ->
-				mainVM.selectedLocation = pos
-				updateColors(info)
-			}
-		)
-		pager.adapter = adapter
+		val pagerAdapter = PagerAdapter(onPosChanged = { pos, info ->
+			mainVM.selectedLocation = pos
+			updateColors(info)
+		})
+		val pager = binding.rvPager.apply {
+			adapter = pagerAdapter
+		}
 
+		// todo move out to individual items
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
-				mainVM.refresh(mainVM.selectedLocation).observe(viewLifecycleOwner) {
+				val info = pagerAdapter.getItem(mainVM.selectedLocation)
+				mainVM.refresh(info).observe(viewLifecycleOwner) {
 					if(it is Loading) {
 						isRefreshing = true
 					} else {
 						isRefreshing = false
 						if(it is Error) {
-							showMessage(
-								when(it) {
-									// obvious timeout
-									is InterruptedIOException -> R.string.error_timed_out
-									// others like UnknownHostException when it can't resolve hostname
-									is IOException -> R.string.error_no_internet
-									// others like http error codes (400, 404, etc.)
-									is HttpException -> R.string.error_server_error
-									else -> R.string.error_unknown
-								}
-							)
+							val msg = when(it) {
+								// obvious timeout
+								is InterruptedIOException -> R.string.error_timed_out
+								// others like UnknownHostException when it can't resolve hostname
+								is IOException -> R.string.error_no_internet
+								// others like http error codes (400, 404, etc.)
+								is HttpException -> R.string.error_server_error
+								else -> R.string.error_unknown
+							}
+							showMessage(msg)
 						}
 					}
 				}
@@ -108,15 +104,15 @@ class HomeFragment: Fragment() {
 				is Success -> {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
-					adapter.submitList(list)
+					pagerAdapter.submitList(list)
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 					if(!isEmpty) {
 						val selectedPos = mainVM.selectedLocation
-						// since this is not animated, onPosChanged -> updateColors aren't triggered
+						// since this is not animated, onPosChanged -> updateColors isn't triggered
 						pager.scrollToPosition(selectedPos)
-						updateColors(adapter.currentList[selectedPos])
+						updateColors(pagerAdapter.getItem(selectedPos))
 					}
 				}
 				is Error -> {
@@ -135,8 +131,8 @@ class HomeFragment: Fragment() {
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
-			R.id.locationsFragment -> findNavController().navigate(R.id.action_open_saved_locations)
-			R.id.addLocationFragment -> findNavController().navigate(R.id.action_open_add_location)
+			R.id.myLocationsFragment -> findNavController().navigate(R.id.myLocationsFragment)
+			R.id.addLocationFragment -> findNavController().navigate(R.id.addLocationFragment)
 			else -> return super.onOptionsItemSelected(item)
 		}
 		return true

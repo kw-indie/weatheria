@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.model.FoundLocation
-import asceapps.weatheria.databinding.ItemSearchResultBinding
+import asceapps.weatheria.databinding.ItemAddLocationBinding
 
-class SearchAdapter(
+class AddLocationAdapter(
 	private val onItemClick: (FoundLocation) -> Unit
-): BaseAdapter<FoundLocation, SearchAdapter.ViewHolder>() {
+): BaseAdapter<FoundLocation, AddLocationAdapter.ViewHolder>() {
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		val binding = ItemSearchResultBinding.inflate(
+		val binding = ItemAddLocationBinding.inflate(
 			LayoutInflater.from(parent.context),
 			parent,
 			false
@@ -24,18 +24,11 @@ class SearchAdapter(
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bind(getItem(position))
-	}
-
-	class ViewHolder(
-		private val binding: ItemSearchResultBinding
-	) : RecyclerView.ViewHolder(binding.root) {
-
-		fun bind(fl: FoundLocation) {
-			with(binding) {
-				location = fl
-				executePendingBindings()
-			}
+		with(holder.binding) {
+			location = getItem(position)
+			executePendingBindings()
 		}
 	}
+
+	class ViewHolder(val binding: ItemAddLocationBinding): RecyclerView.ViewHolder(binding.root)
 }

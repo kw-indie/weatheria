@@ -7,16 +7,16 @@ import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
 
-class WeatherInfoAdapter(
-	private val onItemInserted: (pos: Int) -> Unit,
+class PagerAdapter(
 	private val onPosChanged: (pos: Int, info: WeatherInfo) -> Unit
-): BaseAdapter<WeatherInfo, WeatherInfoAdapter.ViewHolder>() {
+): BaseAdapter<WeatherInfo, PagerAdapter.ViewHolder>() {
 
+	private var recyclerView: RecyclerView? = null
 	private val pagerSnapHelper = PagerSnapHelper()
 	private val dataObserver = object: RecyclerView.AdapterDataObserver() {
 		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
 			if(itemCount == 1)
-				onItemInserted(positionStart)
+				recyclerView?.scrollToPosition(positionStart)
 		}
 	}
 	private val scrollListener = object: RecyclerView.OnScrollListener() {
@@ -31,6 +31,7 @@ class WeatherInfoAdapter(
 	}
 
 	override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+		this.recyclerView = recyclerView
 		pagerSnapHelper.attachToRecyclerView(recyclerView)
 		registerAdapterDataObserver(dataObserver)
 		recyclerView.addOnScrollListener(scrollListener)
@@ -40,6 +41,7 @@ class WeatherInfoAdapter(
 		recyclerView.removeOnScrollListener(scrollListener)
 		unregisterAdapterDataObserver(dataObserver)
 		pagerSnapHelper.attachToRecyclerView(null)
+		this.recyclerView = null
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,16 +51,15 @@ class WeatherInfoAdapter(
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bind(getItem(position))
-	}
-
-	class ViewHolder(private val binding: ItemWeatherInfoBinding): RecyclerView.ViewHolder(binding.root) {
-
-		fun bind(wi: WeatherInfo) {
-			with(binding) {
-				info = wi
-				executePendingBindings()
-			}
+		with(holder.binding) {
+			info = getItem(position)
+			executePendingBindings()
 		}
 	}
+
+	public override fun getItem(position: Int): WeatherInfo {
+		return super.getItem(position)
+	}
+
+	class ViewHolder(val binding: ItemWeatherInfoBinding): RecyclerView.ViewHolder(binding.root)
 }

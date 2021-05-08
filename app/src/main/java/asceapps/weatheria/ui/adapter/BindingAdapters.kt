@@ -5,9 +5,28 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.ui.drawable.DirectionDrawable
 import coil.load
+
+@BindingAdapter("dividerEnabled")
+fun enabledDivider(recyclerView: RecyclerView, enabled: Boolean) {
+	if(enabled) { // meaningless.. one only needs to add this attr if they want this to be true
+		with(recyclerView) {
+			val layoutManager = layoutManager as LinearLayoutManager
+			val divider = DividerItemDecoration(context, layoutManager.orientation)
+			addItemDecoration(divider)
+		}
+	}
+}
+
+@BindingAdapter("hasFixedSize")
+fun setHasFixedSize(recyclerView: RecyclerView, hasFixedSize: Boolean) {
+	recyclerView.setHasFixedSize(hasFixedSize)
+}
 
 @BindingAdapter("icon")
 fun loadIconFromUrl(view: ImageView, icon: String) {

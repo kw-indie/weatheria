@@ -8,13 +8,17 @@ import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.SettingsRepo
-import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.util.asyncPing
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -45,10 +49,7 @@ class MainViewModel @Inject constructor(
 		manualOnlineCheck.value = asyncPing()
 	}
 
-	fun refresh(pos: Int): Flow<Result<Unit>> {
-		val infoList = weatherInfoList.value as Success<List<WeatherInfo>>
-		return infoRepo.refresh(infoList.data[pos])
-	}
+	fun refresh(info: WeatherInfo) = infoRepo.refresh(info)
 
 	fun reorder(l: Location, toPos: Int) = viewModelScope.launch {
 		infoRepo.reorder(l.id, l.pos, toPos)

@@ -6,9 +6,9 @@
 		xmlns:tools="http://schemas.android.com/tools"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context=".ui.fragment.HomeFragment">
+		tools:context=".ui.fragment.MyLocationsFragment">
 		<TextView
-			android:id="@+id/tv_empty_pager"
+			android:id="@+id/tv_no_locations"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_vertical"
@@ -18,18 +18,13 @@
 			android:textSize="@dimen/_12ssp"
 			android:visibility="gone"
 			tools:visibility="visible"/>
-		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-			android:id="@+id/swipe_refresh"
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/location_list"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
-			<androidx.recyclerview.widget.RecyclerView
-				android:id="@+id/rv_pager"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:orientation="horizontal"
-				app:layoutManager="LinearLayoutManager"
-				app:hasFixedSize="@{true}"
-				tools:listitem="@layout/item_weather_info"/>
-		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+			android:layout_height="match_parent"
+			app:layoutManager="LinearLayoutManager"
+			app:dividerEnabled="@{true}"
+			app:hasFixedSize="@{true}"
+			tools:listitem="@layout/item_my_locations"/>
 	</FrameLayout>
 </layout>

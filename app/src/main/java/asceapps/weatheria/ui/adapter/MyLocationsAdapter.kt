@@ -9,19 +9,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.data.model.WeatherInfo
-import asceapps.weatheria.databinding.ItemLocationBinding
+import asceapps.weatheria.databinding.ItemMyLocationsBinding
 import java.util.*
 
-class LocationsAdapter(
-	private val onDeleteClick: (WeatherInfo) -> Unit,
-	private val onItemClick: (WeatherInfo, Int) -> Unit,
-	private val onStartDrag: (View) -> Unit,
-	private val onEndDrag: (View) -> Unit,
-	private val onReorder: (WeatherInfo, Int) -> Unit
-): RecyclerView.Adapter<LocationsAdapter.ViewHolder>() {
+class MyLocationsAdapter(
+	private val itemCallback: ItemCallback
+): RecyclerView.Adapter<MyLocationsAdapter.ViewHolder>() {
 
-	private val list = Callback.list
 	private val touchHelper = ItemTouchHelper(ReorderCallback())
+	val currentList get() = DiffCallback.list
 
 	init {
 		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -35,31 +31,15 @@ class LocationsAdapter(
 		touchHelper.attachToRecyclerView(null)
 	}
 
-	fun getItem(position: Int) = list[position]
-
-	override fun getItemCount() = list.size
-
-	fun reorder(fromPos: Int, toPos: Int) {
-		if(fromPos == toPos) return
-		if(fromPos < toPos) {
-			Collections.rotate(list.subList(fromPos, toPos + 1), -1)
-		} else {
-			Collections.rotate(list.subList(toPos, fromPos + 1), 1)
-		}
-		notifyItemMoved(fromPos, toPos)
-	}
-
-	fun submitList(newList: List<WeatherInfo>) {
-		Callback.diffResult(newList).dispatchUpdatesTo(this)
-	}
+	override fun getItemCount() = currentList.size
 
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val holder: ViewHolder
-		ItemLocationBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
+		ItemMyLocationsBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
 			holder = ViewHolder(this)
-			ibDelete.setOnClickListener { onDeleteClick(info!!) }
-			tvName.setOnClickListener { onItemClick(info!!, holder.bindingAdapterPosition) }
+			ibDelete.setOnClickListener { itemCallback.onDeleteClick(info!!) }
+			tvName.setOnClickListener { itemCallback.onItemClick(holder.bindingAdapterPosition) }
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
@@ -72,31 +52,49 @@ class LocationsAdapter(
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bind(getItem(position))
-	}
-
-	class ViewHolder(private val binding: ItemLocationBinding): RecyclerView.ViewHolder(binding.root) {
-
-		fun bind(i: WeatherInfo) {
-			with(binding) {
-				info = i
-				executePendingBindings()
-			}
+		with(holder.binding) {
+			info = getItem(position)
+			executePendingBindings()
 		}
 	}
 
-	private object Callback: DiffUtil.Callback() {
+	fun getItem(position: Int) = currentList[position]
 
-		val list = mutableListOf<WeatherInfo>()
-		private var newList = emptyList<WeatherInfo>()
-
-		fun diffResult(l: List<WeatherInfo>): DiffUtil.DiffResult {
+	fun submitList(l: List<WeatherInfo>) {
+		with(DiffCallback) {
 			newList = l
 			val diffResult = DiffUtil.calculateDiff(this)
 			list.clear()
 			list.addAll(l)
-			return diffResult
+			diffResult.dispatchUpdatesTo(this@MyLocationsAdapter)
 		}
+	}
+
+	fun reorder(fromPos: Int, toPos: Int) {
+		if(fromPos == toPos) return
+		if(fromPos < toPos) {
+			Collections.rotate(currentList.subList(fromPos, toPos + 1), -1)
+		} else {
+			Collections.rotate(currentList.subList(toPos, fromPos + 1), 1)
+		}
+		notifyItemMoved(fromPos, toPos)
+	}
+
+	class ViewHolder(val binding: ItemMyLocationsBinding): RecyclerView.ViewHolder(binding.root)
+
+	interface ItemCallback {
+
+		fun onDeleteClick(info: WeatherInfo)
+		fun onItemClick(pos: Int)
+		fun onStartDrag(view: View)
+		fun onEndDrag(view: View)
+		fun onReorder(info: WeatherInfo, toPos: Int)
+	}
+
+	private object DiffCallback: DiffUtil.Callback() {
+
+		val list = mutableListOf<WeatherInfo>()
+		var newList = emptyList<WeatherInfo>()
 
 		override fun getOldListSize() = list.size
 		override fun getNewListSize() = newList.size
@@ -116,7 +114,8 @@ class LocationsAdapter(
 		override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
 			super.onSelectedChanged(viewHolder, actionState)
 			if(viewHolder == null) return
-			if(actionState == ItemTouchHelper.ACTION_STATE_DRAG) onStartDrag(viewHolder.itemView)
+			if(actionState == ItemTouchHelper.ACTION_STATE_DRAG)
+				itemCallback.onStartDrag(viewHolder.itemView)
 		}
 
 		override fun onMove(
@@ -135,10 +134,10 @@ class LocationsAdapter(
 
 		override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
 			super.clearView(recyclerView, viewHolder)
-			onEndDrag(viewHolder.itemView)
+			itemCallback.onEndDrag(viewHolder.itemView)
 			val newPos = lastMove.second
-			val item = getItem(newPos)
-			onReorder(item, newPos)
+			val info = getItem(newPos)
+			itemCallback.onReorder(info, newPos)
 			lastMove = noMove
 		}
 

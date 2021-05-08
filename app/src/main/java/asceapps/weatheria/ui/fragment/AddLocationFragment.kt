@@ -20,14 +20,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
-import asceapps.weatheria.ui.adapter.SearchAdapter
+import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
@@ -67,13 +65,12 @@ class AddLocationFragment: Fragment() {
 	}
 
 	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
+		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
 		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
-		val searchAdapter = SearchAdapter(onItemClick = { loc ->
+		val addLocationAdapter = AddLocationAdapter(onItemClick = { loc ->
 			addLocationVM.add(loc).observe(viewLifecycleOwner) {
 				when(it) {
 					is Loading -> {
@@ -89,12 +86,8 @@ class AddLocationFragment: Fragment() {
 				}
 			}
 		})
-		binding.rvResults.apply {
-			adapter = searchAdapter
-			val layoutManager = layoutManager as LinearLayoutManager
-			val divider = DividerItemDecoration(context, layoutManager.orientation)
-			addItemDecoration(divider)
-			setHasFixedSize(true)
+		binding.rvResult.apply {
+			adapter = addLocationAdapter
 		}
 
 		mapView = binding.map.apply {
@@ -121,7 +114,7 @@ class AddLocationFragment: Fragment() {
 								latLngFormat.format(Locale.US, latitude, longitude)
 							}
 						} else {
-							searchAdapter.submitList(emptyList())
+							addLocationAdapter.submitList(emptyList())
 							""
 						}
 						searchView.apply {
@@ -143,11 +136,11 @@ class AddLocationFragment: Fragment() {
 				}
 				is Success -> {
 					val list = it.data
-					searchAdapter.submitList(list)
+					addLocationAdapter.submitList(list)
 					val isEmpty = list.isEmpty()
 					binding.tvNoResult.isVisible = isEmpty
-					binding.rvResults.isVisible = !isEmpty
-					if(!isEmpty) binding.rvResults.smoothScrollToPosition(0)
+					binding.rvResult.isVisible = !isEmpty
+					if(!isEmpty) binding.rvResult.scrollToPosition(0)
 				}
 				is Error -> {
 					// todo copy actual reasons from 'refresh' in HomeFragment
@@ -216,7 +209,7 @@ class AddLocationFragment: Fragment() {
 
 	private fun onMyLocationClick() {
 		if(addLocationVM.useDeviceForLocation) {
-			requestPermission()
+			requirePermission()
 		} else {
 			addLocationVM.getIpGeolocation().observe(viewLifecycleOwner) {
 				when(it) {
@@ -238,7 +231,7 @@ class AddLocationFragment: Fragment() {
 		}
 	}
 
-	private fun requestPermission() {
+	private fun requirePermission() {
 		val permissions = arrayOf(
 			if(addLocationVM.useHighAccuracyLocation) Manifest.permission.ACCESS_FINE_LOCATION
 			else Manifest.permission.ACCESS_COARSE_LOCATION
@@ -256,7 +249,7 @@ class AddLocationFragment: Fragment() {
 				AlertDialog.Builder(requireContext())
 					.setTitle(R.string.request_rationale_title)
 					.setMessage(R.string.location_request_rationale)
-					.setPositiveButton(R.string.give_permission) { _, _ -> requestPermission() }
+					.setPositiveButton(R.string.give_permission) { _, _ -> requirePermission() }
 					.setNegativeButton(R.string.dismiss, null)
 					.create()
 					.show()

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	tools:context=".ui.home.HomePagerFragment">
+<layout>
 	<data>
 		<variable
 			name="info"
 			type="asceapps.weatheria.data.model.WeatherInfo"/>
 	</data>
 	<androidx.core.widget.NestedScrollView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:scrollbars="none">
+		android:scrollbars="none"
+		tools:context=".ui.home.HomePagerFragment">
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -41,8 +42,8 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:alpha="0.75"
-				android:textSize="@dimen/_10ssp"
 				android:text="@{info.localNow}"
+				android:textSize="@dimen/_10ssp"
 				app:layout_constraintEnd_toEndOf="@id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@id/tv_location"
@@ -53,11 +54,11 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_4sdp"
 				android:alpha="0.75"
-				android:textSize="@dimen/_9ssp"
 				android:text="@{@string/f_last_update(info.lastUpdate)}"
+				android:textSize="@dimen/_9ssp"
+				app:layout_constraintEnd_toEndOf="@id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@id/tv_time"
-				app:layout_constraintEnd_toEndOf="@id/mid_v_guideline"
 				tools:text="Last update: 0 min ago"/>
 			<ImageView
 				android:id="@+id/iv_icon"
@@ -77,9 +78,9 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_8sdp"
+				android:singleLine="true"
 				android:text="@{info.todayMinMax}"
 				android:textSize="@dimen/_12ssp"
-				android:singleLine="true"
 				app:layout_constraintBottom_toTopOf="@id/tv_weather"
 				app:layout_constraintEnd_toEndOf="@id/iv_icon"
 				app:layout_constraintStart_toStartOf="@id/iv_icon"
@@ -101,9 +102,9 @@
 				android:id="@+id/tv_feels_like"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:singleLine="true"
 				android:text="@{@string/f_feels_like(info.currentFeel)}"
 				android:textSize="@dimen/_12ssp"
-				android:singleLine="true"
 				app:layout_constraintBaseline_toBaselineOf="@id/tv_min_max"
 				app:layout_constraintEnd_toEndOf="@id/tv_temp"
 				app:layout_constraintStart_toStartOf="@id/tv_temp"
@@ -133,13 +134,13 @@
 				android:gravity="center_vertical|end"
 				android:text="@{info.currentWindSpeed}"
 				android:textSize="@dimen/_12ssp"
-				app:drawableTint="?attr/colorOnSurface"
 				app:drawableStartCompat="@drawable/ic_wind"
-				app:windDirection="@{info.current.windDir}"
+				app:drawableTint="?attr/colorOnSurface"
 				app:layout_constraintBottom_toTopOf="@id/tv_humidity"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintStart_toStartOf="@+id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_weather"
+				app:windDirection="@{info.current.windDir}"
 				tools:text="150 m/s"/>
 			<TextView
 				android:id="@+id/tv_humidity"

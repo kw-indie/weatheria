@@ -11,16 +11,14 @@ import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.data.entity.WeatherInfoEntity
 import asceapps.weatheria.data.model.Current
 import asceapps.weatheria.data.model.Daily
-import asceapps.weatheria.data.model.FoundLocation
 import asceapps.weatheria.data.model.Hourly
 import asceapps.weatheria.data.model.Location
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.di.IoDispatcher
+import asceapps.weatheria.util.asResultFlow
+import asceapps.weatheria.util.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.Duration
@@ -43,59 +41,31 @@ class WeatherInfoRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	fun getAll() = flow {
-		emit(Loading)
-		val flow = dao.loadAll()
-			.map { list ->
-				val modList = list.map { e -> entityToModel(e) }
-				Success(modList)
-			}
-			.flowOn(ioDispatcher)
-		emitAll(flow)
-	}
+	fun getAll() = dao.loadAll()
+		// i think this mapping isn't worth switching context to ioDispatcher
+		.map { it.map { e -> entityToModel(e) } }
+		.asResultFlow() // concerned over 2 consecutive Flow.map()'s
 
 	// todo remove unused
-	fun getAllIds() = flow {
-		emit(Loading)
-		val flow = dao.loadAllIds()
-			.distinctUntilChanged()
-			.map { Success(it) }
-		emitAll(flow)
-	}
+	fun getAllIds() = dao.loadAllIds()
+		.distinctUntilChanged()
+		.asResultFlow()
 
-	fun get(locationId: Int) = flow {
-		emit(Loading)
-		val flow = dao.load(locationId)
-			.distinctUntilChanged()
-			.map { Success(it) }
-		emitAll(flow)
-	}
+	fun get(locationId: Int) = dao.load(locationId)
+		.distinctUntilChanged()
+		.asResultFlow()
 
 	// todo move to locationRepo? add location there, then when this repo does not find info, make it fetch
-	fun add(fl: FoundLocation) = flow {
-		emit(Loading)
-		try {
-			val oneCallResp = withContext(ioDispatcher) {
-				api.oneCall(fl.lat.toString(), fl.lng.toString())
-			}
-			val infoEntity = responseToEntity(fl, oneCallResp)
-			dao.insert(infoEntity)
-			emit(Success(Unit))
-		} catch(e: Exception) {
-			e.printStackTrace()
-			emit(Error(e))
+	fun add(loc: BaseLocation) = resultFlow {
+		val ocr = withContext(ioDispatcher) {
+			api.oneCall(loc.lat.toString(), loc.lng.toString())
 		}
+		val infoEntity = responseToEntity(loc, ocr)
+		dao.insert(infoEntity)
 	}
 
-	fun refresh(info: WeatherInfo) = flow {
-		emit(Loading)
-		try {
-			internalRefresh(info.location)
-			emit(Success(Unit))
-		} catch(e: Exception) {
-			e.printStackTrace()
-			emit(Error(e))
-		}
+	fun refresh(info: WeatherInfo) = resultFlow {
+		internalRefresh(info.location)
 	}
 
 	private suspend fun internalRefresh(loc: BaseLocation) {

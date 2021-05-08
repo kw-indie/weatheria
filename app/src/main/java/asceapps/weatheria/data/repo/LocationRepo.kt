@@ -7,9 +7,9 @@ import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.data.model.FoundLocation
 import asceapps.weatheria.di.IoDispatcher
 import asceapps.weatheria.util.awaitCurrentLocation
+import asceapps.weatheria.util.resultFlow
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
@@ -20,48 +20,26 @@ class LocationRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	fun getDeviceLocation(ctx: Context, accuracy: Int) = flow {
-		emit(Loading)
-		try {
-			val location = ctx.awaitCurrentLocation(accuracy)
-			emit(Success(location))
-		} catch(e: Exception) {
-			e.printStackTrace()
-			emit(Error(e))
-		}
+	fun getDeviceLocation(ctx: Context, accuracy: Int) = resultFlow {
+		ctx.awaitCurrentLocation(accuracy)
 	}
 
-	fun getIpGeolocation() = flow {
-		emit(Loading)
-		try {
-			val latLng = ipApi.lookup()
-			emit(Success(latLng))
-		} catch(e: Exception) {
-			e.printStackTrace()
-			emit(Error(e))
-		}
+	fun getIpGeolocation() = resultFlow {
+		ipApi.lookup()
 	}.flowOn(ioDispatcher)
 
-	fun search(query: String) = flow {
-		emit(Loading)
-		try {
-			when {
-				query.isEmpty() -> emit(Success(emptyList<FoundLocation>()))
-				query.matches(coordinateRegex) -> {
-					val (lat, lng) = query.split(',')
-					val resp = weatherApi.find(lat, lng)
-					val list = responseToModelList(resp)
-					emit(Success(list))
-				}
-				else -> {
-					val resp = weatherApi.find(query)
-					val list = responseToModelList(resp)
-					emit(Success(list))
-				}
+	fun search(query: String) = resultFlow {
+		when {
+			query.isEmpty() -> emptyList()
+			query.matches(coordinateRegex) -> {
+				val (lat, lng) = query.split(',')
+				val resp = weatherApi.find(lat, lng)
+				responseToModelList(resp)
 			}
-		} catch(e: Exception) {
-			e.printStackTrace()
-			emit(Error(e))
+			else -> {
+				val resp = weatherApi.find(query)
+				responseToModelList(resp)
+			}
 		}
 	}.flowOn(ioDispatcher)
 

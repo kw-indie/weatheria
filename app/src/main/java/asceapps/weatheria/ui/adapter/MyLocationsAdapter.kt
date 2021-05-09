@@ -24,11 +24,9 @@ class MyLocationsAdapter(
 	}
 
 	override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+		// since we want touch helper live as long as the adapter is attached,
+		// we decided to not bother detach it and let it die with it
 		touchHelper.attachToRecyclerView(recyclerView)
-	}
-
-	override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-		touchHelper.attachToRecyclerView(null)
 	}
 
 	override fun getItemCount() = currentList.size
@@ -38,7 +36,7 @@ class MyLocationsAdapter(
 		val holder: ViewHolder
 		ItemMyLocationsBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply {
 			holder = ViewHolder(this)
-			ibDelete.setOnClickListener { itemCallback.onDeleteClick(info!!) }
+			ibDelete.setOnClickListener { itemCallback.onDeleteClick(item!!) }
 			tvName.setOnClickListener { itemCallback.onItemClick(holder.bindingAdapterPosition) }
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
@@ -53,7 +51,7 @@ class MyLocationsAdapter(
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		with(holder.binding) {
-			info = getItem(position)
+			item = getItem(position)
 			executePendingBindings()
 		}
 	}

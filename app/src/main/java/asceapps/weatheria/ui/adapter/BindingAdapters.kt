@@ -12,9 +12,9 @@ import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.ui.drawable.DirectionDrawable
 import coil.load
 
-@BindingAdapter("dividerEnabled")
-fun enabledDivider(recyclerView: RecyclerView, enabled: Boolean) {
-	if(enabled) { // meaningless.. one only needs to add this attr if they want this to be true
+@BindingAdapter("hasDividers")
+fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
+	if(hasDividers) {
 		with(recyclerView) {
 			val layoutManager = layoutManager as LinearLayoutManager
 			val divider = DividerItemDecoration(context, layoutManager.orientation)
@@ -22,11 +22,12 @@ fun enabledDivider(recyclerView: RecyclerView, enabled: Boolean) {
 		}
 	}
 }
-
-@BindingAdapter("hasFixedSize")
-fun setHasFixedSize(recyclerView: RecyclerView, hasFixedSize: Boolean) {
-	recyclerView.setHasFixedSize(hasFixedSize)
-}
+// - can have multiple attr in 1 method like:
+// @BindingAdapter(values = [attr1, attr2, ..], requireAll = Boolean)
+// funName(v: View, attr1: Type1, attr2: Type2, ..)
+// don't abuse it. make sure an adapter has 1 responsibility
+// - classes with setters don't need binding adapters
+// - if these were not top level fun's, we need to add @JvmStatic
 
 @BindingAdapter("icon")
 fun loadIconFromUrl(view: ImageView, icon: String) {

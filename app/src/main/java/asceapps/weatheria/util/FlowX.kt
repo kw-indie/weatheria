@@ -27,7 +27,7 @@ inline fun <T> resultFlow(crossinline block: suspend () -> T) = flow {
 	}
 }
 
-fun <T> Flow<T>.asResultFlow() = flow {
+fun <T> Flow<T>.asResult() = flow {
 	emit(Loading)
 	emitAll(map { Success(it) })
 }

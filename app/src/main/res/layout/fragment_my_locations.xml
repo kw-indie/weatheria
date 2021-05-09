@@ -23,8 +23,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			app:layoutManager="LinearLayoutManager"
-			app:dividerEnabled="@{true}"
 			app:hasFixedSize="@{true}"
+			app:hasDividers="@{true}"
 			tools:listitem="@layout/item_my_locations"/>
 	</FrameLayout>
 </layout>

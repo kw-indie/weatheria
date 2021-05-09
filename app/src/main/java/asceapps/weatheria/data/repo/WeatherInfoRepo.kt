@@ -15,7 +15,7 @@ import asceapps.weatheria.data.model.Hourly
 import asceapps.weatheria.data.model.Location
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.di.IoDispatcher
-import asceapps.weatheria.util.asResultFlow
+import asceapps.weatheria.util.asResult
 import asceapps.weatheria.util.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -43,17 +43,17 @@ class WeatherInfoRepo @Inject constructor(
 
 	fun getAll() = dao.loadAll()
 		// i think this mapping isn't worth switching context to ioDispatcher
-		.map { it.map { e -> entityToModel(e) } }
-		.asResultFlow() // concerned over 2 consecutive Flow.map()'s
+		.map { list -> list.map { e -> entityToModel(e) } }
+		.asResult() // concerned over 2 consecutive Flow.map()'s
 
 	// todo remove unused
 	fun getAllIds() = dao.loadAllIds()
 		.distinctUntilChanged()
-		.asResultFlow()
+		.asResult()
 
 	fun get(locationId: Int) = dao.load(locationId)
 		.distinctUntilChanged()
-		.asResultFlow()
+		.asResult()
 
 	// todo move to locationRepo? add location there, then when this repo does not find info, make it fetch
 	fun add(loc: BaseLocation) = resultFlow {

@@ -2,7 +2,7 @@
 <layout>
 	<data>
 		<variable
-			name="location"
+			name="item"
 			type="asceapps.weatheria.data.model.FoundLocation"/>
 	</data>
 	<TextView
@@ -12,7 +12,7 @@
 		style="@style/ListItem"
 		android:layout_width="match_parent"
 		android:layout_height="?attr/listPreferredItemHeight"
-		android:text="@{location.name + `, ` + location.country}"
+		android:text="@{item.name + `, ` + item.country}"
 		app:drawableStartCompat="@drawable/ic_add_location"
 		tools:text="@tools:sample/cities"/>
 </layout>

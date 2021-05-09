@@ -41,7 +41,6 @@ class MyLocationsAdapter(
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
-					return@setOnTouchListener true
 				}
 				false
 			}

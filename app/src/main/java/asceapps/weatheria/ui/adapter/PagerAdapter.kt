@@ -1,15 +1,14 @@
 package asceapps.weatheria.ui.adapter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.R
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
 
 class PagerAdapter(
 	private val onPosChanged: (pos: Int, info: WeatherInfo) -> Unit
-): BaseAdapter<WeatherInfo>() {
+): BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 
 	override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
 		// since we want all listeners/observers live as long as the adapter is attached,
@@ -36,14 +35,7 @@ class PagerAdapter(
 		recyclerView.addOnScrollListener(scrollListener)
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
-		val binding = ItemWeatherInfoBinding.inflate(
-			LayoutInflater.from(parent.context),
-			parent,
-			false
-		)
-		return BindingHolder(binding)
-	}
+	override fun getItemViewType(position: Int) = R.layout.item_weather_info
 
 	public override fun getItem(position: Int): WeatherInfo {
 		return super.getItem(position)

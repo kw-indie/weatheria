@@ -47,20 +47,6 @@ class MyLocationsFragment: Fragment() {
 				findNavController().navigateUp()
 			}
 
-			override fun onStartDrag(view: View) {
-				val scale = 1.05f
-				view.animate()
-					.scaleX(scale)
-					.scaleY(scale)
-			}
-
-			override fun onEndDrag(view: View) {
-				val scale = 1f
-				view.animate()
-					.scaleX(scale)
-					.scaleY(scale)
-			}
-
 			override fun onReorder(info: WeatherInfo, toPos: Int) {
 				mainVM.reorder(info.location, toPos)
 			}

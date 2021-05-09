@@ -20,7 +20,10 @@ class PagerAdapter(
 			}
 		}
 		registerAdapterDataObserver(dataObserver)
+
 		val pagerSnapHelper = PagerSnapHelper()
+		pagerSnapHelper.attachToRecyclerView(recyclerView)
+
 		val scrollListener = object: RecyclerView.OnScrollListener() {
 			override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
 				if(newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -31,7 +34,6 @@ class PagerAdapter(
 				}
 			}
 		}
-		pagerSnapHelper.attachToRecyclerView(recyclerView)
 		recyclerView.addOnScrollListener(scrollListener)
 	}
 

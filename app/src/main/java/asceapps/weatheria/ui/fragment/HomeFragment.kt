@@ -230,7 +230,7 @@ class HomeFragment: Fragment() {
 			}
 		}
 		// don't animate if same colors
-		if(currentSky != newSky) { // this equality is intended
+		if(currentSky !== newSky) {
 			currentSky = newSky
 			animator.run {
 				setObjectValues(newSky)

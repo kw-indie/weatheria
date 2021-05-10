@@ -91,7 +91,8 @@
 	<string name="no_search_result">لا نتائج.\n\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بقدر كافٍ، ثم اضغط زر البحث لإظهار النتائج.</string>
 	<string name="hint_search">ابحث بالاسم أو الإحداثيات</string>
 	<!--locations-->
-	<string name="action_delete_all">حذف جميع المواقع</string>
+	<string name="action_delete_all">حذف الكل</string>
+	<string name="action_refresh_all">تحديث الكل</string>
 	<string name="cd_delete">حذف</string>
 	<string name="cd_reorder">ترتيب</string>
 	<!--errors-->

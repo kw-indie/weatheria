@@ -85,7 +85,7 @@ class HomeFragment: Fragment() {
 					} else {
 						isRefreshing = false
 						if(it is Error) {
-							val msg = when(it) {
+							val msg = when(it.t) {
 								// obvious timeout
 								is InterruptedIOException -> R.string.error_timed_out
 								// others like UnknownHostException when it can't resolve hostname

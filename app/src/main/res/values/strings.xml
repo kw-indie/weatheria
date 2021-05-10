@@ -92,7 +92,8 @@
 	<string name="no_search_result">No result.\n\nUse the search bar above or zoom the map enough, then press the search button to show results.</string>
 	<string name="hint_search">Search by name or coordinates</string>
 	<!--locations-->
-	<string name="action_delete_all">Delete all locations</string>
+	<string name="action_delete_all">Delete all</string>
+	<string name="action_refresh_all">Refresh all</string>
 	<string name="cd_delete">Delete</string>
 	<string name="cd_reorder">Reorder</string>
 	<!--errors-->

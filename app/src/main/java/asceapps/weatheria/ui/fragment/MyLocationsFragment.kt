@@ -88,6 +88,21 @@ class MyLocationsFragment: Fragment() {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when(item.itemId) {
 			R.id.addLocationFragment -> findNavController().navigate(R.id.addLocationFragment)
+			R.id.action_refresh_all -> mainVM.refreshAll().observe(viewLifecycleOwner) {
+				when(it) {
+					is Loading -> {
+						// todo show loading anim
+					}
+					else -> {
+						// todo cancel loading anim
+						if(it is Error) {
+							when(it.t) {
+								// todo copy errors from home refresh
+							}
+						}
+					}
+				}
+			}
 			R.id.action_delete_all -> mainVM.deleteAll()
 			// todo add refresh all
 			else -> return super.onOptionsItemSelected(item)
@@ -97,6 +112,6 @@ class MyLocationsFragment: Fragment() {
 
 	override fun onPrepareOptionsMenu(menu: Menu) {
 		super.onPrepareOptionsMenu(menu)
-		menu.findItem(R.id.action_delete_all).isEnabled = !emptyList
+		menu.setGroupEnabled(R.id.bulk_actions, !emptyList)
 	}
 }

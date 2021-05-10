@@ -69,16 +69,16 @@ class WeatherInfoRepo @Inject constructor(
 		internalRefresh(info.location)
 	}
 
+	fun refreshAll() = resultFlow {
+		dao.getLocations().forEach { internalRefresh(it) }
+	}
+
 	private suspend fun internalRefresh(loc: BaseLocation) {
 		val updatedInfo = withContext(ioDispatcher) {
 			val ocr = with(loc) { api.oneCall(lat.toString(), lng.toString()) }
 			responseToEntity(loc, ocr)
 		}
 		dao.update(updatedInfo)
-	}
-
-	suspend fun refreshAll() {
-		dao.getLocations().forEach { internalRefresh(it) }
 	}
 
 	suspend fun reorder(info: WeatherInfo, toPos: Int) {

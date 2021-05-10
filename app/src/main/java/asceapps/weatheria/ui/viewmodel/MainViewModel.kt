@@ -50,6 +50,8 @@ class MainViewModel @Inject constructor(
 
 	fun refresh(info: WeatherInfo) = infoRepo.refresh(info)
 
+	fun refreshAll() = infoRepo.refreshAll()
+
 	fun reorder(info: WeatherInfo, toPos: Int) = viewModelScope.launch {
 		infoRepo.reorder(info, toPos)
 	}

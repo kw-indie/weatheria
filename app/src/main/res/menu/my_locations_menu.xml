@@ -7,8 +7,14 @@
 		android:icon="@drawable/ic_add_location"
 		android:title="@string/action_add_location"
 		app:showAsAction="ifRoom"/>
-	<item
-		android:id="@+id/action_delete_all"
-		android:title="@string/action_delete_all"
-		app:showAsAction="never"/>
+	<group android:id="@+id/bulk_actions">
+		<item
+			android:id="@+id/action_refresh_all"
+			android:title="@string/action_refresh_all"
+			app:showAsAction="never"/>
+		<item
+			android:id="@+id/action_delete_all"
+			android:title="@string/action_delete_all"
+			app:showAsAction="never"/>
+	</group>
 </menu>

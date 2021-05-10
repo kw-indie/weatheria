@@ -5,8 +5,8 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 
 fun hideKeyboard(any: View) {
 	ViewCompat.getWindowInsetsController(any)?.hide(WindowInsetsCompat.Type.ime())
@@ -45,17 +45,32 @@ fun View.edgeToEdge(
 	}
 }
 
-fun SearchView.onTextSubmitFlow() = callbackFlow {
+inline fun SearchView.onSubmit(crossinline block: (query: String) -> Unit) {
 	setOnQueryTextListener(object: SearchView.OnQueryTextListener {
 		override fun onQueryTextSubmit(query: String): Boolean {
-			trySend(query)
+			block(query)
 			return true
 		}
 
 		override fun onQueryTextChange(newText: String) = true
 	})
+}
 
-	awaitClose {
-		setOnQueryTextListener(null)
+inline fun RecyclerView.Adapter<*>.onItemInserted(crossinline block: (atPos: Int) -> Unit) {
+	val callback = object: RecyclerView.AdapterDataObserver() {
+		override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+			if(itemCount == 1)
+				block(positionStart)
+		}
 	}
+	registerAdapterDataObserver(callback)
+}
+
+inline fun ViewPager2.onPageChanged(crossinline block: (pos: Int) -> Unit) {
+	val callback = object: ViewPager2.OnPageChangeCallback() {
+		override fun onPageSelected(position: Int) {
+			block(position)
+		}
+	}
+	registerOnPageChangeCallback(callback)
 }

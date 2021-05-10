@@ -19,6 +19,7 @@ import asceapps.weatheria.util.asResult
 import asceapps.weatheria.util.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.Duration
@@ -42,8 +43,8 @@ class WeatherInfoRepo @Inject constructor(
 ) {
 
 	fun getAll() = dao.loadAll()
-		// i think this mapping isn't worth switching context to ioDispatcher
 		.map { list -> list.map { e -> entityToModel(e) } }
+		.flowOn(ioDispatcher)
 		.asResult() // concerned over 2 consecutive Flow.map()'s
 
 	// todo remove unused

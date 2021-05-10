@@ -27,6 +27,8 @@ import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.observe
+import asceapps.weatheria.util.onItemInserted
+import asceapps.weatheria.util.onPageChanged
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
@@ -61,19 +63,22 @@ class HomeFragment: Fragment() {
 		setUpBackgroundStuff()
 		setUpOnlineStatusStuff(binding.root)
 
-		// todo assign offscreen page limit
-		val pagerAdapter = PagerAdapter(onPosChanged = { pos, info ->
-			mainVM.selectedLocation = pos
-			updateColors(info)
-		})
-		val pager = binding.rvPager.apply {
-			adapter = pagerAdapter
+		val pagerAdapter = PagerAdapter()
+		val pager = binding.pager.apply {
+			offscreenPageLimit = 1
+			adapter = pagerAdapter.apply {
+				onItemInserted { setCurrentItem(it, false) }
+			}
+			onPageChanged { pos ->
+				mainVM.selectedLocation = pos
+				updateColors(pagerAdapter.getItem(pos))
+			}
 		}
 
 		// todo move out to individual items
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
-				val info = pagerAdapter.getItem(mainVM.selectedLocation)
+				val info = pagerAdapter.getItem(pager.currentItem)
 				mainVM.refresh(info).observe(viewLifecycleOwner) {
 					if(it is Loading) {
 						isRefreshing = true
@@ -109,10 +114,7 @@ class HomeFragment: Fragment() {
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 					if(!isEmpty) {
-						val selectedPos = mainVM.selectedLocation
-						// since this is not animated, onPosChanged -> updateColors isn't triggered
-						pager.scrollToPosition(selectedPos)
-						updateColors(pagerAdapter.getItem(selectedPos))
+						pager.setCurrentItem(mainVM.selectedLocation, false)
 					}
 				}
 				is Error -> {

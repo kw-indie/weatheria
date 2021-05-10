@@ -29,7 +29,7 @@ import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
-import asceapps.weatheria.util.onTextSubmitFlow
+import asceapps.weatheria.util.onSubmit
 import com.google.android.gms.location.LocationRequest
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
@@ -158,9 +158,7 @@ class AddLocationFragment: Fragment() {
 		searchView = (searchMenuItem.actionView as SearchView).apply {
 			setIconifiedByDefault(false)
 			queryHint = getString(R.string.hint_search)
-			onTextSubmitFlow().observe(viewLifecycleOwner) {
-				addLocationVM.search(it)
-			}
+			onSubmit { addLocationVM.search(it) }
 		}
 	}
 

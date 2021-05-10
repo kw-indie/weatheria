@@ -39,7 +39,7 @@ class MyLocationsFragment: Fragment() {
 
 		val myLocationsAdapter = MyLocationsAdapter(object: MyLocationsAdapter.ItemCallback {
 			override fun onDeleteClick(info: WeatherInfo) {
-				mainVM.delete(info.location)
+				mainVM.delete(info)
 			}
 
 			override fun onItemClick(pos: Int) {
@@ -48,7 +48,7 @@ class MyLocationsFragment: Fragment() {
 			}
 
 			override fun onReorder(info: WeatherInfo, toPos: Int) {
-				mainVM.reorder(info.location, toPos)
+				mainVM.reorder(info, toPos)
 			}
 		})
 		binding.locationList.apply {

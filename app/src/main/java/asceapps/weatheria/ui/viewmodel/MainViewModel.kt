@@ -51,12 +51,12 @@ class MainViewModel @Inject constructor(
 
 	fun refresh(info: WeatherInfo) = infoRepo.refresh(info)
 
-	fun reorder(l: Location, toPos: Int) = viewModelScope.launch {
-		infoRepo.reorder(l.id, l.pos, toPos)
+	fun reorder(info: WeatherInfo, toPos: Int) = viewModelScope.launch {
+		infoRepo.reorder(info, toPos)
 	}
 
-	fun delete(l: Location) = viewModelScope.launch {
-		infoRepo.delete(l.id, l.pos)
+	fun delete(info: WeatherInfo) = viewModelScope.launch {
+		infoRepo.delete(info)
 	}
 
 	fun deleteAll() = viewModelScope.launch {

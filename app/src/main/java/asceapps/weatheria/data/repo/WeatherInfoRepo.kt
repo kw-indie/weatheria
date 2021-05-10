@@ -81,12 +81,12 @@ class WeatherInfoRepo @Inject constructor(
 		dao.getLocations().forEach { internalRefresh(it) }
 	}
 
-	suspend fun reorder(id: Int, fromPos: Int, toPos: Int) {
-		dao.reorder(id, fromPos, toPos)
+	suspend fun reorder(info: WeatherInfo, toPos: Int) {
+		with(info.location) { dao.reorder(id, pos, toPos) }
 	}
 
-	suspend fun delete(id: Int, pos: Int) {
-		dao.delete(id, pos)
+	suspend fun delete(info: WeatherInfo) {
+		with(info.location) { dao.delete(id, pos) }
 	}
 
 	suspend fun deleteAll() {

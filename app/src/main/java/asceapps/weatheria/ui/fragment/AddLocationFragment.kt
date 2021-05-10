@@ -77,6 +77,7 @@ class AddLocationFragment: Fragment() {
 						// todo show loading anim
 					}
 					is Success -> {
+						// todo maybe stay to add more?
 						findNavController().navigateUp()
 					}
 					is Error -> {

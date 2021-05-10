@@ -3,7 +3,6 @@ package asceapps.weatheria.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import asceapps.weatheria.data.model.Location
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Result

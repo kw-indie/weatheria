@@ -12,6 +12,12 @@ import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.ui.drawable.DirectionDrawable
 import coil.load
 
+// - can have multiple attr in 1 method like:
+// @BindingAdapter(values = [attr1, attr2, ..], requireAll = Boolean)
+// funName(v: View, attr1: Type1, attr2: Type2, ..)
+// don't abuse it. make sure an adapter has 1 responsibility
+// - classes with setters don't need binding adapters
+// - if these were not top level fun's, we need to add @JvmStatic
 @BindingAdapter("hasDividers")
 fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 	if(hasDividers) {
@@ -22,12 +28,6 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 		}
 	}
 }
-// - can have multiple attr in 1 method like:
-// @BindingAdapter(values = [attr1, attr2, ..], requireAll = Boolean)
-// funName(v: View, attr1: Type1, attr2: Type2, ..)
-// don't abuse it. make sure an adapter has 1 responsibility
-// - classes with setters don't need binding adapters
-// - if these were not top level fun's, we need to add @JvmStatic
 
 @BindingAdapter("icon")
 fun loadIconFromUrl(view: ImageView, icon: String) {

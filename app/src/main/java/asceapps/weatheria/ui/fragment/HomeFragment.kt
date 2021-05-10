@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.animation.TypeEvaluator
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -26,6 +25,7 @@ import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.getColors
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onItemInserted
 import asceapps.weatheria.util.onPageChanged
@@ -160,28 +160,10 @@ class HomeFragment: Fragment() {
 		}
 
 		// todo move to settings?
-		// region init colors
-		dawn = intArrayOf(
-			ContextCompat.getColor(activity, R.color.dawn_1),
-			ContextCompat.getColor(activity, R.color.dawn_2),
-			ContextCompat.getColor(activity, R.color.dawn_3)
-		)
-		day = intArrayOf(
-			ContextCompat.getColor(activity, R.color.day_1),
-			ContextCompat.getColor(activity, R.color.day_2),
-			ContextCompat.getColor(activity, R.color.day_3)
-		)
-		dusk = intArrayOf(
-			ContextCompat.getColor(activity, R.color.dusk_1),
-			ContextCompat.getColor(activity, R.color.dusk_2),
-			ContextCompat.getColor(activity, R.color.dusk_3)
-		)
-		night = intArrayOf(
-			ContextCompat.getColor(activity, R.color.night_1),
-			ContextCompat.getColor(activity, R.color.night_2),
-			ContextCompat.getColor(activity, R.color.night_3)
-		)
-		// endregion
+		dawn = activity.getColors(R.color.dawn_1, R.color.dawn_2, R.color.dawn_3)
+		day = activity.getColors(R.color.day_1, R.color.day_2, R.color.day_3)
+		dusk = activity.getColors(R.color.dusk_1, R.color.dusk_2, R.color.dusk_3)
+		night = activity.getColors(R.color.night_1, R.color.night_2, R.color.night_3)
 
 		gradientEvaluator = TypeEvaluator<IntArray> { fraction, from, to ->
 			val argbEvaluator = ArgbEvaluator.getInstance()

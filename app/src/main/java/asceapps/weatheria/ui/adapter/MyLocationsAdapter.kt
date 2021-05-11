@@ -25,10 +25,11 @@ class MyLocationsAdapter(
 	override fun onHolderCreated(holder: BindingHolder<ItemMyLocationsBinding>) {
 		with(holder.binding) {
 			ibDelete.setOnClickListener { itemCallback.onDeleteClick(item!!) }
-			tvName.setOnClickListener { itemCallback.onItemClick(holder.bindingAdapterPosition) }
+			tvName.setOnClickListener { itemCallback.onItemClick(item!!.location.pos) }
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
+					return@setOnTouchListener true
 				}
 				false
 			}

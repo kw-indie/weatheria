@@ -23,23 +23,30 @@ fun Context.onlineStatusFlow() = onlineStatusFlow(
 	getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 )
 
+private const val TIMEOUT = 5000
 private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 	val request = NetworkRequest.Builder()
 		.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 		.build()
 
 	val callback = object: ConnectivityManager.NetworkCallback() {
+		private var lastCheck = 0L // thread local, no need for sync
 		override fun onAvailable(network: Network) = refresh()
 
 		override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) = refresh()
 
-		// do NOT offer(error), since we may have lost one network, but not the others
+		// do NOT send(error), since we may have lost one network, but not the others
 		// for some reason, the OS calls this many times on each event (at least 4 times)
 		override fun onLost(network: Network) = refresh()
 
 		private fun refresh() {
-			trySend(Loading)
-			trySend(blockingPing())
+			val now = System.currentTimeMillis()
+			if(now > lastCheck + TIMEOUT) {
+				lastCheck = now
+				trySend(Loading)
+				// this is already on a background thread
+				trySend(blockingPing())
+			}
 		}
 	}
 
@@ -65,7 +72,7 @@ private fun blockingPing(): Result<Unit> {
 		Socket().use {
 			// dns servers listen on port 53
 			val socketAddress = InetSocketAddress("8.8.8.8", 53)
-			it.connect(socketAddress, 1500)
+			it.connect(socketAddress, TIMEOUT)
 		}
 		Success(Unit)
 	} catch(e: Exception) {

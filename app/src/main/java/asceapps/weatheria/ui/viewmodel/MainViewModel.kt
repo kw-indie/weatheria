@@ -12,7 +12,7 @@ import asceapps.weatheria.util.asyncPing
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.debounce
@@ -33,7 +33,8 @@ class MainViewModel @Inject constructor(
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(Duration.minutes(1)), Loading)
 	var selectedLocation = settingsRepo.selectedLocation // only assigns init value
 
-	private val manualOnlineCheck = MutableStateFlow<Result<Unit>>(Loading)
+	// sharedFlow does not have .distinctUntilChanged() like stateFlow
+	private val manualOnlineCheck = MutableSharedFlow<Result<Unit>>()
 	val onlineStatus = merge(manualOnlineCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
 		.debounce(1000)
@@ -44,8 +45,8 @@ class MainViewModel @Inject constructor(
 	}
 
 	fun checkOnline() = viewModelScope.launch {
-		manualOnlineCheck.value = Loading
-		manualOnlineCheck.value = asyncPing()
+		manualOnlineCheck.emit(Loading)
+		manualOnlineCheck.emit(asyncPing())
 	}
 
 	fun refresh(info: WeatherInfo) = infoRepo.refresh(info)

@@ -15,10 +15,8 @@ gen/
 out/
 
 # Gradle files
-gradle/
 .gradle/
 build/
-gradle.properties
 gradlew
 gradlew.bat
 

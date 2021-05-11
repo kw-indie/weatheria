@@ -45,7 +45,7 @@ class SettingsRepo @Inject constructor(
 		updateAutoRefresh()
 	}
 
-	val changesFlow = prefs.onChangeFlow()
+	val changesFlow get() = prefs.onChangeFlow()
 
 	// 0 = metric, 1 = imperial
 	private val units: Int

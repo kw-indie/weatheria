@@ -120,7 +120,7 @@ class AddLocationFragment: Fragment() {
 						}
 						searchView.apply {
 							// this does not submit empty queries regardless of passed value
-							setQuery(query, false)
+							setQuery(query, true)
 						}
 					}
 				}

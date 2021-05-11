@@ -14,13 +14,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -30,11 +28,11 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(Duration.minutes(1)), Loading)
+		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000), 1)
 	var selectedLocation = settingsRepo.selectedLocation // only assigns init value
 
 	// sharedFlow does not have .distinctUntilChanged() like stateFlow
-	private val manualOnlineCheck = MutableSharedFlow<Result<Unit>>()
+	private val manualOnlineCheck = MutableSharedFlow<Result<Unit>>(1)
 	val onlineStatus = merge(manualOnlineCheck, appContext.onlineStatusFlow())
 		// debounce helps ui complete responding (anim) to last emission
 		.debounce(1000)
@@ -45,8 +43,10 @@ class MainViewModel @Inject constructor(
 	}
 
 	fun checkOnline() = viewModelScope.launch {
-		manualOnlineCheck.emit(Loading)
-		manualOnlineCheck.emit(asyncPing())
+		// use tryEmit w/ reply=1 or emit w/ reply=0
+		// emit creates an extra coroutine
+		manualOnlineCheck.tryEmit(Loading)
+		manualOnlineCheck.tryEmit(asyncPing())
 	}
 
 	fun refresh(info: WeatherInfo) = infoRepo.refresh(info)

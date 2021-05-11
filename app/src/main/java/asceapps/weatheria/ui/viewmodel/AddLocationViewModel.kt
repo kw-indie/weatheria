@@ -19,12 +19,12 @@ class AddLocationViewModel @Inject constructor(
 	private val settingsRepo: SettingsRepo
 ): ViewModel() {
 
-	val useDeviceForLocation: Boolean get() = settingsRepo.useDeviceForLocation
-	val useHighAccuracyLocation: Boolean get() = settingsRepo.useHighAccuracyLocation
+	val useDeviceForLocation get() = settingsRepo.useDeviceForLocation
+	val useHighAccuracyLocation get() = settingsRepo.useHighAccuracyLocation
 
 	private val query = MutableStateFlow("")
 	val searchResult = query
-		.debounce(1000)
+		.debounce(1500)
 		.flatMapLatest { q -> locationRepo.search(q) }
 
 	fun search(q: String) {

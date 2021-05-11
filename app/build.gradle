@@ -25,7 +25,7 @@ android {
 
 		// if i don't add the quotes separately, the generated var is typed in as a broken int
 		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty("weather_app_id") + "\"")
-		resValue "string", "maps_api_key", (project.findProperty("maps_api_key") ?: "")
+		resValue "string", "google_api_key", (project.findProperty("google_api_key") ?: "")
 
 		// removes unused i18n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
@@ -147,8 +147,9 @@ dependencies {
 
 	// maps & location
 	implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
+	// flp (+ activity recognition + geofencing)
 	implementation "com.google.android.gms:play-services-location:18.0.0"
-	// manually specified the version available in mavenCentral instead of clinging to jcenter
+	// manually specified the version available in google() instead of clinging to jcenter()
 	implementation "com.android.volley:volley:1.2.0"
 
 	// work manager
@@ -162,7 +163,8 @@ dependencies {
 	def hiltCompilerVer = '1.0.0'
 	kapt "androidx.hilt:hilt-compiler:$hiltCompilerVer"
 	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
-	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltCompilerVer"
+	// this f***y artifact is always behind
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
 
 	// coil
 	implementation 'io.coil-kt:coil:1.2.1'

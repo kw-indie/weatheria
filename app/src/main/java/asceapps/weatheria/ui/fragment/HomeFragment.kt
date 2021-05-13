@@ -63,7 +63,6 @@ class HomeFragment: Fragment() {
 
 		val pagerAdapter = PagerAdapter()
 		val pager = binding.pager.apply {
-			offscreenPageLimit = 1
 			adapter = pagerAdapter.apply {
 				onItemInserted { setCurrentItem(it, false) }
 			}
@@ -73,7 +72,6 @@ class HomeFragment: Fragment() {
 			}
 		}
 
-		// todo move out to individual items
 		val swipeRefresh = binding.swipeRefresh.apply {
 			setOnRefreshListener {
 				val info = pagerAdapter.getItem(pager.currentItem)
@@ -222,12 +220,11 @@ class HomeFragment: Fragment() {
 	}
 
 	private fun setUpOnlineStatusStuff(anyView: View) {
-		val snackbar = Snackbar.make(anyView, R.string.error_no_internet, Snackbar.LENGTH_INDEFINITE)
-			.apply {
-				animationMode = Snackbar.ANIMATION_MODE_SLIDE
-				setAction(R.string.retry) { mainVM.checkOnline() }
-			}
-		mainVM.onlineStatus.observe(this) {
+		val snackbar = Snackbar.make(anyView, R.string.error_no_internet, Snackbar.LENGTH_INDEFINITE).apply {
+			animationMode = Snackbar.ANIMATION_MODE_SLIDE
+			setAction(R.string.retry) { mainVM.checkOnline() }
+		}
+		mainVM.onlineStatus.observe(viewLifecycleOwner) {
 			when(it) {
 				is Loading -> {
 					// todo show loading anim

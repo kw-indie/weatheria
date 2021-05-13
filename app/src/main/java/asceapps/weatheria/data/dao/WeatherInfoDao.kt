@@ -19,13 +19,6 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract fun loadAll(): Flow<List<WeatherInfoEntity>>
 
-	@Query("SELECT id FROM locations ORDER BY pos")
-	abstract fun loadAllIds(): Flow<List<Int>>
-
-	@Transaction
-	@Query("SELECT * FROM locations WHERE id = :locationId")
-	abstract fun load(locationId: Int): Flow<WeatherInfoEntity>
-
 	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract suspend fun getLocations(): List<LocationEntity>
 
@@ -45,9 +38,9 @@ abstract class WeatherInfoDao {
 		with(info) {
 			upsertLocation(location)
 			upsertCurrent(current)
-			deleteHourly(hourly[0].locationId) // delete old
+			deleteHourly(location.id) // delete old
 			upsertHourly(hourly)
-			deleteDaily(daily[0].locationId) // delete old
+			deleteDaily(location.id) // delete old
 			upsertDaily(daily)
 		}
 	}
@@ -94,9 +87,6 @@ abstract class WeatherInfoDao {
 
 	@Query("UPDATE locations SET pos = :pos WHERE id = :locationId")
 	protected abstract suspend fun setPos(locationId: Int, pos: Int)
-
-	@Query("UPDATE locations SET pos = pos+1 WHERE pos >= :fromPos")
-	protected abstract suspend fun incPos(fromPos: Int)
 
 	@Query("UPDATE locations SET pos = pos+1 WHERE pos BETWEEN :fromPos AND :toPos")
 	protected abstract suspend fun incPos(fromPos: Int, toPos: Int)

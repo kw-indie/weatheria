@@ -29,6 +29,7 @@ class MainViewModel @Inject constructor(
 
 	val weatherInfoList = infoRepo.getAll()
 		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000), 1)
+	// saving pos is straightforward/easy, saving id is doable but more complex for no gains
 	var selectedLocation = settingsRepo.selectedLocation // only assigns init value
 
 	// sharedFlow does not have .distinctUntilChanged() like stateFlow

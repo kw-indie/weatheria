@@ -43,7 +43,7 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 			val now = System.currentTimeMillis()
 			if(now > lastCheck + TIMEOUT) {
 				lastCheck = now
-				trySend(Loading)
+				trySend(Loading())
 				// this is already on a background thread
 				trySend(blockingPing())
 			}
@@ -51,7 +51,7 @@ private fun onlineStatusFlow(cm: ConnectivityManager) = callbackFlow {
 	}
 
 	// fire initial value
-	trySend(Loading)
+	trySend(Loading())
 	trySend(asyncPing())
 
 	cm.registerNetworkCallback(request, callback)

@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(
 	fun checkOnline() = viewModelScope.launch {
 		// use tryEmit w/ reply=1 or emit w/ reply=0
 		// emit creates an extra coroutine
-		manualOnlineCheck.tryEmit(Loading)
+		manualOnlineCheck.tryEmit(Loading())
 		manualOnlineCheck.tryEmit(asyncPing())
 	}
 

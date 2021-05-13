@@ -1,6 +1,7 @@
 package asceapps.weatheria.data.repo
 
 import android.content.Context
+import android.location.Location
 import asceapps.weatheria.data.api.FindResponse
 import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
@@ -20,15 +21,15 @@ class LocationRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	fun getDeviceLocation(ctx: Context, accuracy: Int) = resultFlow {
+	fun getDeviceLocation(ctx: Context, accuracy: Int) = resultFlow<Location> {
 		ctx.awaitCurrentLocation(accuracy)
 	}
 
-	fun getIpGeolocation() = resultFlow {
+	fun getIpGeolocation() = resultFlow<String> {
 		ipApi.lookup()
 	}.flowOn(ioDispatcher)
 
-	fun search(query: String) = resultFlow {
+	fun search(query: String) = resultFlow<List<FoundLocation>> {
 		when {
 			query.isEmpty() -> emptyList()
 			query.matches(coordinateRegex) -> {

@@ -47,7 +47,7 @@ class WeatherInfoRepo @Inject constructor(
 		.asResult() // concerned over 2 consecutive Flow.map()'s
 
 	// todo move to locationRepo? add location there, then when this repo does not find info, make it fetch
-	fun add(loc: BaseLocation) = resultFlow {
+	fun add(loc: BaseLocation) = resultFlow<Unit> {
 		val ocr = withContext(ioDispatcher) {
 			api.oneCall(loc.lat.toString(), loc.lng.toString())
 		}
@@ -55,12 +55,17 @@ class WeatherInfoRepo @Inject constructor(
 		dao.insert(infoEntity)
 	}
 
-	fun refresh(info: WeatherInfo) = resultFlow {
+	fun refresh(info: WeatherInfo) = resultFlow<Unit> {
 		internalRefresh(info.location)
 	}
 
-	fun refreshAll() = resultFlow {
-		dao.getLocations().forEach { internalRefresh(it) }
+	fun refreshAll() = resultFlow<Unit> {
+		val locations = dao.getLocations()
+		val size = locations.size
+		locations.forEachIndexed { i, e ->
+			internalRefresh(e)
+			emit(Loading(100 / size * (i + 1)))
+		}
 	}
 
 	private suspend fun internalRefresh(loc: BaseLocation) {
@@ -287,10 +292,12 @@ class WeatherInfoRepo @Inject constructor(
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
 		// region weather condition stuff
-		private val conditionIds = intArrayOf(200, 201, 202, 210, 211, 212, 221, 230, 231, 232, 300, 301, 302,
+		private val conditionIds = intArrayOf(
+			200, 201, 202, 210, 211, 212, 221, 230, 231, 232, 300, 301, 302,
 			310, 311, 312, 313, 314, 321, 500, 501, 502, 503, 504, 511, 520, 521, 522, 531, 600, 601, 602,
 			611, 612, 613, 615, 616, 620, 621, 622, 701, 711, 721, 731, 741, 751, 761, 762, 771, 781, 800,
-			801, 802, 803, 804)
+			801, 802, 803, 804
+		)
 
 		private fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)
 

@@ -59,15 +59,13 @@ class AddLocationFragment: Fragment() {
 		::permissionRequestCallback
 	)
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setHasOptionsMenu(true)
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		// turns out this can be called from here as well
+		setHasOptionsMenu(true)
+
 		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
 		val addLocationAdapter = AddLocationAdapter(onItemClick = { loc ->

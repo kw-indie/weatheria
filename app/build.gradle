@@ -23,9 +23,10 @@ android {
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-		// if i don't add the quotes separately, the generated var is typed in as a broken int
-		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty("weather_app_id") + "\"")
-		resValue "string", "google_api_key", (project.findProperty("google_api_key") ?: "")
+		Properties ps = new Properties()
+		new File("local.properties").withInputStream { ps.load(it) }
+		buildConfigField("String", "WEATHER_APP_ID", "\"$ps.weather_app_id\"")
+		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused i18n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"

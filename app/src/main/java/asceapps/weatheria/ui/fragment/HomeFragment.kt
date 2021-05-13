@@ -49,15 +49,13 @@ class HomeFragment: Fragment() {
 	private lateinit var animator: ObjectAnimator
 	private var currentSky = init
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setHasOptionsMenu(true)
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		// turns out this can be called from here as well
+		setHasOptionsMenu(true)
+
 		val binding = FragmentHomeBinding.inflate(inflater, container, false)
 
 		setUpBackgroundStuff()

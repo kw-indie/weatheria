@@ -26,15 +26,13 @@ class MyLocationsFragment: Fragment() {
 	private val mainVM: MainViewModel by activityViewModels()
 	private var emptyList = true
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setHasOptionsMenu(true)
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		// turns out this can be called from here as well
+		setHasOptionsMenu(true)
+
 		val binding = FragmentMyLocationsBinding.inflate(inflater, container, false)
 
 		val myLocationsAdapter = MyLocationsAdapter(object: MyLocationsAdapter.ItemCallback {

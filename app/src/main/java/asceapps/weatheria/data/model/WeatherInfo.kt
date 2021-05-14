@@ -4,12 +4,10 @@ import android.text.format.DateUtils
 import asceapps.weatheria.data.base.IDed
 import java.text.NumberFormat
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DecimalStyle
+import kotlin.math.min
 
 class WeatherInfo(
 	val location: Location,
@@ -17,10 +15,9 @@ class WeatherInfo(
 	val current: Current,
 	val hourly: List<Hourly>,
 	val daily: List<Daily>
-) : IDed {
+): IDed {
 
 	override val id = location.id
-
 	override fun hashCode() = id + lastUpdateInstant.epochSecond.toInt()
 
 	// if daily includes today, get it, else, get last day
@@ -28,29 +25,53 @@ class WeatherInfo(
 	// if hourly includes this hour, get it, else get last hour
 	val thisHour = Instant.now().let { hourly.lastOrNull { hour -> hour.hour < it } } ?: hourly[0]
 
-	val secondOfToday get() = LocalTime.now(location.zoneOffset).toSecondOfDay()
-	val secondOfSunriseToday get() = localSecondOfDay(today.sunrise, location.zoneOffset)
-	val secondOfSunsetToday get() = localSecondOfDay(today.sunset, location.zoneOffset)
+	val partOfDay: Pair<Int, Float>
+		get() {
+			val secondsInDay = 24 * 60 * 60f
+			val now = Instant.now()
+			val nowSecondOfDay = now.epochSecond % secondsInDay
+			val zeroSecondOfDay = now.epochSecond - nowSecondOfDay
+			// all values below are in fractions and not seconds
+			val nowF = nowSecondOfDay / secondsInDay
+			// sun- rise/set are taken from approx of `today`
+			val sunriseF = (today.sunrise.epochSecond % secondsInDay) / secondsInDay
+			val sunsetF = (today.sunset.epochSecond % secondsInDay) / secondsInDay
+			// transitionF is dawn or dusk (~70 min at the equator).
+			// for simplicity, make it 1 hour before/after sun- rise/set.
+			// near poles, days/nights can be too long, so
+			// ensure transition is min of 1 hour or half of smaller of day/night
+			val dayLengthF = sunsetF - sunriseF
+			val nightLengthF = 1 - dayLengthF
+			val transitionF = min(1 / 24f, min(dayLengthF, nightLengthF) / 2)
+
+			val startOfDawnF = sunriseF - transitionF
+			val endOfDawnF = sunriseF + transitionF
+			val startOfDuskF = sunsetF - transitionF
+			val endOfDuskF = sunsetF + transitionF
+			return when {
+				nowF < startOfDawnF -> 0 to 0f
+				nowF < sunriseF -> 1 to (nowF - startOfDawnF) / transitionF
+				nowF < endOfDawnF -> 2 to (nowF - sunriseF) / transitionF
+				nowF < startOfDuskF -> 3 to 0f
+				nowF < sunsetF -> 4 to (nowF - startOfDuskF) / transitionF
+				nowF < endOfDuskF -> 5 to (nowF - sunsetF) / transitionF
+				else -> 0 to 0f
+			}
+		}
 
 	// todo make most of these properties value classes in kotlin 1.5
 	val localNow get() = localDateTime(location.zoneOffset)
 	val lastUpdate get() = relativeTime(lastUpdateInstant)
-
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
 	val currentWindSpeed get() = speed(current.windSpeed)
 	val currentHumidity get() = percent(current.humidity)
 	val currentDewPoint get() = temp(current.dewPoint)
 	val todayMinMax get() = minMax(today.min, today.max)
-	val todaySunrise get() = time(today.sunrise, location.zoneOffset)
-	val todaySunset get() = time(today.sunset, location.zoneOffset)
+	val todaySunrise get() = localTime(today.sunrise, location.zoneOffset)
+	val todaySunset get() = localTime(today.sunset, location.zoneOffset)
 
 	companion object {
-
-		private fun localSecondOfDay(instant: Instant, offset: ZoneOffset) =
-			LocalDateTime.ofInstant(instant, offset)
-				.toLocalTime()
-				.toSecondOfDay()
 
 		// region formatting
 		fun setFormatSystem(metric: Boolean, speedUnit: String) {
@@ -79,9 +100,9 @@ class WeatherInfo(
 			DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
 
 		private fun localDateTime(offset: ZoneOffset): String =
-			dtFormatter.format(OffsetDateTime.now(offset))
+			dtFormatter.format(Instant.now().atOffset(offset))
 
-		private fun time(instant: Instant, offset: ZoneOffset): String =
+		private fun localTime(instant: Instant, offset: ZoneOffset): String =
 			tFormatter.format(instant.atOffset(offset))
 
 		private fun temp(deg: Int) =

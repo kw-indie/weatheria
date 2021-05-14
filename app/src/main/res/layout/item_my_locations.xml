@@ -17,7 +17,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="?attr/listPreferredItemHeight"
 			android:paddingHorizontal="?attr/listPreferredItemHeight"
-			android:text="@{item.locationName}"
+			android:text="@{item.location.name + ' ' + item.location.country}"
 			tools:text="@tools:sample/cities"/>
 		<ImageButton
 			android:id="@+id/ib_delete"

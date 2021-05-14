@@ -33,7 +33,6 @@ class WeatherInfo(
 	val secondOfSunsetToday get() = localSecondOfDay(today.sunset, location.zoneOffset)
 
 	// todo make most of these properties value classes in kotlin 1.5
-	val locationName get() = commaSep(location.name, location.country)
 	val localNow get() = localDateTime(location.zoneOffset)
 	val lastUpdate get() = relativeTime(lastUpdateInstant)
 
@@ -75,7 +74,6 @@ class WeatherInfo(
 		private val tFormatter = DateTimeFormatter.ofPattern("h:mm a")
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
 
-		private fun commaSep(vararg str: String) = str.joinToString()
 		// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build() for arabic numbers
 		private fun relativeTime(instant: Instant): CharSequence =
 			DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())

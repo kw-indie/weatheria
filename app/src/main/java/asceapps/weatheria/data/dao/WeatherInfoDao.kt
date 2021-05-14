@@ -22,11 +22,13 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract suspend fun getLocations(): List<LocationEntity>
 
+	@Query("SELECT COUNT() FROM locations")
+	abstract suspend fun getLocationsCount(): Int
+
 	@Transaction
 	open suspend fun insert(info: WeatherInfoEntity) {
 		with(info) {
-			location.pos = getLocationsCount()
-			upsertLocation(location)
+			insertLocation(location)
 			upsertCurrent(current)
 			upsertHourly(hourly)
 			upsertDaily(daily)
@@ -34,15 +36,18 @@ abstract class WeatherInfoDao {
 	}
 
 	@Transaction
-	open suspend fun update(info: WeatherInfoEntity) {
-		with(info) {
-			upsertLocation(location)
-			upsertCurrent(current)
-			deleteHourly(location.id) // delete old
-			upsertHourly(hourly)
-			deleteDaily(location.id) // delete old
-			upsertDaily(daily)
-		}
+	open suspend fun update(
+		zoneOffset: Int,
+		current: CurrentEntity,
+		hourly: List<HourlyEntity>,
+		daily: List<DailyEntity>
+	) {
+		updateLocation(current.locationId, zoneOffset)
+		upsertCurrent(current)
+		deleteHourly(current.locationId) // delete old
+		upsertHourly(hourly)
+		deleteDaily(current.locationId) // delete old
+		upsertDaily(daily)
 	}
 
 	@Transaction
@@ -66,11 +71,11 @@ abstract class WeatherInfoDao {
 	@Query("DELETE FROM locations")
 	abstract suspend fun deleteAll()
 
-	@Query("SELECT COUNT() FROM locations")
-	abstract suspend fun getLocationsCount(): Int
+	@Insert(onConflict = OnConflictStrategy.IGNORE)
+	protected abstract suspend fun insertLocation(l: LocationEntity)
 
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	protected abstract suspend fun upsertLocation(l: LocationEntity)
+	@Query("UPDATE locations SET zoneOffset = :zoneOffset WHERE id = :id")
+	protected abstract suspend fun updateLocation(id: Int, zoneOffset: Int)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun upsertCurrent(c: CurrentEntity)

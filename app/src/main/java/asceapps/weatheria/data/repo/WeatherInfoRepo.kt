@@ -11,6 +11,7 @@ import asceapps.weatheria.data.entity.LocationEntity
 import asceapps.weatheria.data.entity.WeatherInfoEntity
 import asceapps.weatheria.data.model.Current
 import asceapps.weatheria.data.model.Daily
+import asceapps.weatheria.data.model.FoundLocation
 import asceapps.weatheria.data.model.Hourly
 import asceapps.weatheria.data.model.Location
 import asceapps.weatheria.data.model.WeatherInfo
@@ -43,16 +44,33 @@ class WeatherInfoRepo @Inject constructor(
 
 	fun getAll() = dao.loadAll()
 		.map { list -> list.map { e -> entityToModel(e) } }
-		.flowOn(ioDispatcher)
 		.asResult() // concerned over 2 consecutive Flow.map()'s
+		.flowOn(ioDispatcher)
 
 	// todo move to locationRepo? add location there, then when this repo does not find info, make it fetch
-	fun add(loc: BaseLocation) = resultFlow<Unit> {
+	fun add(fl: FoundLocation) = resultFlow<Unit> {
+		val ocr = withContext(ioDispatcher) {
+			api.oneCall(fl.lat.toString(), fl.lng.toString())
+		}
+		val pos = dao.getLocationsCount()
+		val l = with(fl) {
+			LocationEntity(id, lat, lng, name, country, ocr.timezone_offset, pos)
+		}
+		val c = extractCurrent(fl.id, ocr)
+		val h = extractHourly(fl.id, ocr)
+		val d = extractDaily(fl.id, ocr)
+		val infoEntity = WeatherInfoEntity(l, c, h, d)
+		dao.insert(infoEntity)
+	}
+
+	private suspend fun internalRefresh(loc: BaseLocation) {
 		val ocr = withContext(ioDispatcher) {
 			api.oneCall(loc.lat.toString(), loc.lng.toString())
 		}
-		val infoEntity = responseToEntity(loc, ocr)
-		dao.insert(infoEntity)
+		val c = extractCurrent(loc.id, ocr)
+		val h = extractHourly(loc.id, ocr)
+		val d = extractDaily(loc.id, ocr)
+		dao.update(ocr.timezone_offset, c, h, d)
 	}
 
 	fun refresh(info: WeatherInfo) = resultFlow<Unit> {
@@ -66,14 +84,6 @@ class WeatherInfoRepo @Inject constructor(
 			internalRefresh(e)
 			emit(Loading(100 / size * (i + 1)))
 		}
-	}
-
-	private suspend fun internalRefresh(loc: BaseLocation) {
-		val updatedInfo = withContext(ioDispatcher) {
-			val ocr = with(loc) { api.oneCall(lat.toString(), lng.toString()) }
-			responseToEntity(loc, ocr)
-		}
-		dao.update(updatedInfo)
 	}
 
 	suspend fun reorder(info: WeatherInfo, toPos: Int) {
@@ -90,17 +100,34 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun responseToEntity(l: BaseLocation, ocr: OneCallResponse): WeatherInfoEntity {
-			val location = with(l) {
-				LocationEntity(id, lat, lng, name, country, ocr.timezone_offset)
-			}
-			val current = with(ocr.current) {
-				CurrentEntity(
-					l.id,
+		private fun extractCurrent(locationId: Int, ocr: OneCallResponse) = with(ocr.current) {
+			CurrentEntity(
+				locationId,
+				dt,
+				weather[0].id,
+				wind_speed,
+				meteorologicalToCircular(wind_deg),
+				pressure,
+				humidity,
+				dew_point.roundToInt(),
+				clouds,
+				temp.roundToInt(),
+				feels_like.roundToInt(),
+				visibility,
+				rain?._1h,
+				snow?._1h
+			)
+		}
+
+		private fun extractHourly(locationId: Int, ocr: OneCallResponse) = ocr.hourly.map {
+			with(it) {
+				val weather = weather[0]
+				HourlyEntity(
+					locationId,
 					dt,
-					weather[0].id,
+					weather.id,
 					wind_speed,
-					wind_deg,
+					meteorologicalToCircular(wind_deg),
 					pressure,
 					humidity,
 					dew_point.roundToInt(),
@@ -108,72 +135,59 @@ class WeatherInfoRepo @Inject constructor(
 					temp.roundToInt(),
 					feels_like.roundToInt(),
 					visibility,
+					(pop * 100).roundToInt(),
 					rain?._1h,
 					snow?._1h
 				)
 			}
-			val hourly = ocr.hourly.map {
-				with(it) {
-					val weather = weather[0]
-					HourlyEntity(
-						l.id,
-						dt,
-						weather.id,
-						wind_speed,
-						wind_deg,
-						pressure,
-						humidity,
-						dew_point.roundToInt(),
-						clouds,
-						temp.roundToInt(),
-						feels_like.roundToInt(),
-						visibility,
-						(pop * 100).roundToInt(),
-						rain?._1h,
-						snow?._1h
-					)
-				}
+		}
+
+		private fun extractDaily(locationId: Int, ocr: OneCallResponse) = ocr.daily.map {
+			with(it) {
+				val weather = weather[0]
+				val temp = it.temp
+				val feel = it.feels_like
+				DailyEntity(
+					locationId,
+					dt,
+					weather.id,
+					wind_speed,
+					meteorologicalToCircular(wind_deg),
+					pressure,
+					humidity,
+					dew_point.roundToInt(),
+					clouds,
+					temp.min.roundToInt(),
+					temp.max.roundToInt(),
+					temp.morn.roundToInt(),
+					temp.day.roundToInt(),
+					temp.eve.roundToInt(),
+					temp.night.roundToInt(),
+					feel.morn.roundToInt(),
+					feel.day.roundToInt(),
+					feel.eve.roundToInt(),
+					feel.night.roundToInt(),
+					sunrise,
+					sunset,
+					(pop * 100).roundToInt(),
+					uvi,
+					rain,
+					snow
+				)
 			}
-			val daily = ocr.daily.map {
-				with(it) {
-					val weather = weather[0]
-					val temp = it.temp
-					val feel = it.feels_like
-					DailyEntity(
-						l.id,
-						dt,
-						weather.id,
-						wind_speed,
-						wind_deg,
-						pressure,
-						humidity,
-						dew_point.roundToInt(),
-						clouds,
-						temp.min.roundToInt(),
-						temp.max.roundToInt(),
-						temp.morn.roundToInt(),
-						temp.day.roundToInt(),
-						temp.eve.roundToInt(),
-						temp.night.roundToInt(),
-						feel.morn.roundToInt(),
-						feel.day.roundToInt(),
-						feel.eve.roundToInt(),
-						feel.night.roundToInt(),
-						sunrise,
-						sunset,
-						(pop * 100).roundToInt(),
-						uvi,
-						rain,
-						snow
-					)
-				}
-			}
-			return WeatherInfoEntity(location, current, hourly, daily)
 		}
 
 		private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
 			val location = with(info.location) {
-				Location(id, lat, lng, name, country, ZoneOffset.ofTotalSeconds(zoneOffset), pos)
+				Location(
+					id,
+					lat,
+					lng,
+					name,
+					countryCodeToFlag(country),
+					ZoneOffset.ofTotalSeconds(zoneOffset),
+					pos
+				)
 			}
 			val daily = info.daily.map {
 				with(it) {
@@ -291,12 +305,19 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
+		private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
+
+		private fun countryCodeToFlag(cc: String): String {
+			val offset = 0x1F1E6 - 0x41 // tiny A - normal A
+			val cps = IntArray(2) { i -> cc[i].code + offset }
+			return String(cps, 0, cps.size)
+		}
+
 		// region weather condition stuff
 		private val conditionIds = intArrayOf(
-			200, 201, 202, 210, 211, 212, 221, 230, 231, 232, 300, 301, 302,
-			310, 311, 312, 313, 314, 321, 500, 501, 502, 503, 504, 511, 520, 521, 522, 531, 600, 601, 602,
-			611, 612, 613, 615, 616, 620, 621, 622, 701, 711, 721, 731, 741, 751, 761, 762, 771, 781, 800,
-			801, 802, 803, 804
+			200, 201, 202, 210, 211, 212, 221, 230, 231, 232, 300, 301, 302, 310, 311, 312, 313, 314, 321,
+			500, 501, 502, 503, 504, 511, 520, 521, 522, 531, 600, 601, 602, 611, 612, 613, 615, 616, 620,
+			621, 622, 701, 711, 721, 731, 741, 751, 761, 762, 771, 781, 800, 801, 802, 803, 804
 		)
 
 		private fun conditionIndex(conditionId: Int) = conditionIds.binarySearch(conditionId)

@@ -34,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.HttpException
 import java.io.IOException
 import java.io.InterruptedIOException
+import kotlin.math.min
 
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
@@ -180,30 +181,37 @@ class HomeFragment: Fragment() {
 			// fraction of sun rise/set in real OR approx. today
 			val riseFraction = info.secondOfSunriseToday / daySeconds
 			val setFraction = info.secondOfSunsetToday / daySeconds
-			// 'delta' = time to transition between day/night, passing through dawn/dusk
-			// user .coerceIn(1 / 24f / 60, abs(setFraction - riseFraction) / 2) to coerce value
-			// between 1 min and half day/night
-			val deltaFraction = 1 / 24f // transition takes 2 hours, 1 hour before/after dawn/dusk
+			// transition time is dawn or dusk
+			// it's said that this duration is ~70 min at equator
+			// for simplicity, our transition takes 1 hour, 30 min before/after dawn/dusk
+			val transitionTime = 1 / 48f
+			// corrected transition time (ctt) is for edge cases (at poles)
+			// where day/night -time can be too short/long.
+			val daytime = setFraction - riseFraction
+			val nighttime = 1 - daytime
+			val smaller = min(daytime, nighttime)
+			// so now we have ctf in [1hour - half of the smaller of day/night]
+			val ctt = transitionTime.coerceAtMost(smaller / 2)
 			// new colors to animate to
 			when {
-				dayFraction < riseFraction - deltaFraction -> night
+				dayFraction < riseFraction - ctt -> night
 				dayFraction < riseFraction -> {
-					val head = riseFraction - deltaFraction
+					val head = riseFraction - ctt
 					val localFraction = (dayFraction - head) / (riseFraction - head)
 					gradientEvaluator.evaluate(localFraction, night, dawn)
 				}
-				dayFraction < riseFraction + deltaFraction -> {
-					val localFraction = (dayFraction - riseFraction) / deltaFraction
+				dayFraction < riseFraction + ctt -> {
+					val localFraction = (dayFraction - riseFraction) / ctt
 					gradientEvaluator.evaluate(localFraction, dawn, day)
 				}
-				dayFraction < setFraction - deltaFraction -> day
+				dayFraction < setFraction - ctt -> day
 				dayFraction < setFraction -> {
-					val head = setFraction - deltaFraction
+					val head = setFraction - ctt
 					val localFraction = (dayFraction - head) / (setFraction - head)
 					gradientEvaluator.evaluate(localFraction, day, dusk)
 				}
-				dayFraction < setFraction + deltaFraction -> {
-					val localFraction = (dayFraction - setFraction) / deltaFraction
+				dayFraction < setFraction + ctt -> {
+					val localFraction = (dayFraction - setFraction) / ctt
 					gradientEvaluator.evaluate(localFraction, dusk, night)
 				}
 				else -> night

@@ -29,7 +29,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/_24sdp"
 				android:gravity="center_horizontal"
-				android:text="@{item.locationName}"
+				android:text="@{item.location.name}"
 				android:textSize="@dimen/_14ssp"
 				android:textStyle="bold"
 				app:layout_constraintEnd_toStartOf="@+id/mid_v_guideline"

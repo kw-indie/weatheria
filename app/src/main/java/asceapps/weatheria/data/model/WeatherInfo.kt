@@ -14,7 +14,13 @@ class WeatherInfo(
 	private val lastUpdateInstant: Instant,
 	val current: Current,
 	val hourly: List<Hourly>,
-	val daily: List<Daily>
+	val daily: List<Daily>,
+	/**
+	 * 0: High, within an hour
+	 * 1: Medium, within 2 days
+	 * 2: Low, within a week
+	 */
+	val accuracy: Int
 ): IDed {
 
 	override val id = location.id

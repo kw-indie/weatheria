@@ -42,6 +42,10 @@ class WeatherInfoRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
+	suspend fun prune() {
+		dao.prune()
+	}
+
 	fun getAll() = dao.loadAll()
 		.map { list -> list.map { e -> entityToModel(e) } }
 		.asResult() // concerned over 2 consecutive Flow.map()'s
@@ -189,6 +193,8 @@ class WeatherInfoRepo @Inject constructor(
 					pos
 				)
 			}
+			val lastUpdate = toInstant(info.current.dt)
+			val now = Instant.now()
 			val daily = info.daily.map {
 				with(it) {
 					Daily(
@@ -203,33 +209,39 @@ class WeatherInfoRepo @Inject constructor(
 					)
 				}
 			}
-			val first3DaysDaytime = arrayListOf(
-				with(daily[0]) { sunrise..sunset },
-				with(daily[1]) { sunrise..sunset },
-				with(daily[2]) { sunrise..sunset }
-			)
+			// after the introduction of prune(), taking hardcoded first 3 elements in daily can throw IOOBE
+			// so just take the closest day to now and extrapolate
+			val closest3DaysDaytime = with(daily.last { it.date < now }) {
+				val oneDay = Duration.ofDays(1)
+				val twoDays = Duration.ofDays(2)
+				arrayOf(
+					sunrise..sunset,
+					(sunrise + oneDay)..(sunset + oneDay),
+					(sunrise + twoDays)..(sunset + twoDays)
+				)
+			}
 			val hourly = info.hourly.map {
 				with(it) {
 					val hour = toInstant(dt)
 					// hourly data are only from first 48 hours, starting from this hour not 00:00
 					Hourly(
 						hour,
-						conditionIcon(conditionId, first3DaysDaytime.any { daytime -> hour in daytime }),
+						conditionIcon(conditionId, closest3DaysDaytime.any { daytime -> hour in daytime }),
 						temp,
 						pop
 					)
 				}
 			}
-			val lastUpdate = toInstant(info.current.dt)
-			val now = Instant.now()
 			val elapsedTime = Duration.between(lastUpdate, now)
+			val accuracy: Int
 			val current = when {
 				elapsedTime.toHours() < 1 -> { // fresh
+					accuracy = 0 // high
 					with(info.current) {
 						Current(
 							toInstant(dt),
 							conditionIndex(conditionId),
-							conditionIcon(conditionId, now in first3DaysDaytime[0]),
+							conditionIcon(conditionId, now in closest3DaysDaytime[0]),
 							temp,
 							feelsLike,
 							pressure,
@@ -238,17 +250,19 @@ class WeatherInfoRepo @Inject constructor(
 							clouds,
 							visibility,
 							windSpeed,
-							windDir,
-							0 // high
+							windDir
 						)
 					}
 				}
-				elapsedTime.toHours() < info.hourly.size -> { // approximate from hourly
+				// hardcoded 48 instead of hourly.size
+				// since last hour is always 48 later and hourly.size changes
+				elapsedTime.toHours() < 48 -> { // approximate from hourly
+					accuracy = 1 // medium
 					with(info.hourly.last { it.dt < now.epochSecond }) {
 						Current(
 							toInstant(dt),
 							conditionIndex(conditionId),
-							conditionIcon(conditionId, first3DaysDaytime.any { daytime -> now in daytime }),
+							conditionIcon(conditionId, closest3DaysDaytime.any { daytime -> now in daytime }),
 							temp,
 							feelsLike,
 							pressure,
@@ -257,12 +271,12 @@ class WeatherInfoRepo @Inject constructor(
 							clouds,
 							visibility,
 							windSpeed,
-							windDir,
-							1 // medium
+							windDir
 						)
 					}
 				}
 				else -> { // approximate from daily, if no match, just use last day
+					accuracy = 2 // low
 					val day = info.daily.last { it.dt < now.epochSecond }
 					// we can push all times to offset, but we'll get the same result with default offset
 					val nowTime = LocalTime.now()
@@ -294,13 +308,12 @@ class WeatherInfoRepo @Inject constructor(
 							// no visibility in daily, use last hour's
 							info.hourly.last().visibility,
 							windSpeed,
-							windDir,
-							2 // low
+							windDir
 						)
 					}
 				}
 			}
-			return WeatherInfo(location, lastUpdate, current, hourly, daily)
+			return WeatherInfo(location, lastUpdate, current, hourly, daily, accuracy)
 		}
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())

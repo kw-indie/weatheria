@@ -28,7 +28,7 @@ abstract class WeatherInfoDao {
 	@Transaction
 	open suspend fun insert(info: WeatherInfoEntity) {
 		with(info) {
-			insertLocation(location)
+			upsertLocation(location)
 			upsertCurrent(current)
 			upsertHourly(hourly)
 			upsertDaily(daily)
@@ -71,8 +71,48 @@ abstract class WeatherInfoDao {
 	@Query("DELETE FROM locations")
 	abstract suspend fun deleteAll()
 
-	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	protected abstract suspend fun insertLocation(l: LocationEntity)
+	@Transaction
+	open suspend fun prune() {
+		val nowSeconds = (System.currentTimeMillis() / 1000).toInt()
+		val prevHour = nowSeconds - 60 * 60
+		val prevDay = nowSeconds - 60 * 60 * 24
+		val locations = getLocations()
+		locations.forEach { l ->
+			val lastHour = getLastHour(l.id)
+			if(nowSeconds < lastHour) {
+				deleteAllHoursBefore(l.id, prevHour)
+			} else {
+				deleteAllHoursButLast(l.id)
+			}
+			val lastDay = getLastDay(l.id)
+			if(nowSeconds < lastDay) {
+				deleteAllDaysBefore(l.id, prevDay)
+			} else {
+				deleteAllDaysButLast(l.id)
+			}
+		}
+	}
+
+	@Query("SELECT MAX(dt) from hourly WHERE locationId = :locationId")
+	protected abstract suspend fun getLastHour(locationId: Int): Int
+
+	@Query("DELETE FROM hourly WHERE locationId = :locationId AND dt < :unixSeconds")
+	protected abstract suspend fun deleteAllHoursBefore(locationId: Int, unixSeconds: Int)
+
+	@Query("DELETE FROM hourly WHERE locationId = :locationId AND dt != (SELECT MAX(dt) FROM hourly WHERE locationId = :locationId)")
+	protected abstract suspend fun deleteAllHoursButLast(locationId: Int)
+
+	@Query("SELECT MAX(dt) from daily WHERE locationId = :locationId")
+	protected abstract suspend fun getLastDay(locationId: Int): Int
+
+	@Query("DELETE FROM daily WHERE locationId = :locationId AND dt < :unixSeconds")
+	protected abstract suspend fun deleteAllDaysBefore(locationId: Int, unixSeconds: Int)
+
+	@Query("DELETE FROM daily WHERE locationId = :locationId AND dt != (SELECT MAX(dt) FROM daily WHERE locationId = :locationId)")
+	protected abstract suspend fun deleteAllDaysButLast(locationId: Int)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	protected abstract suspend fun upsertLocation(l: LocationEntity)
 
 	@Query("UPDATE locations SET zoneOffset = :zoneOffset WHERE id = :id")
 	protected abstract suspend fun updateLocation(id: Int, zoneOffset: Int)

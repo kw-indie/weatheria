@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,10 +28,6 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.onStart {
-			emit(Loading())
-			infoRepo.prune()
-		}
 		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000), 1)
 	// saving pos is straightforward/easy, saving id is doable but more complex for no gains
 	var selectedLocation = settingsRepo.selectedLocation // only assigns init value

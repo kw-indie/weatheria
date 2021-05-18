@@ -12,10 +12,11 @@ import asceapps.weatheria.R
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
+import asceapps.weatheria.worker.DatabasePruneWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import java.time.Duration
-import java.time.Instant
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -43,6 +44,7 @@ class SettingsRepo @Inject constructor(
 		// irl, this happens when app settings are auto backed up
 		updateUnits()
 		updateAutoRefresh()
+		updatePruneWorker()
 	}
 
 	val changesFlow get() = prefs.onChangeFlow()
@@ -102,15 +104,15 @@ class SettingsRepo @Inject constructor(
 			.setRequiredNetworkType(NetworkType.UNMETERED)
 			.setRequiresBatteryNotLow(true)
 			.build()
-		val now = Instant.now()
+		val now = LocalDateTime.now()
 		val lastMidnight = now.truncatedTo(ChronoUnit.DAYS)
 		var nextSection = lastMidnight
 		do {
-			nextSection = nextSection.plus(periodL, ChronoUnit.HOURS)
+			nextSection = nextSection.plusHours(periodL)
 		} while(nextSection < now)
 		val secondsUntilNextSection = Duration.between(now, nextSection).seconds
 		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(periodL, TimeUnit.HOURS)
-			.addTag(autoRefreshPeriod)
+			.addTag(autoRefreshPeriod) // to cancel by tag
 			.setConstraints(constraints)
 			.setInitialDelay(secondsUntilNextSection, TimeUnit.SECONDS)
 			.build()
@@ -122,5 +124,20 @@ class SettingsRepo @Inject constructor(
 		// debugging commands:
 		// adb shell dumpsys jobscheduler
 		// adb shell am broadcast -a "androidx.work.diagnostics.REQUEST_DIAGNOSTICS" -p "<package_name>"
+	}
+
+	private fun updatePruneWorker() {
+		val pruneWorkName = DatabasePruneWorker::class.qualifiedName!!
+		val now = LocalDateTime.now()
+		val nextMidnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1)
+		val secondsUntilMidnight = Duration.between(now, nextMidnight).seconds
+		val work = PeriodicWorkRequestBuilder<DatabasePruneWorker>(1, TimeUnit.DAYS)
+			.setInitialDelay(secondsUntilMidnight, TimeUnit.SECONDS)
+			.build()
+		workManager.enqueueUniquePeriodicWork(
+			pruneWorkName,
+			ExistingPeriodicWorkPolicy.KEEP,
+			work
+		)
 	}
 }

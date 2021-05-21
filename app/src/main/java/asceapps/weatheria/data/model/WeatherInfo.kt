@@ -1,7 +1,7 @@
 package asceapps.weatheria.data.model
 
 import android.text.format.DateUtils
-import asceapps.weatheria.data.base.IDed
+import asceapps.weatheria.data.base.Listable
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.ZoneOffset
@@ -11,7 +11,6 @@ import kotlin.math.min
 
 class WeatherInfo(
 	val location: Location,
-	private val lastUpdateInstant: Instant,
 	val current: Current,
 	val hourly: List<Hourly>,
 	val daily: List<Daily>,
@@ -21,10 +20,10 @@ class WeatherInfo(
 	 * 2: Low, within a week
 	 */
 	val accuracy: Int
-): IDed {
+): Listable {
 
 	override val id = location.id
-	override fun hashCode() = id + lastUpdateInstant.epochSecond.toInt()
+	override fun hashCode() = id + location.lastUpdate.epochSecond.toInt()
 
 	// if daily includes today, get it, else, get last day
 	val today = Instant.now().let { daily.lastOrNull { day -> day.date < it } } ?: daily[0]
@@ -67,7 +66,7 @@ class WeatherInfo(
 
 	// todo make most of these properties value classes in kotlin 1.5
 	val localNow get() = localDateTime(location.zoneOffset)
-	val lastUpdate get() = relativeTime(lastUpdateInstant)
+	val lastUpdate get() = relativeTime(location.lastUpdate)
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
 	val currentWindSpeed get() = speed(current.windSpeed)

@@ -128,10 +128,14 @@ class SettingsRepo @Inject constructor(
 
 	private fun updatePruneWorker() {
 		val pruneWorkName = DatabasePruneWorker::class.qualifiedName!!
+		val constraints = Constraints.Builder()
+			.setRequiresBatteryNotLow(true)
+			.build()
 		val now = LocalDateTime.now()
 		val nextMidnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1)
 		val secondsUntilMidnight = Duration.between(now, nextMidnight).seconds
 		val work = PeriodicWorkRequestBuilder<DatabasePruneWorker>(1, TimeUnit.DAYS)
+			.setConstraints(constraints)
 			.setInitialDelay(secondsUntilMidnight, TimeUnit.SECONDS)
 			.build()
 		workManager.enqueueUniquePeriodicWork(

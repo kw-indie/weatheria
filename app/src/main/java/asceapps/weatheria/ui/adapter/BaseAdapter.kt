@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.BR
-import asceapps.weatheria.data.base.IDed
+import asceapps.weatheria.data.base.Listable
 
-abstract class BaseAdapter<T: IDed, B: ViewDataBinding>:
+abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 	ListAdapter<T, BaseAdapter.BindingHolder<B>>(HashCallback<T>()) {
 
 	init {
@@ -39,7 +39,7 @@ abstract class BaseAdapter<T: IDed, B: ViewDataBinding>:
 	open fun onHolderCreated(holder: BindingHolder<B>) {}
 	//open fun onBindHolder(holder: BindingHolder<B>, item: T) {}
 
-	private class HashCallback<T: IDed>: DiffUtil.ItemCallback<T>() {
+	private class HashCallback<T: Listable>: DiffUtil.ItemCallback<T>() {
 
 		override fun areItemsTheSame(oldT: T, newT: T) = oldT.id == newT.id
 		override fun areContentsTheSame(oldT: T, newT: T) = oldT.hashCode() == newT.hashCode()

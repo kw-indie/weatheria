@@ -42,10 +42,6 @@ class WeatherInfoRepo @Inject constructor(
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-	suspend fun prune() {
-		dao.prune()
-	}
-
 	fun getAll() = dao.loadAll()
 		.map { list -> list.map { e -> entityToModel(e) } }
 		.asResult() // concerned over 2 consecutive Flow.map()'s
@@ -56,9 +52,12 @@ class WeatherInfoRepo @Inject constructor(
 		val ocr = withContext(ioDispatcher) {
 			api.oneCall(fl.lat.toString(), fl.lng.toString())
 		}
-		val pos = dao.getLocationsCount()
 		val l = with(fl) {
-			LocationEntity(id, lat, lng, name, country, ocr.timezone_offset, pos)
+			val zoneOffset = ocr.timezone_offset
+			// or use (System.currentTimeMillis() / 1000).toInt()
+			val lastUpdate = ocr.current.dt
+			val pos = dao.getLocationsCount()
+			LocationEntity(id, lat, lng, name, country, zoneOffset, lastUpdate, pos)
 		}
 		val c = extractCurrent(fl.id, ocr)
 		val h = extractHourly(fl.id, ocr)
@@ -71,10 +70,11 @@ class WeatherInfoRepo @Inject constructor(
 		val ocr = withContext(ioDispatcher) {
 			api.oneCall(loc.lat.toString(), loc.lng.toString())
 		}
+		val lastUpdate = ocr.current.dt // always match with 'add' above
 		val c = extractCurrent(loc.id, ocr)
 		val h = extractHourly(loc.id, ocr)
 		val d = extractDaily(loc.id, ocr)
-		dao.update(ocr.timezone_offset, c, h, d)
+		dao.update(ocr.timezone_offset, lastUpdate, c, h, d)
 	}
 
 	fun refresh(info: WeatherInfo) = resultFlow<Unit> {
@@ -100,6 +100,10 @@ class WeatherInfoRepo @Inject constructor(
 
 	suspend fun deleteAll() {
 		dao.deleteAll()
+	}
+
+	suspend fun prune() {
+		dao.prune()
 	}
 
 	companion object {
@@ -190,10 +194,10 @@ class WeatherInfoRepo @Inject constructor(
 					name,
 					countryCodeToFlag(country),
 					ZoneOffset.ofTotalSeconds(zoneOffset),
+					toInstant(lastUpdate),
 					pos
 				)
 			}
-			val lastUpdate = toInstant(info.current.dt)
 			val now = Instant.now()
 			val daily = info.daily.map {
 				with(it) {
@@ -232,14 +236,13 @@ class WeatherInfoRepo @Inject constructor(
 					)
 				}
 			}
-			val elapsedTime = Duration.between(lastUpdate, now)
+			val elapsedTime = Duration.between(location.lastUpdate, now)
 			val accuracy: Int
 			val current = when {
 				elapsedTime.toHours() < 1 -> { // fresh
 					accuracy = 0 // high
 					with(info.current) {
 						Current(
-							toInstant(dt),
 							conditionIndex(conditionId),
 							conditionIcon(conditionId, now in closest3DaysDaytime[0]),
 							temp,
@@ -260,7 +263,6 @@ class WeatherInfoRepo @Inject constructor(
 					accuracy = 1 // medium
 					with(info.hourly.last { it.dt < now.epochSecond }) {
 						Current(
-							toInstant(dt),
 							conditionIndex(conditionId),
 							conditionIcon(conditionId, closest3DaysDaytime.any { daytime -> now in daytime }),
 							temp,
@@ -286,7 +288,6 @@ class WeatherInfoRepo @Inject constructor(
 					val eve = noon.plusHours(6)
 					with(day) {
 						Current(
-							toInstant(dt),
 							conditionIndex(conditionId),
 							conditionIcon(conditionId, now.epochSecond in sunrise..sunset),
 							when {
@@ -313,7 +314,7 @@ class WeatherInfoRepo @Inject constructor(
 					}
 				}
 			}
-			return WeatherInfo(location, lastUpdate, current, hourly, daily, accuracy)
+			return WeatherInfo(location, current, hourly, daily, accuracy)
 		}
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())

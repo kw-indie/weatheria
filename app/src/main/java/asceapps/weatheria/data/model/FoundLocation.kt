@@ -1,7 +1,7 @@
 package asceapps.weatheria.data.model
 
 import asceapps.weatheria.data.base.BaseLocation
-import asceapps.weatheria.data.base.IDed
+import asceapps.weatheria.data.base.Listable
 
 class FoundLocation(
 	override val id: Int,
@@ -15,7 +15,7 @@ class FoundLocation(
 	val humidity: Int,
 	val windSpeed: Float,
 	val windDir: Int
-): BaseLocation, IDed {
+): BaseLocation, Listable {
 
 	override fun hashCode() = id
 }

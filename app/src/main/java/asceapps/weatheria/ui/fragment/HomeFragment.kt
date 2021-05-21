@@ -106,6 +106,9 @@ class HomeFragment: Fragment() {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					pagerAdapter.submitList(list)
+					// updateColor here fixes issue when fragment is stopped/started,
+					// but onPageChanged not triggered
+					updateColors(list[mainVM.selectedLocation])
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty

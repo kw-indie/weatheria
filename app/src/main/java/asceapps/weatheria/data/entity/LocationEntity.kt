@@ -12,5 +12,6 @@ class LocationEntity(
 	val name: String,
 	val country: String,
 	val zoneOffset: Int,
+	val lastUpdate: Int,
 	val pos: Int
 ): BaseLocation

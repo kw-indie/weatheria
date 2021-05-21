@@ -1,6 +1,6 @@
 package asceapps.weatheria.data.base
 
-interface IDed {
+interface Listable {
 
 	val id: Int
 

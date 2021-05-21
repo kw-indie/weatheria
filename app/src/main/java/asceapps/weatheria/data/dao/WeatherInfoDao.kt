@@ -38,15 +38,15 @@ abstract class WeatherInfoDao {
 	@Transaction
 	open suspend fun update(
 		zoneOffset: Int,
+		lastUpdate: Int,
 		current: CurrentEntity,
 		hourly: List<HourlyEntity>,
 		daily: List<DailyEntity>
 	) {
-		updateLocation(current.locationId, zoneOffset)
+		updateLocation(current.locationId, zoneOffset, lastUpdate)
+		// we don't need to delete old rows now since we have prune
 		upsertCurrent(current)
-		deleteHourly(current.locationId) // delete old
 		upsertHourly(hourly)
-		deleteDaily(current.locationId) // delete old
 		upsertDaily(daily)
 	}
 
@@ -73,49 +73,34 @@ abstract class WeatherInfoDao {
 
 	@Transaction
 	open suspend fun prune() {
+		// this is scheduled to run at midnight.
+		// since we are only dealing with utc times here, no need to bring in local dt
 		val nowSeconds = (System.currentTimeMillis() / 1000).toInt()
-		val prevHour = nowSeconds - 60 * 60
-		val prevDay = nowSeconds - 60 * 60 * 24
-		val locations = getLocations()
-		locations.forEach { l ->
-			val lastHour = getLastHour(l.id)
-			if(nowSeconds < lastHour) {
-				deleteAllHoursBefore(l.id, prevHour)
-			} else {
-				deleteAllHoursButLast(l.id)
-			}
-			val lastDay = getLastDay(l.id)
-			if(nowSeconds < lastDay) {
-				deleteAllDaysBefore(l.id, prevDay)
-			} else {
-				deleteAllDaysButLast(l.id)
-			}
-		}
+		val thisHour = nowSeconds - nowSeconds % 3600
+		val prevHour = thisHour - 3600
+		val thisDay = nowSeconds - nowSeconds % (3600 * 24)
+		// since we don't care what location it is, we wanna prune all locations,
+		// we just run queries on the table directly.
+		// current is valid for 1 hour, then it's approximated by hourly
+		deleteAllCurrentBefore(prevHour) // 'prev' cuz dt might be 11:59, so it's still valid
+		deleteAllHourlyBefore(thisHour) // 'this' cuz first hour is already 'this hour'
+		deleteAllDailyBefore(thisDay) // same as hourly
 	}
 
-	@Query("SELECT MAX(dt) from hourly WHERE locationId = :locationId")
-	protected abstract suspend fun getLastHour(locationId: Int): Int
+	@Query("DELETE FROM current WHERE dt < :unixSeconds")
+	protected abstract suspend fun deleteAllCurrentBefore(unixSeconds: Int)
 
-	@Query("DELETE FROM hourly WHERE locationId = :locationId AND dt < :unixSeconds")
-	protected abstract suspend fun deleteAllHoursBefore(locationId: Int, unixSeconds: Int)
+	@Query("DELETE FROM hourly WHERE dt < :unixSeconds")
+	protected abstract suspend fun deleteAllHourlyBefore(unixSeconds: Int)
 
-	@Query("DELETE FROM hourly WHERE locationId = :locationId AND dt != (SELECT MAX(dt) FROM hourly WHERE locationId = :locationId)")
-	protected abstract suspend fun deleteAllHoursButLast(locationId: Int)
-
-	@Query("SELECT MAX(dt) from daily WHERE locationId = :locationId")
-	protected abstract suspend fun getLastDay(locationId: Int): Int
-
-	@Query("DELETE FROM daily WHERE locationId = :locationId AND dt < :unixSeconds")
-	protected abstract suspend fun deleteAllDaysBefore(locationId: Int, unixSeconds: Int)
-
-	@Query("DELETE FROM daily WHERE locationId = :locationId AND dt != (SELECT MAX(dt) FROM daily WHERE locationId = :locationId)")
-	protected abstract suspend fun deleteAllDaysButLast(locationId: Int)
+	@Query("DELETE FROM daily WHERE dt < :unixSeconds")
+	protected abstract suspend fun deleteAllDailyBefore(unixSeconds: Int)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun upsertLocation(l: LocationEntity)
 
-	@Query("UPDATE locations SET zoneOffset = :zoneOffset WHERE id = :id")
-	protected abstract suspend fun updateLocation(id: Int, zoneOffset: Int)
+	@Query("UPDATE locations SET zoneOffset = :zoneOffset AND lastUpdate = :lastUpdate WHERE id = :id")
+	protected abstract suspend fun updateLocation(id: Int, zoneOffset: Int, lastUpdate: Int)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun upsertCurrent(c: CurrentEntity)

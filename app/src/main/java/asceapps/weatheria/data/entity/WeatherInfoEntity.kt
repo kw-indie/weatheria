@@ -13,13 +13,11 @@ class WeatherInfoEntity(
 	val daily: List<DailyEntity>
 ) {
 
-	override fun hashCode() = location.id + current.dt
-
 	// for distinctUntilChanged
 	override fun equals(other: Any?): Boolean {
 		return other != null &&
 			other is WeatherInfoEntity &&
 			location.id == other.location.id &&
-			current.dt == other.current.dt
+			location.lastUpdate == other.location.lastUpdate
 	}
 }

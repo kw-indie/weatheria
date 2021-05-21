@@ -1,9 +1,6 @@
 package asceapps.weatheria.data.model
 
-import java.time.Instant
-
 class Current(
-	val time: Instant,
 	val conditionIndex: Int,
 	val icon: String,
 	val temp: Int,

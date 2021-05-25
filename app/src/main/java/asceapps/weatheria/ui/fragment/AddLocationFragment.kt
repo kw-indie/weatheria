@@ -4,12 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -208,23 +203,7 @@ class AddLocationFragment: Fragment() {
 		if(addLocationVM.useDeviceForLocation) {
 			requirePermission()
 		} else {
-			addLocationVM.getIpGeolocation().observe(viewLifecycleOwner) {
-				when(it) {
-					is Loading -> {
-						// todo show loading anim
-					}
-					is Success -> {
-						val (lat, lng) = it.data.split(",").map { d -> d.toDouble() }
-						googleMap.animateCamera(
-							CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), maxZoom)
-						)
-					}
-					is Error -> {
-						// todo retrofit errors from homeFragment
-						//showMessage(R.string.error_unknown)
-					}
-				}
-			}
+			addLocationVM.searchByIP()
 		}
 	}
 

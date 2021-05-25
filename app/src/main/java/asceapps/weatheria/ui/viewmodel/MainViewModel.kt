@@ -12,11 +12,7 @@ import asceapps.weatheria.util.asyncPing
 import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +25,7 @@ class MainViewModel @Inject constructor(
 
 	val weatherInfoList = infoRepo.getAll()
 		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000), 1)
+
 	// saving pos is straightforward/easy, saving id is doable but more complex for no gains
 	var selectedLocation = settingsRepo.selectedLocation // only assigns init value
 

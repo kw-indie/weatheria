@@ -18,17 +18,18 @@ import androidx.room.ForeignKey
 class HourlyEntity(
 	val locationId: Int,
 	val dt: Int,
-	val conditionId: Int,
+	val temp: Int,
+	val feelsLike: Int,
+	val condition: Int,
+	val isDay: Boolean,
 	val windSpeed: Float,
 	val windDir: Int,
 	val pressure: Int,
+	val precip: Float,
 	val humidity: Int,
 	val dewPoint: Int,
 	val clouds: Int,
-	val temp: Int,
-	val feelsLike: Int,
 	val visibility: Int,
 	val pop: Int,
-	val rain: Float? = null,
-	val snow: Float? = null
+	val uv: Int
 )

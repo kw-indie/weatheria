@@ -8,9 +8,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.ui.drawable.DirectionDrawable
-import coil.load
 
 // - can have multiple attr in 1 method like:
 // @BindingAdapter(values = [attr1, attr2, ..], requireAll = Boolean)
@@ -31,12 +29,11 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 
 @BindingAdapter("icon")
 fun loadIconFromUrl(view: ImageView, icon: String) {
-	view.load(WeatherApi.ICON_URL_FORMAT.format(icon)) {
-		// placeholder(res_id)
-		// error(res_id)
-		// transformations(CircleCropTransformation())
-		crossfade(true)
-	}
+	view.setImageResource(view.resources.getIdentifier(
+		icon,
+		"drawable",
+		view.context.packageName
+	))
 }
 
 @BindingAdapter("windDirection")

@@ -11,5 +11,6 @@ class Current(
 	val clouds: Int,
 	val visibility: Int,
 	val windSpeed: Float,
-	val windDir: Int
+	val windDir: Int,
+	val uv: Int
 )

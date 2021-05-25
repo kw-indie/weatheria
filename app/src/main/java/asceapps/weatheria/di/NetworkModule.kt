@@ -1,8 +1,6 @@
 package asceapps.weatheria.di
 
 import asceapps.weatheria.BuildConfig
-import asceapps.weatheria.data.api.IPApi
-import asceapps.weatheria.data.api.ToStringConverterFactory
 import asceapps.weatheria.data.api.WeatherApi
 import dagger.Module
 import dagger.Provides
@@ -20,33 +18,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-	companion object {
-
-		private const val CALL_TIMEOUT = 10L
-	}
-
 	@Provides
-	@Singleton
-	fun provideIPApi(): IPApi {
-		// this nice api is free and does not even require an API key
-		val client = OkHttpClient.Builder()
-			.callTimeout(CALL_TIMEOUT, TimeUnit.SECONDS)
-			.build()
-		return Retrofit.Builder()
-			//.baseUrl("http://ip-api.com/json") // no free https
-			.baseUrl("https://ipapi.co/")
-			.client(client)
-			.addConverterFactory(ToStringConverterFactory())
-			.build()
-			.create()
-	}
-
-	@Provides
-	@Singleton
+	@Singleton // fixme prolly not needed
 	fun provideWeatherApi(): WeatherApi {
 		val interceptor = Interceptor { chain ->
 			val newUrl = chain.request().url.newBuilder()
-				.addQueryParameter("appId", BuildConfig.WEATHER_APP_ID)
+				.addQueryParameter("key", BuildConfig.WEATHER_API_KEY)
 				.build()
 			val request = chain.request().newBuilder()
 				.url(newUrl)
@@ -55,10 +32,10 @@ class NetworkModule {
 		}
 		val client = OkHttpClient.Builder()
 			.addInterceptor(interceptor)
-			.callTimeout(CALL_TIMEOUT, TimeUnit.SECONDS) // throws InterruptedIOException
+			.callTimeout(10, TimeUnit.SECONDS) // throws InterruptedIOException
 			.build()
 		return Retrofit.Builder()
-			.baseUrl("https://api.openweathermap.org/data/2.5/")
+			.baseUrl("https://api.weatherapi.com/v1/")
 			.client(client)
 			.addConverterFactory(GsonConverterFactory.create())
 			.build()

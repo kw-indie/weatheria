@@ -9,7 +9,6 @@ import android.net.NetworkRequest
 import androidx.annotation.RequiresPermission
 import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -67,16 +66,14 @@ suspend fun asyncPing() = withContext(Dispatchers.IO) {
 }
 
 // todo throttle, don't start new if already started
-private fun blockingPing(): Result<Unit> {
-	return try {
-		Socket().use {
-			// dns servers listen on port 53
-			val socketAddress = InetSocketAddress("8.8.8.8", 53)
-			it.connect(socketAddress, TIMEOUT)
-		}
-		Success(Unit)
-	} catch(e: Exception) {
-		e.printStackTrace()
-		Error(e)
+private fun blockingPing() = try {
+	Socket().use {
+		// dns servers listen on port 53
+		val socketAddress = InetSocketAddress("8.8.8.8", 53)
+		it.connect(socketAddress, TIMEOUT)
 	}
+	Success(Unit)
+} catch(e: Exception) {
+	e.printStackTrace()
+	Error(e)
 }

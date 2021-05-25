@@ -2,12 +2,7 @@ package asceapps.weatheria.ui.fragment
 
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.animation.ArgbEvaluator
 import androidx.core.animation.ObjectAnimator
@@ -106,14 +101,15 @@ class HomeFragment: Fragment() {
 					swipeRefresh.isRefreshing = false
 					val list = it.data
 					pagerAdapter.submitList(list)
-					// updateColor here fixes issue when fragment is stopped/started,
-					// but onPageChanged not triggered
-					updateColors(list[mainVM.selectedLocation])
 					val isEmpty = list.isEmpty()
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 					if(!isEmpty) {
-						pager.setCurrentItem(mainVM.selectedLocation, false)
+						val selected = mainVM.selectedLocation
+						// updateColor here fixes issue when fragment is stopped/started,
+						// but onPageChanged not triggered
+						updateColors(list[selected])
+						pager.setCurrentItem(selected, false)
 					}
 				}
 				is Error -> {

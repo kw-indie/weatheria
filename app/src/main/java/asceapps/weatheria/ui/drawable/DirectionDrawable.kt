@@ -48,7 +48,7 @@ class DirectionDrawable: Drawable() {
 		val sx = bounds.right / size
 		val sy = bounds.bottom / size
 		Matrix().apply {
-			setRotate(deg.toFloat(), c, c)
+			setRotate(-deg.toFloat(), c, c)
 			postScale(sx, sy)
 			PATH.transform(this, path)
 		}

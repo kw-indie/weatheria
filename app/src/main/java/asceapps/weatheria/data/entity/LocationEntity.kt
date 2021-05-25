@@ -9,9 +9,9 @@ class LocationEntity(
 	@PrimaryKey override val id: Int,
 	override val lat: Float,
 	override val lng: Float,
-	val name: String,
-	val country: String,
-	val zoneOffset: Int,
+	override val name: String,
+	override val country: String,
+	val zoneId: String,
 	val lastUpdate: Int,
 	val pos: Int
 ): BaseLocation

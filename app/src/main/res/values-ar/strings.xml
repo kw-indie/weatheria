@@ -11,68 +11,67 @@
 	<string name="f_last_update">آخر تحديث: %s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
 	<string name="cd_weather_icon">أيقونة حالة الطقس</string>
-	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
+	<string name="cd_pressure">الضغط الجوي</string>
 	<string name="cd_humidity">الرطوبة</string>
+	<string name="cd_dew_point">درجة التكثف</string>
+	<string name="cd_clouds">السحب</string>
+	<string name="cd_visibility">مدى الرؤية</string>
+	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
+	<string name="cd_uv_index">الأشعة فوق البنفسجية</string>
 	<string name="cd_sunrise">وقت شروق الشمس</string>
 	<string name="cd_sunset">وقت غروب الشمس</string>
 	<string-array name="weather_conditions">
-		<item>عاصفة رعدية وأمطار خفيفة</item>
-		<item>عاصفة رعدية وأمطار</item>
-		<item>عاصفة رعدية وأمطار غزيرة</item>
-		<item>عاصفة رعدية خفيفة</item>
-		<item>عاصفة رعدية</item>
-		<item>عاصفة رعدية شديدة</item>
-		<item>عاصفة رعدية متفرقة</item>
-		<item>عاصفة رعدية ورذاذ خفيف</item>
-		<item>عاصفة رعدية ورذاذ</item>
-		<item>عاصفة رعدية ورذاذ غزير</item>
+		<item>صافي</item>
+		<item>غائم جزئيًا</item>
+		<item>غائم</item>
+		<item>معتم</item>
+		<item>سديم</item>
+		<item>أمطار متفرقة محتملة</item>
+		<item>ثلج متفرق محتمل</item>
+		<item>مطر متجمد متفرق محتمل</item>
+		<item>رذاذ ثلجي متفرق محتمل</item>
+		<item>طلقات رعدية محتملة</item>
+		<item>ثلوج عاصفة</item>
+		<item>عاصفة ثلجية</item>
+		<item>ضباب كثيف</item>
+		<item>ضباب ثلجي</item>
+		<item>رذاذ خفيف متفرق</item>
 		<item>رذاذ خفيف</item>
-		<item>رذاذ</item>
-		<item>رذاذ شديد الكثافة</item>
-		<item>رذاذ ممطر خفيف</item>
-		<item>رذاذ ممطر</item>
-		<item>رذاذ ممطر غزير</item>
-		<item>أمطار متقطعة ورذاذ</item>
-		<item>مطر غزير ورذاذ</item>
-		<item>رذاذ متقطع</item>
+		<item>رذاذ ثلجي</item>
+		<item>رذاذ ثلجي كثيف</item>
+		<item>أمطار خفيفة متفرقة</item>
 		<item>مطر خفيف</item>
+		<item>أمطار معتدلة في بعض الأحيان</item>
 		<item>أمطار معتدلة</item>
+		<item>أمطار غزيرة في بعض الأحيان</item>
 		<item>أمطار غزيرة</item>
-		<item>أمطار غزيرة جدا</item>
-		<item>أمطار شديدة الغزارة</item>
-		<item>مطر شديد البرودة</item>
-		<item>مطر خفيف متقطع</item>
-		<item>مطر متقطع</item>
-		<item>مطر متقطع شديد الغزارة</item>
-		<item>أمطار متقطعة ومتفرقة</item>
+		<item>أمطار ثلجية خفيفة</item>
+		<item>أمطار ثلجية معتدلة أو شديدة</item>
+		<item>مطر متجمد خفيف</item>
+		<item>مطر متجمد معتدل أو شديد</item>
+		<item>ثلوج خفيفة متفرقة</item>
 		<item>ثلوج خفيفة</item>
-		<item>ثلج</item>
+		<item>ثلوج معتدلة متفرقة</item>
+		<item>ثلوج معتدلة</item>
+		<item>ثلوج كثيفة متفرقة</item>
 		<item>ثلوج كثيفة</item>
 		<item>برَد</item>
-		<item>برَد متقطع خفيف</item>
-		<item>برَد متقطع</item>
-		<item>أمطار خفيفة وثلوج</item>
-		<item>أمطار وثلوج</item>
-		<item>ثلوج متقطعة خفيفة</item>
-		<item>ثلوج متقطعة</item>
-		<item>ثلوج متقطعة كثيفة</item>
-		<item>ضباب</item>
-		<item>دخان</item>
-		<item>سديم</item>
-		<item>رمال ودوامات غبار</item>
-		<item>ضباب كثيف</item>
-		<item>رمال</item>
-		<item>غبار</item>
-		<item>رماد بركاني</item>
-		<item>عواصف فجائية</item>
-		<item>إعصار</item>
-		<item>سماء صافية</item>
-		<item>سحب قليلة: ١١–٢٥٪</item>
-		<item>سحب متفرقة: ٢٥–٥٠٪</item>
-		<item>سحب متقطعة: ٥٠–٨٥٪</item>
-		<item>سماء ملبدة بالغيوم: ٨٥–١٠٠٪</item>
+		<item>أمطار خفيفة مؤقتة</item>
+		<item>أمطار معتدلة أو غزيرة مؤقتة</item>
+		<item>أمطار غزيرة مؤقتة</item>
+		<item>مطر متجمد خفيف مؤقت</item>
+		<item>مطر متجمد معتدل أو غزير مؤقت</item>
+		<item>ثلج خفيف مؤقت</item>
+		<item>ثلج معتدل أو غزير مؤقت</item>
+		<item>برَد خفيف مؤقت</item>
+		<item>برَد معتدل أو غزير مؤقت</item>
+		<item>أمطار رعدية خفيفة متفرقة</item>
+		<item>أمطار رعدية معتدلة أو غزيرة</item>
+		<item>ثلوج خفيفة متفرقة مع رعد</item>
+		<item>ثلوج معتدلة أو كثيفة مصحوبة برعد</item>
 	</string-array>
 	<string-array name="moon_phases">
+		<item>محاق</item>
 		<item>هلال متزايد</item>
 		<item>التربيع الأول</item>
 		<item>أحدب متزايد</item>
@@ -80,7 +79,6 @@
 		<item>أحدب متناقص</item>
 		<item>التربيع الأخير</item>
 		<item>هلال متناقص</item>
-		<item>محاق</item>
 	</string-array>
 	<!--add location-->
 	<string name="action_search">بحث</string>
@@ -112,7 +110,7 @@
 		<item>إمبراطوري</item>
 	</string-array>
 	<string-array name="units_speed">
-		<item>م/ث</item>
+		<item>كم/س</item>
 		<item>ميل/ساعة</item>
 	</string-array>
 	<string name="cat_header_loc">موقعي</string>

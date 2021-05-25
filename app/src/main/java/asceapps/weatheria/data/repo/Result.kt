@@ -2,12 +2,10 @@ package asceapps.weatheria.data.repo
 
 sealed class Result<out T> {
 
-	override fun toString(): String {
-		return when(this) {
-			is Loading -> "Loading[%=$percent]"
-			is Success -> "Success[data=$data]"
-			is Error -> "Error[t=$t]"
-		}
+	final override fun toString() = when(this) {
+		is Loading -> "Loading[%=$percent]"
+		is Success -> "Success[data=$data]"
+		is Error -> "Error[t=$t]"
 	}
 }
 

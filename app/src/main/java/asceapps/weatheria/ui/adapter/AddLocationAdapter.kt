@@ -1,12 +1,12 @@
 package asceapps.weatheria.ui.adapter
 
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.FoundLocation
+import asceapps.weatheria.data.api.SearchResponse
 import asceapps.weatheria.databinding.ItemAddLocationBinding
 
 class AddLocationAdapter(
-	private val onItemClick: (FoundLocation) -> Unit
-): BaseAdapter<FoundLocation, ItemAddLocationBinding>() {
+	private val onItemClick: (SearchResponse) -> Unit
+) : BaseAdapter<SearchResponse, ItemAddLocationBinding>() {
 
 	override fun onHolderCreated(holder: BindingHolder<ItemAddLocationBinding>) = with(holder.binding) {
 		root.setOnClickListener {

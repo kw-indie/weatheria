@@ -4,21 +4,19 @@ import android.text.format.DateUtils
 import asceapps.weatheria.data.base.Listable
 import java.text.NumberFormat
 import java.time.Instant
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DecimalStyle
 import kotlin.math.min
 
+/**
+ * @param accuracy 0: High (1 hour). 1: Medium (1 day). 2: Low (2 days). 3: Unreliable (3+ days)
+ */
 class WeatherInfo(
 	val location: Location,
 	val current: Current,
 	val hourly: List<Hourly>,
 	val daily: List<Daily>,
-	/**
-	 * 0: High, within an hour
-	 * 1: Medium, within 2 days
-	 * 2: Low, within a week
-	 */
 	val accuracy: Int
 ): Listable {
 
@@ -27,6 +25,7 @@ class WeatherInfo(
 
 	// if daily includes today, get it, else, get last day
 	val today = Instant.now().let { daily.lastOrNull { day -> day.date < it } } ?: daily[0]
+
 	// if hourly includes this hour, get it, else get last hour
 	val thisHour = Instant.now().let { hourly.lastOrNull { hour -> hour.hour < it } } ?: hourly[0]
 
@@ -35,7 +34,6 @@ class WeatherInfo(
 			val secondsInDay = 24 * 60 * 60f
 			val now = Instant.now()
 			val nowSecondOfDay = now.epochSecond % secondsInDay
-			val zeroSecondOfDay = now.epochSecond - nowSecondOfDay
 			// all values below are in fractions and not seconds
 			val nowF = nowSecondOfDay / secondsInDay
 			// sun- rise/set are taken from approx of `today`
@@ -65,7 +63,7 @@ class WeatherInfo(
 		}
 
 	// todo make most of these properties value classes in kotlin 1.5
-	val localNow get() = localDateTime(location.zoneOffset)
+	val localNow get() = localDateTime(location.zoneId)
 	val lastUpdate get() = relativeTime(location.lastUpdate)
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
@@ -73,8 +71,8 @@ class WeatherInfo(
 	val currentHumidity get() = percent(current.humidity)
 	val currentDewPoint get() = temp(current.dewPoint)
 	val todayMinMax get() = minMax(today.min, today.max)
-	val todaySunrise get() = localTime(today.sunrise, location.zoneOffset)
-	val todaySunset get() = localTime(today.sunset, location.zoneOffset)
+	val todaySunrise get() = localTime(today.sunrise, location.zoneId)
+	val todaySunset get() = localTime(today.sunset, location.zoneId)
 
 	companion object {
 
@@ -86,6 +84,7 @@ class WeatherInfo(
 
 		private var metric = true
 		private var speedUnit = ""
+
 		// prints at least 1 digit, sep each 3 digits, 0 to 2 decimal digits, rounds to nearest
 		private val nFormat = NumberFormat.getInstance().apply {
 			minimumFractionDigits = 0
@@ -94,6 +93,7 @@ class WeatherInfo(
 
 		// adds localized percent char
 		private val pFormat = NumberFormat.getPercentInstance()
+
 		// trash java never localizes the xxx part
 		private val dtFormatter = DateTimeFormatter.ofPattern("EEE, d MMMM, h:mm a (xxx)")
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
@@ -104,20 +104,21 @@ class WeatherInfo(
 		private fun relativeTime(instant: Instant): CharSequence =
 			DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
 
-		private fun localDateTime(offset: ZoneOffset): String =
-			dtFormatter.format(Instant.now().atOffset(offset))
+		private fun localDateTime(zone: ZoneId): String =
+			dtFormatter.format(Instant.now().atZone(zone))
 
-		private fun localTime(instant: Instant, offset: ZoneOffset): String =
-			tFormatter.format(instant.atOffset(offset))
+		private fun localTime(instant: Instant, zone: ZoneId): String =
+			tFormatter.format(instant.atZone(zone))
 
 		private fun temp(deg: Int) =
-			nFormat.format((if(metric) deg - 273.15f else deg * 1.8f - 459.67f).toInt()) + '°'
+			nFormat.format((if(metric) deg else deg * 1.8f + 32).toInt()) + '°'
 
 		private fun minMax(min: Int, max: Int) =
 			temp(min).padEnd(5) + '|' + temp(max).padStart(5)
 
-		private fun speed(mps: Float) =
-			nFormat.format(if(metric) mps else mps * 2.237f) + ' ' + speedUnit
+		private fun speed(kph: Float) =
+			nFormat.format(if(metric) kph else kph * 0.6214f) + ' ' + speedUnit
+
 		// our ratios are already from 0-100, this formatter expects fractions from 0-1
 		private fun percent(ratio: Int): String = pFormat.format(ratio / 100f)
 		// endregion

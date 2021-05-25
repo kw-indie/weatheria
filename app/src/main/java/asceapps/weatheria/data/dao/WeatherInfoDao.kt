@@ -1,15 +1,7 @@
 package asceapps.weatheria.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import asceapps.weatheria.data.entity.CurrentEntity
-import asceapps.weatheria.data.entity.DailyEntity
-import asceapps.weatheria.data.entity.HourlyEntity
-import asceapps.weatheria.data.entity.LocationEntity
-import asceapps.weatheria.data.entity.WeatherInfoEntity
+import androidx.room.*
+import asceapps.weatheria.data.entity.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,13 +29,11 @@ abstract class WeatherInfoDao {
 
 	@Transaction
 	open suspend fun update(
-		zoneOffset: Int,
-		lastUpdate: Int,
 		current: CurrentEntity,
 		hourly: List<HourlyEntity>,
 		daily: List<DailyEntity>
 	) {
-		updateLocation(current.locationId, zoneOffset, lastUpdate)
+		updateLocation(current.locationId, current.dt)
 		// we don't need to delete old rows now since we have prune
 		upsertCurrent(current)
 		upsertHourly(hourly)
@@ -99,8 +89,8 @@ abstract class WeatherInfoDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun upsertLocation(l: LocationEntity)
 
-	@Query("UPDATE locations SET zoneOffset = :zoneOffset AND lastUpdate = :lastUpdate WHERE id = :id")
-	protected abstract suspend fun updateLocation(id: Int, zoneOffset: Int, lastUpdate: Int)
+	@Query("UPDATE locations SET lastUpdate = :lastUpdate WHERE id = :id")
+	protected abstract suspend fun updateLocation(id: Int, lastUpdate: Int)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun upsertCurrent(c: CurrentEntity)

@@ -21,8 +21,12 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Fix maps v3 crash:
+# Fix maps v3 crash (taken from official docs):
 -keep,allowoptimization class com.google.android.libraries.maps.** {*;}
-
+# replaces all the @Keep's in response classes
+-keepclassmembers class asceapps.weatheria.data.api.*Response** {
+	<fields>;
+	<methods>;
+}
 # Ignore annotation used for build tooling. (specified in okio rules)
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement

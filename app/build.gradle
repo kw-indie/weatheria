@@ -25,7 +25,7 @@ android {
 
 		Properties ps = new Properties()
 		new File("local.properties").withInputStream { ps.load(it) }
-		buildConfigField("String", "WEATHER_APP_ID", "\"$ps.weather_app_id\"")
+		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused i18n in libs like AppCompat/play services/maps?
@@ -166,9 +166,6 @@ dependencies {
 	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
 	// this f***y artifact is always behind
 	implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
-
-	// coil
-	implementation 'io.coil-kt:coil:1.2.1'
 
 	// multi screen size support
 	implementation "com.intuit.sdp:sdp-android:1.0.6"

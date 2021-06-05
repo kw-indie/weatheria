@@ -7,7 +7,7 @@ android {
 	def targetSdkVer = 30
 	compileSdkVersion targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
-	buildToolsVersion "31.0.0-rc2"
+	buildToolsVersion "31.0.0-rc4"
 	ndkVersion "22.1.7171670"
 
 	// these config apply to all build types

@@ -261,6 +261,14 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
+		private fun conditionIndex(condition: Int) = CONDITIONS.binarySearch(condition)
+
+		private fun conditionIcon(condition: Int, isDay: Boolean? = null) =
+			"w$condition" + when(isDay) {
+				false -> "n"
+				else -> "d"
+			}
+
 		private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
 
 		private fun localTimeToEpochSeconds(startOfDaySeconds: Int, time: String, zone: ZoneId): Int {

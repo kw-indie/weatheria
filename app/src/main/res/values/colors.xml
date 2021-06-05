@@ -27,4 +27,20 @@
 	<color name="night_1">#050121</color>
 	<color name="night_2">#032163</color>
 	<color name="night_3">#0E2D88</color>
+	<!--icon colors-->
+	<color name="sun_fill">#FFC107</color>
+	<color name="sun_fill_50p">#7FFFC107</color>
+	<color name="sun_stroke">#FF9800</color>
+	<color name="moon_fill">#E1E1FF</color>
+	<color name="moon_fill_50p">#7FE1E1FF</color>
+	<color name="moon_shadow">#C4C4C4</color>
+	<color name="moon_shadow_dark">#B3B3B3</color>
+	<color name="moon_stroke">#2196F3</color>
+	<color name="cloud_fill">#FFFFFF</color>
+	<color name="cloud_dark_fill">#E1E1E1</color>
+	<color name="cloud_dark2_fill">#707070</color>
+	<color name="cloud_stroke">#E1E1E1</color>
+	<color name="cloud_dark_stroke">#C4C4C4</color>
+	<color name="cloud_dark2_stroke">#909090</color>
+	<color name="cloud_dark3_stroke">#404040</color>
 </resources>

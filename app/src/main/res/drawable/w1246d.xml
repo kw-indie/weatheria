@@ -1,0 +1,29 @@
+<vector
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:autoMirrored="true"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<group
+		android:scaleX="0.75"
+		android:scaleY="0.75"
+		android:translateX="-1.25"
+		android:translateY="3.25">
+		<path
+			android:fillColor="@color/sun_fill"
+			android:strokeWidth="1"
+			android:strokeColor="@color/sun_stroke"
+			android:pathData="@string/sun_path"/>
+	</group>
+	<path
+		android:fillColor="@color/cloud_dark2_fill"
+		android:strokeWidth="1"
+		android:strokeColor="@color/cloud_dark3_stroke"
+		android:pathData="@string/cloud_path"/>
+	<path
+		android:strokeWidth="1"
+		android:strokeColor="@color/moon_stroke"
+		android:strokeLineCap="round"
+		android:pathData="@string/torrential_rain_path"/>
+</vector>

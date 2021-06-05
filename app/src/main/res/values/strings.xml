@@ -80,6 +80,24 @@
 		<item>Last Quarter</item>
 		<item>Waning Crescent</item>
 	</string-array>
+	<!--icon paths-->
+	<string name="sun_path" translatable="false">M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z</string>
+	<string name="moon_path" translatable="false">M17.6 14.1a6 6 0 1 1 -8.2-7.5 6 6 0 0 0 8.2 7.5z</string>
+	<string name="cloud_path" translatable="false">M17.96 16.71c4.03-0.29 3.64-5.8-0.08-5.86a3.9 3.9 0 0 0-7.49-0.31 3.16 3.16 0 0 0-3.98 2.38c-2.5 0.46-1.92 3.64 0.06 3.8z</string>
+	<string name="mist_path" translatable="false">M6.97 19.51h11</string>
+	<string name="patchy_rain_path" translatable="false">M12.02 18.76l-1.14 2.78m3.18-2.78l-1.14 2.78</string>
+	<string name="snow_flake_path" translatable="false">M13.11 20.94l-1.27-2.18m1.89 1.09h-2.51m1.88-1.09l-1.26 2.18</string>
+	<string name="freezing_drizzle_path" translatable="false">M8.9 18.76h1.14l-0.57 1.39zm3.14 0l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="lightning_path" translatable="false">M13.04 13.94l-1.14 2.78h1.14l-0.76 1.85h0.76l-0.76 1.85</string>
+	<string name="blowing_path" translatable="false">M13 18.76h5m-5 1.5h4</string>
+	<string name="fog_path" translatable="false">M6.97 18.76h11m-11 1.5h11</string>
+	<string name="freezing_fog_path" translatable="false">M6.97 18.76h1.14l-0.57 1.39zm2.64 0h8.36m-8.93 1.5h8.93</string>
+	<string name="light_drizzle_path" translatable="false">M10.04 18.76l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="heavy_freezing_drizzle_path" translatable="false">M6.97 18.76h1.07l-0.57 1.39zm3.07 0l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="heavy_rain_path" translatable="false">M10.04 18.76L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
+	<string name="freezing_rain_path" translatable="false">M7.76 18.76h2.28L8.9 21.54zm2.28 0L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
+	<string name="ice_pellet_path" translatable="false">M12.5 18.35a1.5 1.5 0 0 1 0 3 1.5 1.5 0 0 1 0-3z</string>
+	<string name="torrential_rain_path" translatable="false">M8.04 18.76L6.9 21.54m3.14-2.78L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
 	<!--add location-->
 	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>

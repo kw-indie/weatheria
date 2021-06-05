@@ -28,12 +28,13 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 }
 
 @BindingAdapter("icon")
-fun loadIconFromUrl(view: ImageView, icon: String) {
-	view.setImageResource(view.resources.getIdentifier(
-		icon,
-		"drawable",
-		view.context.packageName
-	))
+fun setIcon(view: ImageView, icon: String) {
+	val defType = "drawable"
+	val defPackage = view.context.packageName
+	var id = view.resources.getIdentifier(icon, defType, defPackage)
+	if(id == 0) // for when day and night have same icon
+		id = view.resources.getIdentifier(icon.dropLast(1), defType, defPackage)
+	view.setImageResource(id)
 }
 
 @BindingAdapter("windDirection")

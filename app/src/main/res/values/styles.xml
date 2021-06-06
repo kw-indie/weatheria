@@ -15,17 +15,4 @@
 		<item name="android:statusBarColor">@android:color/transparent</item>
 		<item name="statusBarBackground">@android:color/transparent</item>
 	</style>
-
-	<style name="ListItem" parent="Widget.MaterialComponents.TextView">
-		<item name="android:paddingLeft">@dimen/_8sdp</item>
-		<item name="android:paddingRight">@dimen/_8sdp</item>
-		<item name="android:paddingTop">@dimen/_8sdp</item>
-		<item name="android:paddingBottom">@dimen/_8sdp</item>
-		<item name="android:background">?attr/selectableItemBackground</item>
-		<item name="android:gravity">center_vertical</item>
-		<item name="android:singleLine">true</item>
-		<item name="android:ellipsize">marquee</item>
-		<item name="android:drawablePadding">@dimen/_8sdp</item>
-		<item name="android:textAppearance">?attr/textAppearanceListItem</item>
-	</style>
 </resources>

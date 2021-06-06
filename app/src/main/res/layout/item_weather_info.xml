@@ -98,7 +98,7 @@
 				app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
 				app:layout_constraintStart_toEndOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toTopOf="@+id/iv_icon"
-				tools:text="99°"/>
+				tools:text="199°"/>
 			<TextView
 				android:id="@+id/tv_feels_like"
 				android:layout_width="wrap_content"

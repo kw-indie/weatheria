@@ -59,7 +59,7 @@ class HomeFragment: Fragment() {
 		val pagerAdapter = PagerAdapter()
 		val pager = binding.pager.apply {
 			adapter = pagerAdapter.apply {
-				onItemInserted { setCurrentItem(it, false) }
+				onItemInserted { setCurrentItem(it, true) }
 			}
 			onPageChanged { pos ->
 				mainVM.selectedLocation = pos

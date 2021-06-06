@@ -20,7 +20,7 @@
 			android:layout_height="wrap_content"
 			android:contentDescription="@string/maps_MY_LOCATION_ALT_TEXT"
 			android:minWidth="0dp"
-			android:src="@drawable/maps_btn_myl"
+			app:srcCompat="@drawable/maps_btn_myl"
 			app:layout_constraintEnd_toEndOf="@id/map"
 			app:layout_constraintTop_toTopOf="@id/map"/>
 		<TextView

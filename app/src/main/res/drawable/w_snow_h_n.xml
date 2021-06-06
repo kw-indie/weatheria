@@ -21,9 +21,18 @@
 		android:strokeWidth="1"
 		android:strokeColor="@color/cloud_dark2_stroke"
 		android:pathData="@string/cloud_path"/>
-	<path
-		android:strokeWidth="1"
-		android:strokeColor="@color/moon_stroke"
-		android:strokeLineCap="round"
-		android:pathData="@string/patchy_rain_path"/>
+	<group android:translateX="-2.25">
+		<path
+			android:strokeWidth="1"
+			android:strokeColor="@color/cloud_dark_fill"
+			android:strokeLineCap="round"
+			android:pathData="@string/snow_flake_path"/>
+	</group>
+	<group android:translateX="2.25">
+		<path
+			android:strokeWidth="1"
+			android:strokeColor="@color/cloud_dark_fill"
+			android:strokeLineCap="round"
+			android:pathData="@string/snow_flake_path"/>
+	</group>
 </vector>

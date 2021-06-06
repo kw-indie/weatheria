@@ -5,7 +5,7 @@
 	android:autoMirrored="true"
 	android:viewportWidth="24"
 	android:viewportHeight="24">
-	<group android:translateX="2.25">
+	<group android:translateX="-2.25">
 		<path
 			android:strokeWidth="1"
 			android:strokeColor="@color/moon_stroke"

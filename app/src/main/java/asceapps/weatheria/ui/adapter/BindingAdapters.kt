@@ -30,7 +30,7 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 
 @BindingAdapter("icon")
 fun setIcon(view: ImageView, icon: String) {
-	val condition = icon.substring(0, 3).toInt()
+	val condition = icon.substring(0, 4).toInt()
 	val d = 'd'
 	val n = 'n'
 	val pod = icon.getOrNull(4)

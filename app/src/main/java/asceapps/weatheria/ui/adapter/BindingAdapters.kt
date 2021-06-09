@@ -1,6 +1,9 @@
 package asceapps.weatheria.ui.adapter
 
 import android.graphics.Rect
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,10 +13,11 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.R
 import asceapps.weatheria.ui.drawable.DirectionDrawable
 
 @BindingAdapter("goneIf")
-fun hideView(v: View, b: Boolean) {
+fun setGone(v: View, b: Boolean) {
 	v.isVisible = !b
 }
 
@@ -32,6 +36,24 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 			addItemDecoration(divider)
 		}
 	}
+}
+
+@BindingAdapter("accuracy")
+fun setAccuracy(tv: TextView, accuracy: Int) {
+	val color = tv.resources.getColor(
+		when(accuracy) {
+			0 -> R.color.accuracy_fresh
+			1 -> R.color.accuracy_high
+			2 -> R.color.accuracy_medium
+			3 -> R.color.accuracy_low
+			4 -> R.color.accuracy_outdated
+			else -> throw IllegalArgumentException()
+		},
+		tv.context.theme
+	)
+	val newText = SpannableStringBuilder(tv.text)
+		.append(" ⦿", ForegroundColorSpan(color), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+	tv.text = newText
 }
 
 // this is needed cuz stupid dataBinding doesn't recognize input id as reference type, but as int color

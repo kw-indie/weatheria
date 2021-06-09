@@ -8,7 +8,6 @@
 	<string name="action_my_locations">My locations</string>
 	<string name="action_add_location">Add location</string>
 	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
-	<string name="outdated_info">Outdated info. Please refresh.</string>
 	<string name="f_last_update">Last update: %s</string>
 	<string name="f_feels_like">Feels like %s</string>
 	<string name="cd_weather_icon">Weather icon</string>

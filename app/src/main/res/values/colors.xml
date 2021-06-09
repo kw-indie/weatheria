@@ -27,6 +27,12 @@
 	<color name="night_1">#050121</color>
 	<color name="night_2">#032163</color>
 	<color name="night_3">#0E2D88</color>
+	<!--accuracy colors-->
+	<color name="accuracy_fresh">#388E3C</color>
+	<color name="accuracy_high">#8BC34A</color>
+	<color name="accuracy_medium">#FFEB3B</color>
+	<color name="accuracy_low">#FF9800</color>
+	<color name="accuracy_outdated">#F44336</color>
 	<!--icon colors-->
 	<color name="sun_fill">#FFC107</color>
 	<color name="sun_fill_50p">#7FFFC107</color>

@@ -54,29 +54,10 @@
 				android:alpha="0.75"
 				android:text="@{@string/f_last_update(item.lastUpdate)}"
 				android:textSize="@dimen/_9ssp"
+				app:accuracy="@{item.accuracy}"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toBottomOf="@id/tv_time"
-				tools:text="Last update: 0 min ago"/>
-			<TextView
-				android:id="@+id/tv_outdated"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginHorizontal="@dimen/_48sdp"
-				android:layout_marginTop="@dimen/_32sdp"
-				android:gravity="center_vertical"
-				android:text="@string/outdated_info"
-				android:textSize="@dimen/_12ssp"
-				app:goneIf="@{item.accuracy != 4}"
-				app:layout_constrainedHeight="true"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toBottomOf="@id/tv_last_update"
-				tools:visibility="visible"/>
-			<androidx.constraintlayout.widget.Group
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				app:constraint_referenced_ids="iv_icon,tv_min_max,tv_sunrise,tv_moonrise,tv_feels_like,tv_temp,tv_sunset,tv_wind,tv_moonset,tv_humidity,tv_dew_point,tv_pop,tv_weather"
-				app:goneIf="@{item.accuracy == 4}"/>
+				tools:text="Last update: 0 min ago ⦿"/>
 			<ImageView
 				android:id="@+id/iv_icon"
 				android:layout_width="@dimen/_72sdp"

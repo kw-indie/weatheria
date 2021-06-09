@@ -8,7 +8,6 @@
 	<string name="action_my_locations">مواقعي</string>
 	<string name="action_add_location">أضف موقعًا</string>
 	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
-	<string name="outdated_info">معلومات قديمة. فضلًا، قم بالتحديث.</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
 	<string name="cd_weather_icon">أيقونة حالة الطقس</string>

@@ -1,20 +1,21 @@
-apply plugin: "com.android.application"
-apply plugin: "kotlin-android" // for kotlin support
-apply plugin: "kotlin-kapt" // for annotations: data binding, etc
-apply plugin: "dagger.hilt.android.plugin"
+plugins {
+	id 'com.android.application'
+	id 'kotlin-android' // for kotlin support
+	id 'kotlin-kapt' // for annotations: data binding, etc
+	id 'dagger.hilt.android.plugin'
+}
 
 android {
-	def targetSdkVer = 30
 	compileSdkVersion targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
-	buildToolsVersion "31.0.0-rc4"
-	ndkVersion "22.1.7171670"
+	buildToolsVersion buildToolsVer
+	ndkVersion ndkVer
 
 	// these config apply to all build types
 	defaultConfig {
 		// if not specified, package name from manifest will be used, will change when that one changes
 		applicationId "asceapps.weatheria"
-		minSdkVersion 21
+		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
 		versionCode 4
 		versionName "0.3.1"
@@ -65,7 +66,6 @@ android {
 		}
 	}
 
-	def javaVer = JavaVersion.VERSION_11
 	compileOptions {
 		// to use java 8 libs in api < 26. needed even with kotlin for time apis
 		coreLibraryDesugaringEnabled true
@@ -87,31 +87,29 @@ android {
 }
 
 dependencies {
-	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.5"
+	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
 	// kotlin
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer"
 
 	// coroutines
-	def coroutineVer = '1.5.0-native-mt'
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
 	// general & ui
-	implementation "androidx.core:core-ktx:1.6.0-beta01"
-	implementation "androidx.recyclerview:recyclerview:1.2.0"
-	implementation "androidx.viewpager2:viewpager2:1.0.0"
-	implementation "androidx.constraintlayout:constraintlayout:2.1.0-beta02"
-	implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
-	implementation "com.google.android.material:material:1.3.0"
+	implementation "androidx.core:core-ktx:$coreVer"
+	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
+	implementation "androidx.viewpager2:viewpager2:$viewPager2Ver"
+	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
+	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
+	implementation "com.google.android.material:material:$materialVer"
 
 	// to use viewModels delegate, new result system, and lots more
-	implementation "androidx.activity:activity-ktx:1.3.0-alpha08"
-	implementation "androidx.fragment:fragment-ktx:1.4.0-alpha01"
+	implementation "androidx.activity:activity-ktx:$activityVer"
+	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
 
 	// viewModel & liveData
 	// runtime offers new flow consumers (e.g addRepeatingJob)
-	def lifecycleVer = '2.4.0-alpha01'
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	// todo remove, we aren't using liveData anywhere
@@ -119,59 +117,55 @@ dependencies {
 
 	// nav
 	// runtime offers findNavController() and navArgs property
-	def navVer = '2.3.5'
 	implementation "androidx.navigation:navigation-runtime-ktx:$navVer"
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
-	implementation "androidx.core:core-animation:1.0.0-alpha02"
-	implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+	implementation "androidx.core:core-animation:$coreAnimationVer"
+	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableAnimVer"
 
 	// new preferences (fragment, etc.)
-	implementation "androidx.preference:preference-ktx:1.1.1"
+	implementation "androidx.preference:preference-ktx:$preferenceVer"
 
 	// room
 	// runtime is core
 	// ktx adds suspend and Flow support
-	def roomVer = '2.4.0-alpha02'
 	kapt "androidx.room:room-compiler:$roomVer"
 	implementation "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
 
 	// retrofit
-	def retrofitVer = '2.9.0'
 	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
 	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-	implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
+	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"
 
 	// maps & location
-	implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
+	implementation "com.google.android.libraries.maps:maps:$mapsVer"
 	// flp (+ activity recognition + geofencing)
-	implementation "com.google.android.gms:play-services-location:18.0.0"
+	implementation "com.google.android.gms:play-services-location:$locationVer"
 	// manually specified the version available in google() instead of clinging to jcenter()
-	implementation "com.android.volley:volley:1.2.0"
+	implementation "com.android.volley:volley:$volleyVer"
 
 	// work manager
-	implementation 'androidx.work:work-runtime-ktx:2.7.0-alpha03'
+	implementation "androidx.work:work-runtime-ktx:$workVer"
 
 	// hilt
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
 	// hilt with jetpack (viewModel, workManager)
-	def hiltCompilerVer = '1.0.0'
 	kapt "androidx.hilt:hilt-compiler:$hiltCompilerVer"
 	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
 	// this f***y artifact is always behind
-	implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltCompilerOldVer"
 
 	// multi screen size support
-	implementation "com.intuit.sdp:sdp-android:1.0.6"
-	implementation "com.intuit.ssp:ssp-android:1.0.6"
+	implementation "com.intuit.sdp:sdp-android:$intuitVer"
+	implementation "com.intuit.ssp:ssp-android:$intuitVer"
 
 	// android tests
-	testImplementation 'junit:junit:4.13.2'
-	androidTestImplementation "androidx.test.ext:junit:1.1.2"
+	testImplementation "junit:junit:$junitVer"
+	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"
 }

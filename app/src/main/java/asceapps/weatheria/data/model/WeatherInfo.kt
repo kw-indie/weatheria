@@ -10,7 +10,7 @@ import java.time.format.DecimalStyle
 import kotlin.math.min
 
 /**
- * @param accuracy 0: High (1 hour). 1: Medium (1 day). 2: Low (2 days). 3: Unreliable (3+ days)
+ * @param accuracy 0: Real (1 hour). 1: High (1 day). 2: Medium (2 days). 3: Low (3 days). 4: Outdated
  */
 class WeatherInfo(
 	val location: Location,
@@ -23,6 +23,8 @@ class WeatherInfo(
 	override val id = location.id
 	override fun hashCode() = id + location.lastUpdate.epochSecond.toInt()
 
+	// in both 'today' and 'thisHour', sometimes the first element is some time in the future,
+	// hence the 'orNull()' and '?: x[0]'
 	// if daily includes today, get it, else, get last day
 	val today = Instant.now().let { daily.lastOrNull { day -> day.date < it } } ?: daily[0]
 
@@ -31,6 +33,7 @@ class WeatherInfo(
 
 	val partOfDay: Pair<Int, Float>
 		get() {
+			val night = 0 to 0f
 			val secondsInDay = 24 * 60 * 60f
 			val now = Instant.now()
 			val nowSecondOfDay = now.epochSecond % secondsInDay
@@ -52,13 +55,13 @@ class WeatherInfo(
 			val startOfDuskF = sunsetF - transitionF
 			val endOfDuskF = sunsetF + transitionF
 			return when {
-				nowF < startOfDawnF -> 0 to 0f
+				nowF < startOfDawnF -> night // don't remove this case, we need to subtract from < sunriseF
 				nowF < sunriseF -> 1 to (nowF - startOfDawnF) / transitionF
 				nowF < endOfDawnF -> 2 to (nowF - sunriseF) / transitionF
 				nowF < startOfDuskF -> 3 to 0f
 				nowF < sunsetF -> 4 to (nowF - startOfDuskF) / transitionF
 				nowF < endOfDuskF -> 5 to (nowF - sunsetF) / transitionF
-				else -> 0 to 0f
+				else -> night
 			}
 		}
 
@@ -71,8 +74,11 @@ class WeatherInfo(
 	val currentHumidity get() = percent(current.humidity)
 	val currentDewPoint get() = temp(current.dewPoint)
 	val todayMinMax get() = minMax(today.min, today.max)
+	val todayPop get() = percent(today.pop)
 	val todaySunrise get() = localTime(today.sunrise, location.zoneId)
 	val todaySunset get() = localTime(today.sunset, location.zoneId)
+	val todayMoonrise get() = localTime(today.moonrise, location.zoneId)
+	val todayMoonset get() = localTime(today.moonset, location.zoneId)
 
 	companion object {
 
@@ -94,8 +100,8 @@ class WeatherInfo(
 		// adds localized percent char
 		private val pFormat = NumberFormat.getPercentInstance()
 
-		// trash java never localizes the xxx part
-		private val dtFormatter = DateTimeFormatter.ofPattern("EEE, MMMM d, h:mm a (xxx)")
+		// trash java never localizes the xxx part // old pattern: EEE, MMMM d, h:mm a (xxx)
+		private val dtFormatter = DateTimeFormatter.ofPattern("EEE h:mm a (xxx)")
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
 		private val tFormatter = DateTimeFormatter.ofPattern("h:mm a")
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())

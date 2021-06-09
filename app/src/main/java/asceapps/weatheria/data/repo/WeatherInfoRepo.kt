@@ -1,5 +1,6 @@
 package asceapps.weatheria.data.repo
 
+import asceapps.weatheria.R
 import asceapps.weatheria.data.api.*
 import asceapps.weatheria.data.base.BaseLocation
 import asceapps.weatheria.data.dao.WeatherInfoDao
@@ -58,8 +59,7 @@ class WeatherInfoRepo @Inject constructor(
 		val c = extractCurrent(loc.id, resp)
 		val h = extractHourly(loc.id, resp)
 		val d = extractDaily(loc.id, resp)
-		val infoEntity = WeatherInfoEntity(l, c, h, d)
-		dao.insert(infoEntity)
+		dao.insert(l, c, h, d)
 	}
 
 	private suspend fun internalRefresh(loc: BaseLocation) {
@@ -97,10 +97,6 @@ class WeatherInfoRepo @Inject constructor(
 
 	suspend fun deleteAll() {
 		dao.deleteAll()
-	}
-
-	suspend fun prune() {
-		dao.prune()
 	}
 
 	companion object {
@@ -188,7 +184,7 @@ class WeatherInfoRepo @Inject constructor(
 						toInstant(dt),
 						minTemp,
 						maxTemp,
-						conditionIcon(condition),
+						conditionIconResId(condition),
 						pop,
 						uv,
 						toInstant(sunrise),
@@ -205,7 +201,7 @@ class WeatherInfoRepo @Inject constructor(
 					// hourly data are only from first 48 hours, starting from this hour not 00:00
 					Hourly(
 						hour,
-						conditionIcon(condition, isDay),
+						conditionIconResId(condition, isDay),
 						temp,
 						pop
 					)
@@ -214,16 +210,17 @@ class WeatherInfoRepo @Inject constructor(
 			val now = Instant.now()
 			val elapsedHours = Duration.between(location.lastUpdate, now).toHours()
 			val accuracy = when {
-				elapsedHours < 1 -> 0 // fresh
+				elapsedHours < 1 -> 0
 				elapsedHours < 24 -> 1
 				elapsedHours < 48 -> 2
-				else -> 4 // unreliable for approximation
+				elapsedHours < 72 -> 3
+				else -> 4 // no data to approximate from
 			}
 			val current = if(accuracy == 0) {
 				with(info.current) {
 					Current(
 						conditionIndex(condition),
-						conditionIcon(condition, isDay),
+						conditionIconResId(condition, isDay),
 						temp,
 						feelsLike,
 						pressure,
@@ -242,7 +239,7 @@ class WeatherInfoRepo @Inject constructor(
 				with(hour) {
 					Current(
 						conditionIndex(condition),
-						conditionIcon(condition, isDay),
+						conditionIconResId(condition, isDay),
 						temp,
 						feelsLike,
 						pressure,
@@ -263,20 +260,75 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun conditionIndex(condition: Int) = CONDITIONS.binarySearch(condition)
 
-		private fun conditionIcon(condition: Int, isDay: Boolean? = null) =
-			"$condition" + when(isDay) {
-				true -> "d"
-				false -> "n"
-				else -> ""
+		private fun conditionIconResId(condition: Int, isDay: Boolean? = null) = when(condition) {
+			1000 -> if(isDay == true) R.drawable.w_clear_d else R.drawable.w_clear_n
+			1003 -> if(isDay == true) R.drawable.w_cloudy_p_d else R.drawable.w_cloudy_p_n
+			1006 -> if(isDay == true) R.drawable.w_cloudy_d else R.drawable.w_cloudy_n
+			1009 -> R.drawable.w_overcast
+			1030 -> R.drawable.w_mist
+			1063, 1180, 1183, 1186, 1189, 1240 -> when(isDay) {
+				true -> R.drawable.w_rain_l_d
+				false -> R.drawable.w_rain_l_n
+				else -> R.drawable.w_rain_l
 			}
+			1066, 1210, 1213, 1216, 1219, 1255 -> when(isDay) {
+				true -> R.drawable.w_snow_l_d
+				false -> R.drawable.w_snow_l_n
+				else -> R.drawable.w_snow_l
+			}
+			1069, 1204, 1207, 1249 -> when(isDay) {
+				true -> R.drawable.w_sleet_l_d
+				false -> R.drawable.w_sleet_l_n
+				else -> R.drawable.w_sleet_l
+			}
+			1072, 1168 -> R.drawable.w_drizzle_l_f
+			1087, 1273, 1276 -> when(isDay) {
+				true -> R.drawable.w_thunder_d
+				false -> R.drawable.w_thunder_n
+				else -> R.drawable.w_thunder
+			}
+			1114 -> R.drawable.w_snow_b
+			1117 -> R.drawable.w_blizzard
+			1135 -> R.drawable.w_fog
+			1147 -> R.drawable.w_fog_f
+			1150, 1153 -> R.drawable.w_drizzle_l
+			1171 -> R.drawable.w_drizzle_h_f
+			1192, 1195, 1243 -> when(isDay) {
+				true -> R.drawable.w_rain_h_d
+				false -> R.drawable.w_rain_h_n
+				else -> R.drawable.w_rain_h
+			}
+			1198, 1201 -> R.drawable.w_rain_f
+			1222, 1225, 1258 -> when(isDay) {
+				true -> R.drawable.w_snow_h_d
+				false -> R.drawable.w_snow_h_n
+				else -> R.drawable.w_snow_h
+			}
+			1237, 1261 -> when(isDay) {
+				true -> R.drawable.w_ice_pellets_l_d
+				false -> R.drawable.w_ice_pellets_l_n
+				else -> R.drawable.w_ice_pellets_l
+			}
+			1246 -> if(isDay == true) R.drawable.w_rain_t_d else R.drawable.w_rain_t_n
+			1252 -> if(isDay == true) R.drawable.w_sleet_h_d else R.drawable.w_sleet_h_n
+			1264 -> if(isDay == true) R.drawable.w_ice_pellets_h_d else R.drawable.w_ice_pellets_h_n
+			1279, 1282 -> when(isDay) {
+				true -> R.drawable.w_snow_thunder_d
+				false -> R.drawable.w_snow_thunder_n
+				else -> R.drawable.w_snow_thunder
+			}
+			else -> throw IllegalArgumentException()
+		}
 
 		private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
 
-		private fun localTimeToEpochSeconds(startOfDaySeconds: Int, time: String, zone: ZoneId): Int {
+		private fun localTimeToEpochSeconds(dayEpochSeconds: Int, time: String, zone: ZoneId): Int {
 			// stupid shits give startOfDaySeconds in utc and times in local
-			val startOfDay = Instant.ofEpochSecond(startOfDaySeconds.toLong())
+			val startOfDay = Instant.ofEpochSecond(dayEpochSeconds.toLong())
 			val localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a"))
-			val zonedDt = ZonedDateTime.ofInstant(startOfDay, zone).withHour(localTime.hour).withMinute(localTime.minute)
+			val zonedDt = ZonedDateTime.ofInstant(startOfDay, zone)
+				.withHour(localTime.hour)
+				.withMinute(localTime.minute)
 			return zonedDt.toEpochSecond().toInt()
 		}
 

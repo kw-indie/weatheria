@@ -8,9 +8,11 @@
 	<string name="action_my_locations">My locations</string>
 	<string name="action_add_location">Add location</string>
 	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
+	<string name="outdated_info">Outdated info. Please refresh.</string>
 	<string name="f_last_update">Last update: %s</string>
 	<string name="f_feels_like">Feels like %s</string>
 	<string name="cd_weather_icon">Weather icon</string>
+	<string name="cd_pop">Probability of Precipitation</string>
 	<string name="cd_pressure">Pressure</string>
 	<string name="cd_humidity">Humidity</string>
 	<string name="cd_dew_point">Dew point</string>
@@ -20,6 +22,8 @@
 	<string name="cd_uv_index">UV Index</string>
 	<string name="cd_sunrise">Sunrise time</string>
 	<string name="cd_sunset">Sunset time</string>
+	<string name="cd_moonrise">Moonrise time</string>
+	<string name="cd_moonset">Moonset time</string>
 	<string-array name="weather_conditions">
 		<item>Clear</item>
 		<item>Partly cloudy</item>

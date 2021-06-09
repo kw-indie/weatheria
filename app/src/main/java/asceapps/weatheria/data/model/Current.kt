@@ -2,7 +2,7 @@ package asceapps.weatheria.data.model
 
 class Current(
 	val conditionIndex: Int,
-	val icon: String,
+	val icon: Int,
 	val temp: Int,
 	val feelsLike: Int,
 	val pressure: Int,

@@ -3,16 +3,11 @@ package asceapps.weatheria.data.repo
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import asceapps.weatheria.R
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
-import asceapps.weatheria.worker.DatabasePruneWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import java.time.Duration
@@ -44,7 +39,6 @@ class SettingsRepo @Inject constructor(
 		// irl, this happens when app settings are auto backed up
 		updateUnits()
 		updateAutoRefresh()
-		updatePruneWorker()
 	}
 
 	val changesFlow get() = prefs.onChangeFlow()
@@ -124,24 +118,5 @@ class SettingsRepo @Inject constructor(
 		// debugging commands:
 		// adb shell dumpsys jobscheduler
 		// adb shell am broadcast -a "androidx.work.diagnostics.REQUEST_DIAGNOSTICS" -p "<package_name>"
-	}
-
-	private fun updatePruneWorker() {
-		val pruneWorkName = DatabasePruneWorker::class.qualifiedName!!
-		val constraints = Constraints.Builder()
-			.setRequiresBatteryNotLow(true)
-			.build()
-		val now = LocalDateTime.now()
-		val nextMidnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1)
-		val secondsUntilMidnight = Duration.between(now, nextMidnight).seconds
-		val work = PeriodicWorkRequestBuilder<DatabasePruneWorker>(1, TimeUnit.DAYS)
-			.setConstraints(constraints)
-			.setInitialDelay(secondsUntilMidnight, TimeUnit.SECONDS)
-			.build()
-		workManager.enqueueUniquePeriodicWork(
-			pruneWorkName,
-			ExistingPeriodicWorkPolicy.KEEP,
-			work
-		)
 	}
 }

@@ -6,7 +6,7 @@ class Daily(
 	val date: Instant,
 	val min: Int,
 	val max: Int,
-	val icon: String,
+	val icon: Int,
 	val pop: Int,
 	val uv: Int,
 	val sunrise: Instant,

@@ -127,7 +127,7 @@ class ForecastResponse(
 	)
 
 	/**
-	 * All times are in local format = hh:mm AA
+	 * All times are in local format = hh:mm a
 	 * @param moon_phase 8 phases
 	 */
 	class Astro(

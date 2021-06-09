@@ -4,7 +4,7 @@ import java.time.Instant
 
 class Hourly(
 	val hour: Instant,
-	val icon: String,
+	val icon: Int,
 	val temp: Int,
 	val pop: Int
 )

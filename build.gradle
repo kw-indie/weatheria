@@ -4,7 +4,7 @@ buildscript {
 	ext {
 		activityVer = '1.3.0-beta01'
 		appCompatVer = '1.3.0'
-		buildToolsVer = '30.0.0-rc4'
+		buildToolsVer = '31.0.0-rc4'
 		constraintLayoutVer = '2.1.0-beta02'
 		coreVer = '1.6.0-beta02'
 		coreAnimationVer = '1.0.0-alpha02'

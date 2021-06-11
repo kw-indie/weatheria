@@ -119,7 +119,7 @@ class ForecastResponse(
 		val condition: Condition,
 		val maxwind_kph: Float,
 		val totalprecip_mm: Float,
-		val avghumidity: Float,
+		val avghumidity: Int,
 		val avgvis_km: Float,
 		val daily_chance_of_rain: Int,
 		val daily_chance_of_snow: Int,

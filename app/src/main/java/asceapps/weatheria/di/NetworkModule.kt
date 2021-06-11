@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class NetworkModule {
 
 	@Provides
-	@Singleton // fixme prolly not needed
+	@Singleton
 	fun provideWeatherApi(): WeatherApi {
 		val interceptor = Interceptor { chain ->
 			val newUrl = chain.request().url.newBuilder()

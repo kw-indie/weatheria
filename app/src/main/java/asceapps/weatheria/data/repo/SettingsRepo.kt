@@ -27,7 +27,6 @@ class SettingsRepo @Inject constructor(
 	private val defValStr = "0"
 	private val defValBool = false
 	private val unitsKey = appContext.getString(R.string.key_units)
-	private val speedUnits = appContext.resources.getStringArray(R.array.units_speed)
 	private val locUseDevice = appContext.getString(R.string.key_loc_use_device)
 	private val locAccuracyHigh = appContext.getString(R.string.key_loc_accuracy_high)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
@@ -46,12 +45,6 @@ class SettingsRepo @Inject constructor(
 	// 0 = metric, 1 = imperial
 	private val units: Int
 		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
-
-	private val isMetric: Boolean
-		get() = units == 0
-
-	private val speedUnit: String
-		get() = speedUnits[units]
 
 	val useDeviceForLocation: Boolean
 		get() = prefs.getBoolean(locUseDevice, defValBool)
@@ -76,7 +69,7 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateUnits() {
-		WeatherInfo.setFormatSystem(isMetric, speedUnit)
+		WeatherInfo.setUnitsSystem(units)
 	}
 
 	private fun updateAutoRefresh() {

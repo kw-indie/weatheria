@@ -18,7 +18,7 @@
 	<string name="cd_clouds">السحب</string>
 	<string name="cd_visibility">مدى الرؤية</string>
 	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
-	<string name="cd_uv_index">الأشعة فوق البنفسجية</string>
+	<string name="cd_uv">الأشعة فوق البنفسجية</string>
 	<string name="cd_sunrise">وقت شروق الشمس</string>
 	<string name="cd_sunset">وقت غروب الشمس</string>
 	<string name="cd_moonrise">وقت شروق القمر</string>
@@ -73,6 +73,25 @@
 		<item>ثلوج خفيفة متفرقة مع رعد</item>
 		<item>ثلوج معتدلة أو كثيفة مصحوبة برعد</item>
 	</string-array>
+	<string-array name="uv_levels">
+		<item>منخفضة</item>
+		<item>متوسطة</item>
+		<item>عالية</item>
+		<item>عالية جدا</item>
+		<item>خطيرة</item>
+	</string-array>
+	<string-array name="units_distance">
+		<item>كم</item>
+		<item>ميل</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>كم/س</item>
+		<item>ميل/س</item>
+	</string-array>
+	<string-array name="units_pressure">
+		<item>مل بار</item>
+		<item>بوصة زئبق</item>
+	</string-array>
 	<string-array name="moon_phases">
 		<item>محاق</item>
 		<item>هلال متزايد</item>
@@ -111,10 +130,6 @@
 	<string-array name="entries_unit_system">
 		<item>متري</item>
 		<item>إمبراطوري</item>
-	</string-array>
-	<string-array name="units_speed">
-		<item>كم/س</item>
-		<item>ميل/ساعة</item>
 	</string-array>
 	<string name="cat_header_loc">موقعي</string>
 	<string name="title_loc_use_device">طلب الموقع من الجهاز</string>

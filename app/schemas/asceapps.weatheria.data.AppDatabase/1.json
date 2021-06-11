@@ -1,18 +1,18 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "3b4d8be4571960ff96f57588bb2dc3be",
-    "entities": [
-      {
-        "tableName": "locations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, `zoneId` TEXT NOT NULL, `lastUpdate` INTEGER NOT NULL, `pos` INTEGER NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
+	  "version": 1,
+	  "identityHash": "a6ec7bbf090c0a332505116a6ff7d788",
+	  "entities": [
+		  {
+			  "tableName": "locations",
+			  "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, `zoneId` TEXT NOT NULL, `lastUpdate` INTEGER NOT NULL, `pos` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+			  "fields": [
+				  {
+					  "fieldPath": "id",
+					  "columnName": "id",
+					  "affinity": "INTEGER",
+					  "notNull": true
           },
           {
             "fieldPath": "lat",
@@ -66,19 +66,19 @@
         "indices": [],
         "foreignKeys": []
       },
-      {
-        "tableName": "current",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `isDay` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `precip` REAL NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `uv` INTEGER NOT NULL, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "locationId",
-            "columnName": "locationId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "dt",
-            "columnName": "dt",
+		  {
+			  "tableName": "current",
+			  "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `isDay` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `precipitation` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, `visibility` REAL NOT NULL, `uv` INTEGER NOT NULL, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+			  "fields": [
+				  {
+					  "fieldPath": "locationId",
+					  "columnName": "locationId",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
+				  {
+					  "fieldPath": "dt",
+					  "columnName": "dt",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -124,12 +124,12 @@
             "affinity": "INTEGER",
             "notNull": true
           },
-          {
-            "fieldPath": "precip",
-            "columnName": "precip",
-            "affinity": "REAL",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "precipitation",
+					  "columnName": "precipitation",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
           {
             "fieldPath": "humidity",
             "columnName": "humidity",
@@ -148,12 +148,12 @@
             "affinity": "INTEGER",
             "notNull": true
           },
-          {
-            "fieldPath": "visibility",
-            "columnName": "visibility",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "visibility",
+					  "columnName": "visibility",
+					  "affinity": "REAL",
+					  "notNull": true
+				  },
           {
             "fieldPath": "uv",
             "columnName": "uv",
@@ -182,19 +182,19 @@
           }
         ]
       },
-      {
-        "tableName": "hourly",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `isDay` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `precip` REAL NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `uv` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "locationId",
-            "columnName": "locationId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "dt",
-            "columnName": "dt",
+		  {
+			  "tableName": "hourly",
+			  "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `temp` INTEGER NOT NULL, `feelsLike` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `isDay` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `windDir` INTEGER NOT NULL, `pressure` INTEGER NOT NULL, `precipitation` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `dewPoint` INTEGER NOT NULL, `clouds` INTEGER NOT NULL, `visibility` REAL NOT NULL, `pop` INTEGER NOT NULL, `uv` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+			  "fields": [
+				  {
+					  "fieldPath": "locationId",
+					  "columnName": "locationId",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
+				  {
+					  "fieldPath": "dt",
+					  "columnName": "dt",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -240,12 +240,12 @@
             "affinity": "INTEGER",
             "notNull": true
           },
-          {
-            "fieldPath": "precip",
-            "columnName": "precip",
-            "affinity": "REAL",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "precipitation",
+					  "columnName": "precipitation",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
           {
             "fieldPath": "humidity",
             "columnName": "humidity",
@@ -264,12 +264,12 @@
             "affinity": "INTEGER",
             "notNull": true
           },
-          {
-            "fieldPath": "visibility",
-            "columnName": "visibility",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "visibility",
+					  "columnName": "visibility",
+					  "affinity": "REAL",
+					  "notNull": true
+				  },
           {
             "fieldPath": "pop",
             "columnName": "pop",
@@ -305,19 +305,19 @@
           }
         ]
       },
-      {
-        "tableName": "daily",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `precip` REAL NOT NULL, `humidity` INTEGER NOT NULL, `visibility` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `uv` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `moonrise` INTEGER NOT NULL, `moonset` INTEGER NOT NULL, `moonphase` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "locationId",
-            "columnName": "locationId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "dt",
-            "columnName": "dt",
+		  {
+			  "tableName": "daily",
+			  "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `condition` INTEGER NOT NULL, `windSpeed` REAL NOT NULL, `precipitation` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `visibility` REAL NOT NULL, `pop` INTEGER NOT NULL, `uv` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `moonrise` INTEGER NOT NULL, `moonset` INTEGER NOT NULL, `moonphase` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+			  "fields": [
+				  {
+					  "fieldPath": "locationId",
+					  "columnName": "locationId",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
+				  {
+					  "fieldPath": "dt",
+					  "columnName": "dt",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -345,24 +345,24 @@
             "affinity": "REAL",
             "notNull": true
           },
-          {
-            "fieldPath": "precip",
-            "columnName": "precip",
-            "affinity": "REAL",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "precipitation",
+					  "columnName": "precipitation",
+					  "affinity": "INTEGER",
+					  "notNull": true
+				  },
           {
             "fieldPath": "humidity",
             "columnName": "humidity",
             "affinity": "INTEGER",
             "notNull": true
           },
-          {
-            "fieldPath": "visibility",
-            "columnName": "visibility",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
+				  {
+					  "fieldPath": "visibility",
+					  "columnName": "visibility",
+					  "affinity": "REAL",
+					  "notNull": true
+				  },
           {
             "fieldPath": "pop",
             "columnName": "pop",
@@ -432,7 +432,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3b4d8be4571960ff96f57588bb2dc3be')"
+		"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a6ec7bbf090c0a332505116a6ff7d788')"
     ]
   }
 }

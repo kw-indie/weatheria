@@ -9,7 +9,7 @@ class Current(
 	val humidity: Int,
 	val dewPoint: Int,
 	val clouds: Int,
-	val visibility: Int,
+	val visibility: Float,
 	val windSpeed: Float,
 	val windDir: Int,
 	val uv: Int

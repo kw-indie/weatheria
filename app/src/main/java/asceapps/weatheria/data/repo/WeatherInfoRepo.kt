@@ -114,11 +114,11 @@ class WeatherInfoRepo @Inject constructor(
 				wind_kph,
 				meteorologicalToCircular(wind_degree),
 				pressure_mb.roundToInt(),
-				precip_mm,
+				precip_mm.roundToInt(),
 				humidity,
 				firstHour.dewpoint_c.roundToInt(),
 				cloud,
-				vis_km.roundToInt(),
+				vis_km,
 				firstHour.uv.roundToInt()
 			)
 		}
@@ -137,11 +137,11 @@ class WeatherInfoRepo @Inject constructor(
 							wind_kph,
 							meteorologicalToCircular(wind_degree),
 							pressure_mb.roundToInt(),
-							precip_mm,
+							precip_mm.roundToInt(),
 							humidity,
 							dewpoint_c.roundToInt(),
 							cloud,
-							vis_km.roundToInt(),
+							vis_km,
 							max(chance_of_rain, chance_of_snow),
 							uv.roundToInt()
 						)
@@ -161,9 +161,9 @@ class WeatherInfoRepo @Inject constructor(
 					day.maxtemp_c.roundToInt(),
 					day.condition.code,
 					day.maxwind_kph,
-					day.totalprecip_mm,
-					day.avghumidity.roundToInt(),
-					day.avgvis_km.roundToInt(),
+					day.totalprecip_mm.roundToInt(),
+					day.avghumidity,
+					day.avgvis_km,
 					max(day.daily_chance_of_rain, day.daily_chance_of_snow),
 					day.uv.roundToInt(),
 					localTimeToEpochSeconds(forecastDay.date_epoch, astro.sunrise, zone),

@@ -39,7 +39,7 @@ class WeatherInfo(
 			val nowSecondOfDay = now.epochSecond % secondsInDay
 			// all values below are in fractions and not seconds
 			val nowF = nowSecondOfDay / secondsInDay
-			// sun- rise/set are taken from approx of `today`
+			// sunrise/set are taken from approx of `today`
 			val sunriseF = (today.sunrise.epochSecond % secondsInDay) / secondsInDay
 			val sunsetF = (today.sunset.epochSecond % secondsInDay) / secondsInDay
 			// transitionF is dawn or dusk (~70 min at the equator).
@@ -68,12 +68,26 @@ class WeatherInfo(
 	// todo make most of these properties value classes in kotlin 1.5
 	val localNow get() = localDateTime(location.zoneId)
 	val lastUpdate get() = relativeTime(location.lastUpdate)
+	val unitSys get() = unitSystem
 	val currentTemp get() = temp(current.temp)
 	val currentFeel get() = temp(current.feelsLike)
-	val currentWindSpeed get() = speed(current.windSpeed)
+	val currentPressure get() = pressure(current.pressure)
+	val currentWindSpeed get() = distance(current.windSpeed)
 	val currentHumidity get() = percent(current.humidity)
 	val currentDewPoint get() = temp(current.dewPoint)
-	val todayMinMax get() = minMax(today.min, today.max)
+	val currentClouds get() = percent(current.clouds)
+	val currentVisibility get() = distance(current.visibility)
+	val currentUVIndex get() = number(current.uv)
+	val currentUVLevelIndex
+		get() = when(current.uv) {
+			in 0..2 -> 0
+			in 3..5 -> 1
+			in 6..7 -> 2
+			in 8..10 -> 3
+			else -> 4
+		}
+	val todayMax get() = temp(today.max)
+	val todayMin get() = temp(today.min)
 	val todayPop get() = percent(today.pop)
 	val todaySunrise get() = localTime(today.sunrise, location.zoneId)
 	val todaySunset get() = localTime(today.sunset, location.zoneId)
@@ -83,13 +97,12 @@ class WeatherInfo(
 	companion object {
 
 		// region formatting
-		fun setFormatSystem(metric: Boolean, speedUnit: String) {
-			this.metric = metric
-			this.speedUnit = speedUnit
+		fun setUnitsSystem(units: Int) {
+			unitSystem = units
 		}
 
-		private var metric = true
-		private var speedUnit = ""
+		private var unitSystem = 0
+		private val isMetric get() = unitSystem == 0
 
 		// prints at least 1 digit, sep each 3 digits, 0 to 2 decimal digits, rounds to nearest
 		private val nFormat = NumberFormat.getInstance().apply {
@@ -116,17 +129,17 @@ class WeatherInfo(
 		private fun localTime(instant: Instant, zone: ZoneId): String =
 			tFormatter.format(instant.atZone(zone))
 
+		private fun number(n: Number): String = nFormat.format(n)
+
 		private fun temp(deg: Int) =
-			nFormat.format((if(metric) deg else deg * 1.8f + 32).toInt()) + '°'
+			nFormat.format(if(isMetric) deg else (deg * 1.8f + 32).toInt()) + '°'
 
-		private fun minMax(min: Int, max: Int) =
-			temp(min).padEnd(5) + '|' + temp(max).padStart(5)
-
-		private fun speed(kph: Float) =
-			nFormat.format(if(metric) kph else kph * 0.6214f) + ' ' + speedUnit
+		private fun distance(km: Float): String = nFormat.format(if(isMetric) km else km * 0.6214f)
 
 		// our ratios are already from 0-100, this formatter expects fractions from 0-1
 		private fun percent(ratio: Int): String = pFormat.format(ratio / 100f)
+
+		private fun pressure(mb: Int): String = nFormat.format(if(isMetric) mb else mb * 0.0295301f)
 		// endregion
 	}
 }

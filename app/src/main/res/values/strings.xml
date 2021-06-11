@@ -10,6 +10,8 @@
 	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
 	<string name="f_last_update">Last update: %s</string>
 	<string name="f_feels_like">Feels like %s</string>
+	<string name="f_2s" translatable="false">%s %s</string>
+	<string name="f_2s_p" translatable="false">%s (%s)</string>
 	<string name="cd_weather_icon">Weather icon</string>
 	<string name="cd_pop">Probability of Precipitation</string>
 	<string name="cd_pressure">Pressure</string>
@@ -18,7 +20,7 @@
 	<string name="cd_clouds">Clouds</string>
 	<string name="cd_visibility">Visibility</string>
 	<string name="cd_wind_speed_dir">Wind speed and direction</string>
-	<string name="cd_uv_index">UV Index</string>
+	<string name="cd_uv">UV Index</string>
 	<string name="cd_sunrise">Sunrise time</string>
 	<string name="cd_sunset">Sunset time</string>
 	<string name="cd_moonrise">Moonrise time</string>
@@ -72,6 +74,25 @@
 		<item>Moderate or heavy rain with thunder</item>
 		<item>Patchy light snow with thunder</item>
 		<item>Moderate or heavy snow with thunder</item>
+	</string-array>
+	<string-array name="uv_levels">
+		<item>Low</item>
+		<item>Moderate</item>
+		<item>High</item>
+		<item>Very High</item>
+		<item>Extreme</item>
+	</string-array>
+	<string-array name="units_distance">
+		<item>km</item>
+		<item>miles</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>km/h</item>
+		<item>mph</item>
+	</string-array>
+	<string-array name="units_pressure">
+		<item>mb</item>
+		<item>inHg</item>
 	</string-array>
 	<string-array name="moon_phases">
 		<item>New Moon</item>
@@ -135,10 +156,6 @@
 	<string-array name="values_unit_system">
 		<item>0</item>
 		<item>1</item>
-	</string-array>
-	<string-array name="units_speed">
-		<item>km/h</item>
-		<item>mph</item>
 	</string-array>
 	<string name="cat_header_loc">My Location</string>
 	<string name="key_loc_use_device" translatable="false">loc_use_device</string>

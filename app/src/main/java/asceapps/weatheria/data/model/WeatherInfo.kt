@@ -127,7 +127,7 @@ class WeatherInfo(
 			dtFormatter.format(Instant.now().atZone(zone))
 
 		private fun localTime(instant: Instant, zone: ZoneId): String =
-			tFormatter.format(instant.atZone(zone))
+			if(instant.epochSecond == -1L) "-" else tFormatter.format(instant.atZone(zone))
 
 		private fun number(n: Number): String = nFormat.format(n)
 

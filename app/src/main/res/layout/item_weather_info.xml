@@ -322,6 +322,64 @@
 				app:layout_constraintStart_toEndOf="@id/mid_v_guideline"
 				app:layout_constraintTop_toBottomOf="@+id/tv_moonrise"
 				tools:text="4:59 AM"/>
+			<View
+				android:id="@+id/hourly_divider"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginTop="@dimen/_8sdp"
+				android:background="@drawable/divider"
+				app:layout_constraintTop_toBottomOf="@id/tv_moonset"/>
+			<TextView
+				android:id="@+id/hourly_label"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/_8sdp"
+				android:text="@string/hourly_label"
+				android:textAllCaps="true"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/hourly_divider"/>
+			<asceapps.weatheria.ui.view.WeatherChart
+				android:id="@+id/hourly_chart"
+				android:layout_width="match_parent"
+				android:layout_height="@dimen/_144sdp"
+				android:layout_marginTop="@dimen/_8sdp"
+				app:divider="@drawable/divider"
+				app:showDividers="middle"
+				app:dataType="hourly"
+				app:lineWidth="1px"
+				app:pointTextSize="14sp"
+				app:graphPadding="@dimen/_16sdp"
+				app:layout_constraintTop_toBottomOf="@id/hourly_label"/>
+			<View
+				android:id="@+id/daily_divider"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginTop="@dimen/_8sdp"
+				android:background="@drawable/divider"
+				app:layout_constraintTop_toBottomOf="@id/hourly_chart"/>
+			<TextView
+				android:id="@+id/daily_label"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/_8sdp"
+				android:text="@string/daily_label"
+				android:textAllCaps="true"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/daily_divider"/>
+			<asceapps.weatheria.ui.view.WeatherChart
+				android:id="@+id/daily_chart"
+				android:layout_width="match_parent"
+				android:layout_height="@dimen/_144sdp"
+				android:layout_marginTop="@dimen/_8sdp"
+				app:divider="@drawable/divider"
+				app:showDividers="middle"
+				app:dataType="daily"
+				app:lineWidth="1px"
+				app:pointTextSize="14sp"
+				app:graphPadding="@dimen/_16sdp"
+				app:layout_constraintTop_toBottomOf="@id/daily_label"/>
 		</androidx.constraintlayout.widget.ConstraintLayout>
 	</androidx.core.widget.NestedScrollView>
 </layout>

@@ -1,0 +1,13 @@
+<resources>
+	<declare-styleable name="WeatherChart">
+		<attr name="lineColor" format="color"/>
+		<attr name="lineWidth" format="dimension"/>
+		<attr name="pointTextSize" format="dimension"/>
+		<attr name="pointRadius" format="dimension"/>
+		<attr name="graphPadding" format="dimension"/>
+		<attr name="dataType" format="enum">
+			<enum name="hourly" value="0"/>
+			<enum name="daily" value="1"/>
+		</attr>
+	</declare-styleable>
+</resources>

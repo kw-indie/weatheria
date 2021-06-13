@@ -17,7 +17,7 @@ abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<B> {
+	final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<B> {
 		val binding = DataBindingUtil.inflate<B>(
 			LayoutInflater.from(parent.context), viewType, parent, false
 		)
@@ -26,18 +26,18 @@ abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 		return holder
 	}
 
-	override fun onBindViewHolder(holder: BindingHolder<B>, position: Int) {
+	final override fun onBindViewHolder(holder: BindingHolder<B>, position: Int) {
 		val item = getItem(position)
 		with(holder.binding) {
 			setVariable(BR.item, item)
-			//onBindHolder(holder, item)
+			onBindHolder(holder, item)
 			executePendingBindings()
 		}
 	}
 
 	abstract override fun getItemViewType(position: Int): Int
 	open fun onHolderCreated(holder: BindingHolder<B>) {}
-	//open fun onBindHolder(holder: BindingHolder<B>, item: T) {}
+	open fun onBindHolder(holder: BindingHolder<B>, item: T) {}
 
 	private class HashCallback<T: Listable>: DiffUtil.ItemCallback<T>() {
 

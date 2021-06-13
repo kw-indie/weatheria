@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 import java.time.*
 import java.time.chrono.HijrahDate
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -323,13 +324,19 @@ class WeatherInfoRepo @Inject constructor(
 		private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
 
 		private fun localTimeToEpochSeconds(dayEpochSeconds: Int, time: String, zone: ZoneId): Int {
-			// stupid shits give startOfDaySeconds in utc and times in local
-			val startOfDay = Instant.ofEpochSecond(dayEpochSeconds.toLong())
-			val localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a"))
-			val zonedDt = ZonedDateTime.ofInstant(startOfDay, zone)
-				.withHour(localTime.hour)
-				.withMinute(localTime.minute)
-			return zonedDt.toEpochSecond().toInt()
+			return try {
+				// stupid shits give startOfDaySeconds in utc and times in local
+				val startOfDay = Instant.ofEpochSecond(dayEpochSeconds.toLong())
+				val localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a"))
+				val zonedDt = ZonedDateTime.ofInstant(startOfDay, zone)
+					.withHour(localTime.hour)
+					.withMinute(localTime.minute)
+				zonedDt.toEpochSecond().toInt()
+			} catch(e: DateTimeParseException) {
+				// when 'No sunrise/moonset/etc.' is sent
+				e.printStackTrace()
+				-1
+			}
 		}
 
 		private fun moonPhaseIndex(phase: String) = when(phase) {

@@ -25,6 +25,9 @@
 	<string name="cd_sunset">Sunset time</string>
 	<string name="cd_moonrise">Moonrise time</string>
 	<string name="cd_moonset">Moonset time</string>
+	<string name="hourly_label">Later Today</string>
+	<string name="daily_label">Later This Week</string>
+	<string name="today">Today</string>
 	<string-array name="weather_conditions">
 		<item>Clear</item>
 		<item>Partly cloudy</item>

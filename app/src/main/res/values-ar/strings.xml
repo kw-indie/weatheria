@@ -23,6 +23,9 @@
 	<string name="cd_sunset">وقت غروب الشمس</string>
 	<string name="cd_moonrise">وقت شروق القمر</string>
 	<string name="cd_moonset">وقت غروب القمر</string>
+	<string name="hourly_label">لاحقًا اليوم</string>
+	<string name="daily_label">لاحقًا هذا الأسبوع</string>
+	<string name="today">اليوم</string>
 	<string-array name="weather_conditions">
 		<item>صافي</item>
 		<item>غائم جزئيًا</item>

@@ -14,18 +14,39 @@
 	<!--dawn-->
 	<color name="dawn_1">#311B92</color>
 	<color name="dawn_2">#3D5AFE</color>
-	<color name="dawn_3">#3D9AFE</color>
+	<color name="dawn_3">#1783F7</color>
 	<!--day-->
-	<color name="day_1">#03A9F4</color>
-	<color name="day_2">#2196F3</color>
-	<color name="day_3">#1976D2</color>
+	<color name="day_1">#07518C</color>
+	<color name="day_2">#0E6EBB</color>
+	<color name="day_3">#2189DC</color>
 	<!--dusk-->
-	<color name="dusk_1">#FF8B07</color>
+	<color name="dusk_1">#8F0C75</color>
 	<color name="dusk_2">#F44336</color>
-	<color name="dusk_3">#8F0C75</color>
+	<color name="dusk_3">#FF6607</color>
 	<!--night-->
-	<color name="night_1">#0E2D88</color>
+	<color name="night_1">#050121</color>
 	<color name="night_2">#032163</color>
-	<color name="night_3">#050121</color>
-	<color name="map_marker">#F44336</color>
+	<color name="night_3">#0E2D88</color>
+	<!--accuracy colors-->
+	<color name="accuracy_fresh">#388E3C</color>
+	<color name="accuracy_high">#8BC34A</color>
+	<color name="accuracy_medium">#FFEB3B</color>
+	<color name="accuracy_low">#FF9800</color>
+	<color name="accuracy_outdated">#F44336</color>
+	<!--icon colors-->
+	<color name="sun_fill">#FFC107</color>
+	<color name="sun_fill_50p">#7FFFC107</color>
+	<color name="sun_stroke">#FF9800</color>
+	<color name="moon_fill">#E1E1FF</color>
+	<color name="moon_fill_50p">#7FE1E1FF</color>
+	<color name="moon_shadow">#C4C4C4</color>
+	<color name="moon_shadow_dark">#B3B3B3</color>
+	<color name="moon_stroke">#2196F3</color>
+	<color name="cloud_fill">#FFFFFF</color>
+	<color name="cloud_dark_fill">#E1E1E1</color>
+	<color name="cloud_dark2_fill">#707070</color>
+	<color name="cloud_stroke">#E1E1E1</color>
+	<color name="cloud_dark_stroke">#C4C4C4</color>
+	<color name="cloud_dark2_stroke">#909090</color>
+	<color name="cloud_dark3_stroke">#404040</color>
 </resources>

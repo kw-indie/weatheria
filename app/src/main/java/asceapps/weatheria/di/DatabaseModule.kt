@@ -9,16 +9,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
+	@Provides
 	@Singleton
-	@Provides
-	fun provideAppDB(@ApplicationContext context: Context) = AppDatabase.build(context)
-
-	@Provides
-	fun provideLocationDao(appDatabase: AppDatabase) = appDatabase.locationDao()
+	fun provideAppDB(@ApplicationContext appContext: Context) = AppDatabase.build(appContext)
 
 	@Provides
 	fun provideWeatherInfoDao(appDatabase: AppDatabase) = appDatabase.weatherInfoDao()

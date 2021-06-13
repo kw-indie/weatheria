@@ -1,0 +1,25 @@
+<vector
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:autoMirrored="true"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<path
+		android:fillColor="@color/cloud_dark_fill"
+		android:strokeWidth="1"
+		android:strokeColor="@color/cloud_dark2_stroke"
+		android:pathData="@string/cloud_path"/>
+	<group android:translateX="-2.25">
+		<path
+			android:strokeWidth="1"
+			android:strokeColor="@color/cloud_dark_fill"
+			android:strokeLineCap="round"
+			android:pathData="@string/snow_flake_path"/>
+	</group>
+	<path
+		android:strokeWidth="1"
+		android:strokeColor="@color/cloud_dark_fill"
+		android:strokeLineCap="round"
+		android:pathData="@string/blowing_path"/>
+</vector>

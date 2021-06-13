@@ -1,19 +1,44 @@
 package asceapps.weatheria.di
 
-import android.content.Context
-import asceapps.weatheria.api.WeatherService
+import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.api.WeatherApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-	@Singleton
 	@Provides
-	fun provideWeatherService(@ApplicationContext context: Context) = WeatherService.create(context)
+	@Singleton
+	fun provideWeatherApi(): WeatherApi {
+		val interceptor = Interceptor { chain ->
+			val newUrl = chain.request().url.newBuilder()
+				.addQueryParameter("key", BuildConfig.WEATHER_API_KEY)
+				.build()
+			val request = chain.request().newBuilder()
+				.url(newUrl)
+				.build()
+			chain.proceed(request)
+		}
+		val client = OkHttpClient.Builder()
+			.addInterceptor(interceptor)
+			.callTimeout(10, TimeUnit.SECONDS) // throws InterruptedIOException
+			.build()
+		return Retrofit.Builder()
+			.baseUrl("https://api.weatherapi.com/v1/")
+			.client(client)
+			.addConverterFactory(GsonConverterFactory.create())
+			.build()
+			.create()
+	}
 }

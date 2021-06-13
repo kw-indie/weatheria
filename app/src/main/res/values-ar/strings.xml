@@ -1,89 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!--home-->
-	<string name="action_locations">المواقع</string>
-	<string name="action_search">بحث</string>
-	<string name="action_delete">احذف الموقع</string>
-	<string name="action_retain">احذف المواقع الأخرى</string>
-	<string name="action_delete_all">احذف جميع المواقع</string>
+	<string name="noti_def_channel_name">القناة الافتراضية</string>
+	<string name="noti_def_channel_desc">جميع إشعارات التطبيق تستخدم هذه القناة</string>
+	<!--main-->
 	<string name="action_settings">الإعدادات</string>
-	<string name="empty_pager">لا توجد مواقع لعرض توقعات الطقس. لم لا تضيف موقعًا؟</string>
+	<!--home-->
+	<string name="action_my_locations">مواقعي</string>
+	<string name="action_add_location">أضف موقعًا</string>
+	<string name="no_saved_locations">ليس لديك أي مواقع محفوظة. لم لا تضيف واحدًا؟</string>
 	<string name="f_last_update">آخر تحديث: %s</string>
-	<string name="f_comma_sep">%1$s، %2$s</string>
 	<string name="f_feels_like">تشعر وكأنها %s</string>
 	<string name="cd_weather_icon">أيقونة حالة الطقس</string>
-	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
+	<string name="cd_pop">احتمالية الهطول</string>
+	<string name="cd_pressure">الضغط الجوي</string>
 	<string name="cd_humidity">الرطوبة</string>
+	<string name="cd_dew_point">درجة التكثف</string>
+	<string name="cd_clouds">السحب</string>
+	<string name="cd_visibility">مدى الرؤية</string>
+	<string name="cd_wind_speed_dir">سرعة الرياح واتجاهها</string>
+	<string name="cd_uv">الأشعة فوق البنفسجية</string>
 	<string name="cd_sunrise">وقت شروق الشمس</string>
 	<string name="cd_sunset">وقت غروب الشمس</string>
-	<string-array name="dir_letters">
-		<item>ق</item>
-		<item>شق</item>
-		<item>ش</item>
-		<item>شغ</item>
-		<item>غ</item>
-		<item>جغ</item>
-		<item>ج</item>
-		<item>جق</item>
-	</string-array>
+	<string name="cd_moonrise">وقت شروق القمر</string>
+	<string name="cd_moonset">وقت غروب القمر</string>
+	<string name="hourly_label">لاحقًا اليوم</string>
+	<string name="daily_label">لاحقًا هذا الأسبوع</string>
+	<string name="today">اليوم</string>
 	<string-array name="weather_conditions">
-		<item>عاصفة رعدية وأمطار خفيفة</item>
-		<item>عاصفة رعدية وأمطار</item>
-		<item>عاصفة رعدية وأمطار غزيرة</item>
-		<item>عاصفة رعدية خفيفة</item>
-		<item>عاصفة رعدية</item>
-		<item>عاصفة رعدية شديدة</item>
-		<item>عاصفة رعدية متفرقة</item>
-		<item>عاصفة رعدية ورذاذ خفيف</item>
-		<item>عاصفة رعدية ورذاذ</item>
-		<item>عاصفة رعدية ورذاذ غزير</item>
+		<item>صافي</item>
+		<item>غائم جزئيًا</item>
+		<item>غائم</item>
+		<item>معتم</item>
+		<item>سديم</item>
+		<item>أمطار متفرقة محتملة</item>
+		<item>ثلج متفرق محتمل</item>
+		<item>مطر متجمد متفرق محتمل</item>
+		<item>رذاذ ثلجي متفرق محتمل</item>
+		<item>طلقات رعدية محتملة</item>
+		<item>ثلوج عاصفة</item>
+		<item>عاصفة ثلجية</item>
+		<item>ضباب كثيف</item>
+		<item>ضباب ثلجي</item>
+		<item>رذاذ خفيف متفرق</item>
 		<item>رذاذ خفيف</item>
-		<item>رذاذ</item>
-		<item>رذاذ شديد الكثافة</item>
-		<item>رذاذ ممطر خفيف</item>
-		<item>رذاذ ممطر</item>
-		<item>رذاذ ممطر غزير</item>
-		<item>أمطار متقطعة ورذاذ</item>
-		<item>مطر غزير ورذاذ</item>
-		<item>رذاذ متقطع</item>
+		<item>رذاذ ثلجي</item>
+		<item>رذاذ ثلجي كثيف</item>
+		<item>أمطار خفيفة متفرقة</item>
 		<item>مطر خفيف</item>
+		<item>أمطار معتدلة في بعض الأحيان</item>
 		<item>أمطار معتدلة</item>
+		<item>أمطار غزيرة في بعض الأحيان</item>
 		<item>أمطار غزيرة</item>
-		<item>أمطار غزيرة جدا</item>
-		<item>أمطار شديدة الغزارة</item>
-		<item>مطر شديد البرودة</item>
-		<item>مطر خفيف متقطع</item>
-		<item>مطر متقطع</item>
-		<item>مطر متقطع شديد الغزارة</item>
-		<item>أمطار متقطعة ومتفرقة</item>
+		<item>أمطار ثلجية خفيفة</item>
+		<item>أمطار ثلجية معتدلة أو شديدة</item>
+		<item>مطر متجمد خفيف</item>
+		<item>مطر متجمد معتدل أو شديد</item>
+		<item>ثلوج خفيفة متفرقة</item>
 		<item>ثلوج خفيفة</item>
-		<item>ثلج</item>
+		<item>ثلوج معتدلة متفرقة</item>
+		<item>ثلوج معتدلة</item>
+		<item>ثلوج كثيفة متفرقة</item>
 		<item>ثلوج كثيفة</item>
 		<item>برَد</item>
-		<item>برَد متقطع خفيف</item>
-		<item>برَد متقطع</item>
-		<item>أمطار خفيفة وثلوج</item>
-		<item>أمطار وثلوج</item>
-		<item>ثلوج متقطعة خفيفة</item>
-		<item>ثلوج متقطعة</item>
-		<item>ثلوج متقطعة كثيفة</item>
-		<item>ضباب</item>
-		<item>دخان</item>
-		<item>سديم</item>
-		<item>رمال ودوامات غبار</item>
-		<item>ضباب كثيف</item>
-		<item>رمال</item>
-		<item>غبار</item>
-		<item>رماد بركاني</item>
-		<item>عواصف فجائية</item>
-		<item>إعصار</item>
-		<item>سماء صافية</item>
-		<item>سحب قليلة: ١١–٢٥٪</item>
-		<item>سحب متفرقة: ٢٥–٥٠٪</item>
-		<item>سحب متقطعة: ٥٠–٨٥٪</item>
-		<item>سماء ملبدة بالغيوم: ٨٥–١٠٠٪</item>
+		<item>أمطار خفيفة مؤقتة</item>
+		<item>أمطار معتدلة أو غزيرة مؤقتة</item>
+		<item>أمطار غزيرة مؤقتة</item>
+		<item>مطر متجمد خفيف مؤقت</item>
+		<item>مطر متجمد معتدل أو غزير مؤقت</item>
+		<item>ثلج خفيف مؤقت</item>
+		<item>ثلج معتدل أو غزير مؤقت</item>
+		<item>برَد خفيف مؤقت</item>
+		<item>برَد معتدل أو غزير مؤقت</item>
+		<item>أمطار رعدية خفيفة متفرقة</item>
+		<item>أمطار رعدية معتدلة أو غزيرة</item>
+		<item>ثلوج خفيفة متفرقة مع رعد</item>
+		<item>ثلوج معتدلة أو كثيفة مصحوبة برعد</item>
+	</string-array>
+	<string-array name="uv_levels">
+		<item>منخفضة</item>
+		<item>متوسطة</item>
+		<item>عالية</item>
+		<item>عالية جدا</item>
+		<item>خطيرة</item>
+	</string-array>
+	<string-array name="units_distance">
+		<item>كم</item>
+		<item>ميل</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>كم/س</item>
+		<item>ميل/س</item>
+	</string-array>
+	<string-array name="units_pressure">
+		<item>مل بار</item>
+		<item>بوصة زئبق</item>
 	</string-array>
 	<string-array name="moon_phases">
+		<item>محاق</item>
 		<item>هلال متزايد</item>
 		<item>التربيع الأول</item>
 		<item>أحدب متزايد</item>
@@ -91,49 +104,47 @@
 		<item>أحدب متناقص</item>
 		<item>التربيع الأخير</item>
 		<item>هلال متناقص</item>
-		<item>محاق</item>
 	</string-array>
-	<!--map-->
-	<string name="select_on_map">حدد على الخريطة</string>
-	<!--search-->
-	<string name="search_hint">أدخل اسم المكان أو إحداثياته</string>
-	<string name="get_current_location">تحديد موقعك الحالي</string>
-	<string name="getting_location">جاري الحصول على الموقع. إذا استغرق الأمر طويلًا، حاول تحريك الهاتف قليلُا، أو خذ لحظة في الخارج</string>
+	<!--add location-->
+	<string name="action_search">بحث</string>
+	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
+	<string name="location_request_rationale">يحتاج التطبيق لإذن الحصول على موقعك الحالي للحظة فقط. بإمكانك سحب الإذن بعدها بأمان.\nبإمكانك أيضًا تغيير الإعدادات لاستخدام عنوان الـIP لإيجاد موقعك.</string>
+	<string name="give_permission">أعط الإذن</string>
+	<string name="dismiss">رفض</string>
+	<string name="no_search_result">لا نتائج.\n\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بقدر كافٍ، ثم اضغط زر البحث لإظهار النتائج.</string>
+	<string name="hint_search">ابحث بالاسم أو الإحداثيات</string>
 	<!--locations-->
-	<string name="cd_reorder">إعادة ترتيب</string>
+	<string name="action_delete_all">حذف الكل</string>
+	<string name="action_refresh_all">تحديث الكل</string>
+	<string name="cd_delete">حذف</string>
+	<string name="cd_reorder">ترتيب</string>
 	<!--errors-->
+	<string name="retry">أعد المحاولة</string>
 	<string name="error_location_denied">لم يتم الحصول على إذن الموقع</string>
 	<string name="error_location_disabled">الرجاء تفعيل خدمة تحديد الموقع ثم المحاولة مجددًا</string>
+	<string name="error_location_not_found">لم نعثر على موقعك. حاول تفعيل GPS ثم تحريك الهاتف قليلًا.</string>
 	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
 	<string name="error_timed_out">انتهت مهلة الطلب</string>
 	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
-	<string name="error_parsing_resp">خطأ في قراءة الرد. حاول إدخال موقعٍ مختلف</string>
-	<string name="error_duplicate_location">هذا الموقع موجود بالفعل</string>
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--settings-->
 	<string name="cat_header_general">عام</string>
 	<string name="title_units">نظام الوحدات</string>
-	<string-array name="units_entries">
+	<string-array name="entries_unit_system">
 		<item>متري</item>
-		<item>إنجليزي</item>
+		<item>إمبراطوري</item>
 	</string-array>
-	<string-array name="units_speed">
-		<item>م/ث</item>
-		<item>ميل/ساعة</item>
-	</string-array>
-	<string name="title_reorder">تغيير الترتيب</string>
-	<string name="summary_reorder">قم بإعادة ترتيب المواقع</string>
-	<string name="cat_header_display">العرض</string>
-	<string name="title_theme">المظهر</string>
-	<string-array name="theme_entries">
-		<item>حسب النظام</item>
-		<item>داكن</item>
-		<item>فاتح</item>
-	</string-array>
+	<string name="cat_header_loc">موقعي</string>
+	<string name="title_loc_use_device">طلب الموقع من الجهاز</string>
+	<string name="summary_loc_use_device">مفعّل: استخدم الجهاز (GPS أوالشبكة). دقة أعلى، لكنه بطيء أحيانًا ويتطلب الأذونات.</string>
+	<string name="summary_loc_use_ip">معطّل: طلب الموقع عن طريق الـIP. سريع ولا يتطلب الأذونات، لكنه أقل دقة.</string>
+	<string name="title_loc_accuracy_high">طلب موقع عالي الدقة</string>
+	<string name="summary_loc_accuracy_high">مفعّل: نجاح شبه مضمون، لكنه يتطلب إذن الوصول إلى الموقع الدقيق.</string>
+	<string name="summary_loc_accuracy_normal">معطّل: يتطلب إذن الوصول إلى الموقع التقريبي فقط، لكنه أقل دقة ويفشل أحيانًا.</string>
 	<string name="cat_header_sync">المزامنة</string>
 	<string name="title_auto_refresh">التحديث التلقائي</string>
-	<string-array name="auto_refresh_entries">
-		<item>متوقف</item>
+	<string-array name="entries_auto_refresh">
+		<item>تعطيل</item>
 		<item>كل ٦ ساعات</item>
 		<item>كل ١٢ ساعة</item>
 		<item>كل يوم</item>

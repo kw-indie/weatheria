@@ -1,7 +1,9 @@
-apply plugin: "com.android.application"
-apply plugin: "kotlin-android" // for kotlin lang support
-apply plugin: "kotlin-kapt" // for annotations: data binding, etc
-apply plugin: "dagger.hilt.android.plugin"
+plugins {
+	id 'com.android.application'
+	id 'kotlin-android' // for kotlin support
+	id 'kotlin-kapt' // for annotations: data binding, etc
+	id 'dagger.hilt.android.plugin'
+}
 
 android {
 	compileSdkVersion targetSdkVer
@@ -15,15 +17,17 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 3
-		versionName "0.2.1"
+		versionCode 4
+		versionName "0.3.1"
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables.useSupportLibrary = true
 
-		// if i don't add the quotes separately, the generated var is typed in as a broken int
-		buildConfigField("String", "WEATHER_APP_ID", "\"" + project.findProperty("weather_app_id") + "\"")
-		resValue "string", "maps_api_key", (project.findProperty("maps_api_key") ?: "")
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+		Properties ps = new Properties()
+		new File("local.properties").withInputStream { ps.load(it) }
+		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
+		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused i18n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
@@ -46,15 +50,16 @@ android {
 		debug {
 			applicationIdSuffix ".debug"
 		}
-		prerelease {
+		staging {
 			debuggable true
 			minifyEnabled true
-			applicationIdSuffix ".prerelease"
-			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "proguard-prerelease-rules.pro"
+			applicationIdSuffix ".staging"
+			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro", "staging-rules.pro"
 		}
 		release {
 			minifyEnabled true
-			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+			shrinkResources true // verify needed
+			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro"
 			ndk {
 				debugSymbolLevel "full" // include android vitals debug file in app bundle
 			}
@@ -71,34 +76,43 @@ android {
 
 	kotlinOptions {
 		jvmTarget = javaVer
+		// IR compiler: default (since AS 4.2) kotlin compiler backend (supposedly faster, needed for Compose)
+		freeCompilerArgs += [
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // todo find out what for
+			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
+			"-Xopt-in=kotlin.time.ExperimentalTime" // for kotlin duration
+		]
 	}
 
 }
 
 dependencies {
-	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.1"
+	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
 	// kotlin
-	implementation "androidx.core:core-ktx:$coreVer"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer"
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
-	// to use viewModels delegate
+	// general & ui
+	implementation "androidx.core:core-ktx:$coreVer"
+	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
+	implementation "androidx.viewpager2:viewpager2:$viewPager2Ver"
+	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
+	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
+	implementation "com.google.android.material:material:$materialVer"
+
+	// to use viewModels delegate, new result system, and lots more
 	implementation "androidx.activity:activity-ktx:$activityVer"
 	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
 
-	// general
-	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
-	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
-	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
-	implementation "androidx.viewpager2:viewpager2:$viewPagerVer"
-	implementation "com.google.android.material:material:$materialVer"
-
 	// viewModel & liveData
+	// runtime offers new flow consumers (e.g addRepeatingJob)
+	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
+	// todo remove, we aren't using liveData anywhere
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
@@ -109,10 +123,10 @@ dependencies {
 
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
-	implementation "androidx.core:core-animation:$animatorVer"
-	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableVer"
+	implementation "androidx.core:core-animation:$coreAnimationVer"
+	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableAnimVer"
 
-	// preferences fragment
+	// new preferences (fragment, etc.)
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
 
 	// room
@@ -125,11 +139,14 @@ dependencies {
 	// retrofit
 	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
 	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-	implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVer"
+	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"
 
-	// maps
+	// maps & location
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
+	// flp (+ activity recognition + geofencing)
 	implementation "com.google.android.gms:play-services-location:$locationVer"
+	// manually specified the version available in google() instead of clinging to jcenter()
+	implementation "com.android.volley:volley:$volleyVer"
 
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"
@@ -139,18 +156,16 @@ dependencies {
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
 	// hilt with jetpack (viewModel, workManager)
-	kapt "androidx.hilt:hilt-compiler:$hiltJetpackVer"
-	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltJetpackVer"
-	implementation "androidx.hilt:hilt-work:$hiltJetpackVer"
-
-	// coil
-	implementation "io.coil-kt:coil:$coilVer"
+	kapt "androidx.hilt:hilt-compiler:$hiltCompilerVer"
+	implementation "androidx.hilt:hilt-work:$hiltCompilerVer"
+	// this f***y artifact is always behind
+	implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltCompilerOldVer"
 
 	// multi screen size support
-	implementation "com.intuit.sdp:sdp-android:1.0.6"
-	implementation "com.intuit.ssp:ssp-android:1.0.6"
+	implementation "com.intuit.sdp:sdp-android:$intuitVer"
+	implementation "com.intuit.ssp:ssp-android:$intuitVer"
 
 	// android tests
-	testImplementation "junit:junit:4.13.1"
-	androidTestImplementation "androidx.test.ext:junit:1.1.2"
+	testImplementation "junit:junit:$junitVer"
+	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"
 }

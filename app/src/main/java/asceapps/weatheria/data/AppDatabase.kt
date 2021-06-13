@@ -5,11 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.dao.WeatherInfoDao
+import asceapps.weatheria.data.entity.CurrentEntity
+import asceapps.weatheria.data.entity.DailyEntity
+import asceapps.weatheria.data.entity.HourlyEntity
+import asceapps.weatheria.data.entity.LocationEntity
 
 @Database(
 	entities = [
 		LocationEntity::class,
-		SavedLocationEntity::class,
 		CurrentEntity::class,
 		HourlyEntity::class,
 		DailyEntity::class
@@ -19,14 +23,12 @@ import asceapps.weatheria.BuildConfig
 )
 abstract class AppDatabase: RoomDatabase() {
 
-	abstract fun locationDao(): LocationDao
 	abstract fun weatherInfoDao(): WeatherInfoDao
 
 	companion object {
 
 		fun build(appContext: Context) =
 			Room.databaseBuilder(appContext, AppDatabase::class.java, "weatheria")
-				.createFromAsset("database/weatheria.db")
 				.build()
 	}
 }

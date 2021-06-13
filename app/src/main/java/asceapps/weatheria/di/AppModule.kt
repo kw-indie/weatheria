@@ -3,19 +3,22 @@ package asceapps.weatheria.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import androidx.work.WorkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(ActivityRetainedComponent::class)
 class AppModule {
 
-	@Singleton
 	@Provides
-	fun providePrefs(@ApplicationContext context: Context): SharedPreferences =
-		PreferenceManager.getDefaultSharedPreferences(context)
+	fun provideSharedPrefs(@ApplicationContext appContext: Context): SharedPreferences =
+		PreferenceManager.getDefaultSharedPreferences(appContext)
+
+	@Provides
+	fun provideWorkManager(@ApplicationContext appContext: Context): WorkManager =
+		WorkManager.getInstance(appContext)
 }

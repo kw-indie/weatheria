@@ -1,89 +1,104 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
-	<!--home-->
-	<string name="action_locations">Locations</string>
-	<string name="action_search">Search</string>
-	<string name="action_delete">Delete location</string>
-	<string name="action_retain">Delete other locations</string>
-	<string name="action_delete_all">Delete all locations</string>
+	<string name="noti_def_channel_name">Default channel</string>
+	<string name="noti_def_channel_desc">All app notifications use this channel</string>
+	<!--main-->
 	<string name="action_settings">Settings</string>
-	<string name="empty_pager">No location to show forecast for.\nWhy not add one?</string>
+	<!--home-->
+	<string name="action_my_locations">My locations</string>
+	<string name="action_add_location">Add location</string>
+	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
 	<string name="f_last_update">Last update: %s</string>
-	<string name="f_comma_sep">%1$s, %2$s</string>
 	<string name="f_feels_like">Feels like %s</string>
+	<string name="f_2s" translatable="false">%s %s</string>
+	<string name="f_2s_p" translatable="false">%s (%s)</string>
 	<string name="cd_weather_icon">Weather icon</string>
-	<string name="cd_wind_speed_dir">Wind speed and direction</string>
+	<string name="cd_pop">Probability of Precipitation</string>
+	<string name="cd_pressure">Pressure</string>
 	<string name="cd_humidity">Humidity</string>
+	<string name="cd_dew_point">Dew point</string>
+	<string name="cd_clouds">Clouds</string>
+	<string name="cd_visibility">Visibility</string>
+	<string name="cd_wind_speed_dir">Wind speed and direction</string>
+	<string name="cd_uv">UV Index</string>
 	<string name="cd_sunrise">Sunrise time</string>
 	<string name="cd_sunset">Sunset time</string>
-	<string-array name="dir_letters">
-		<item>E</item>
-		<item>NE</item>
-		<item>N</item>
-		<item>NW</item>
-		<item>W</item>
-		<item>SW</item>
-		<item>S</item>
-		<item>SE</item>
-	</string-array>
+	<string name="cd_moonrise">Moonrise time</string>
+	<string name="cd_moonset">Moonset time</string>
+	<string name="hourly_label">Later Today</string>
+	<string name="daily_label">Later This Week</string>
+	<string name="today">Today</string>
 	<string-array name="weather_conditions">
-		<item>Thunderstorm with light rain</item>
-		<item>Thunderstorm with rain</item>
-		<item>Thunderstorm with heavy rain</item>
-		<item>Light thunderstorm</item>
-		<item>Thunderstorm</item>
-		<item>Heavy thunderstorm</item>
-		<item>Ragged thunderstorm</item>
-		<item>Thunderstorm with light drizzle</item>
-		<item>Thunderstorm with drizzle</item>
-		<item>Thunderstorm with heavy drizzle</item>
-		<item>Light intensity drizzle</item>
-		<item>Drizzle</item>
-		<item>Heavy intensity drizzle</item>
-		<item>Light intensity drizzle rain</item>
-		<item>Drizzle rain</item>
-		<item>Heavy intensity drizzle rain</item>
-		<item>Shower rain and drizzle</item>
-		<item>Heavy shower rain and drizzle</item>
-		<item>Shower drizzle</item>
-		<item>Light rain</item>
-		<item>Moderate rain</item>
-		<item>Heavy intensity rain</item>
-		<item>Very heavy rain</item>
-		<item>Extreme rain</item>
-		<item>Freezing rain</item>
-		<item>Light intensity shower rain</item>
-		<item>Shower rain</item>
-		<item>Heavy intensity shower rain</item>
-		<item>Ragged shower rain</item>
-		<item>Light snow</item>
-		<item>Snow</item>
-		<item>Heavy snow</item>
-		<item>Sleet</item>
-		<item>Light shower sleet</item>
-		<item>Shower sleet</item>
-		<item>Light rain and snow</item>
-		<item>Rain and snow</item>
-		<item>Light shower snow</item>
-		<item>Shower snow</item>
-		<item>Heavy shower snow</item>
+		<item>Clear</item>
+		<item>Partly cloudy</item>
+		<item>Cloudy</item>
+		<item>Overcast</item>
 		<item>Mist</item>
-		<item>Smoke</item>
-		<item>Haze</item>
-		<item>Sand and dust whirls</item>
+		<item>Patchy rain possible</item>
+		<item>Patchy snow possible</item>
+		<item>Patchy sleet possible</item>
+		<item>Patchy freezing drizzle possible</item>
+		<item>Thundery outbreaks possible</item>
+		<item>Blowing snow</item>
+		<item>Blizzard</item>
 		<item>Fog</item>
-		<item>Sand</item>
-		<item>Dust</item>
-		<item>Volcanic ash</item>
-		<item>Squalls</item>
-		<item>Tornado</item>
-		<item>Clear sky</item>
-		<item>Few clouds: 11–25%</item>
-		<item>Scattered clouds: 25–50%</item>
-		<item>Broken clouds: 51–84%</item>
-		<item>Overcast clouds: 85–100%</item>
+		<item>Freezing fog</item>
+		<item>Patchy light drizzle</item>
+		<item>Light drizzle</item>
+		<item>Freezing drizzle</item>
+		<item>Heavy freezing drizzle</item>
+		<item>Patchy light rain</item>
+		<item>Light rain</item>
+		<item>Moderate rain at times</item>
+		<item>Moderate rain</item>
+		<item>Heavy rain at times</item>
+		<item>Heavy rain</item>
+		<item>Light freezing rain</item>
+		<item>Moderate or heavy freezing rain</item>
+		<item>Light sleet</item>
+		<item>Moderate or heavy sleet</item>
+		<item>Patchy light snow</item>
+		<item>Light snow</item>
+		<item>Patchy moderate snow</item>
+		<item>Moderate snow</item>
+		<item>Patchy heavy snow</item>
+		<item>Heavy snow</item>
+		<item>Ice pellets</item>
+		<item>Light rain shower</item>
+		<item>Moderate or heavy rain shower</item>
+		<item>Torrential rain shower</item>
+		<item>Light sleet showers</item>
+		<item>Moderate or heavy sleet showers</item>
+		<item>Light snow showers</item>
+		<item>Moderate or heavy snow showers</item>
+		<item>Light showers of ice pellets</item>
+		<item>Moderate or heavy showers of ice pellets</item>
+		<item>Patchy light rain with thunder</item>
+		<item>Moderate or heavy rain with thunder</item>
+		<item>Patchy light snow with thunder</item>
+		<item>Moderate or heavy snow with thunder</item>
+	</string-array>
+	<string-array name="uv_levels">
+		<item>Low</item>
+		<item>Moderate</item>
+		<item>High</item>
+		<item>Very High</item>
+		<item>Extreme</item>
+	</string-array>
+	<string-array name="units_distance">
+		<item>km</item>
+		<item>miles</item>
+	</string-array>
+	<string-array name="units_speed">
+		<item>km/h</item>
+		<item>mph</item>
+	</string-array>
+	<string-array name="units_pressure">
+		<item>mb</item>
+		<item>inHg</item>
 	</string-array>
 	<string-array name="moon_phases">
+		<item>New Moon</item>
 		<item>Waxing Crescent</item>
 		<item>First Quarter</item>
 		<item>Waxing Gibbous</item>
@@ -91,72 +106,83 @@
 		<item>Waning Gibbous</item>
 		<item>Last Quarter</item>
 		<item>Waning Crescent</item>
-		<item>New Moon</item>
 	</string-array>
-	<!--map-->
-	<string name="select_on_map">Select on map</string>
+	<!--icon paths-->
+	<string name="sun_path" translatable="false">M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z</string>
+	<string name="moon_path" translatable="false">M17.6 14.1a6 6 0 1 1 -8.2-7.5 6 6 0 0 0 8.2 7.5z</string>
+	<string name="cloud_path" translatable="false">M17.96 16.71c4.03-0.29 3.64-5.8-0.08-5.86a3.9 3.9 0 0 0-7.49-0.31 3.16 3.16 0 0 0-3.98 2.38c-2.5 0.46-1.92 3.64 0.06 3.8z</string>
+	<string name="mist_path" translatable="false">M6.97 19.51h11</string>
+	<string name="patchy_rain_path" translatable="false">M12.02 18.76l-1.14 2.78m3.18-2.78l-1.14 2.78</string>
+	<string name="snow_flake_path" translatable="false">M13.11 20.94l-1.27-2.18m1.89 1.09h-2.51m1.88-1.09l-1.26 2.18</string>
+	<string name="freezing_drizzle_path" translatable="false">M8.9 18.76h1.14l-0.57 1.39zm3.14 0l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="lightning_path" translatable="false">M13.04 13.94l-1.14 2.78h1.14l-0.76 1.85h0.76l-0.76 1.85</string>
+	<string name="blowing_path" translatable="false">M13 18.76h5m-5 1.5h4</string>
+	<string name="fog_path" translatable="false">M6.97 18.76h11m-11 1.5h11</string>
+	<string name="freezing_fog_path" translatable="false">M6.97 18.76h1.14l-0.57 1.39zm2.64 0h8.36m-8.93 1.5h8.93</string>
+	<string name="light_drizzle_path" translatable="false">M10.04 18.76l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="heavy_freezing_drizzle_path" translatable="false">M6.97 18.76h1.07l-0.57 1.39zm3.07 0l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39m2.57-1.39l-0.57 1.39</string>
+	<string name="heavy_rain_path" translatable="false">M10.04 18.76L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
+	<string name="freezing_rain_path" translatable="false">M7.76 18.76h2.28L8.9 21.54zm2.28 0L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
+	<string name="ice_pellet_path" translatable="false">M12.5 18.35a1.5 1.5 0 0 1 0 3 1.5 1.5 0 0 1 0-3z</string>
+	<string name="torrential_rain_path" translatable="false">M8.04 18.76L6.9 21.54m3.14-2.78L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
+	<!--add location-->
+	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
-	<!--search-->
-	<string name="search_hint">Enter a location name or coordinates</string>
-	<string name="get_current_location">Get current location</string>
-	<string name="getting_location">Getting location. If this takes long, try moving the phone a bit, or take a moment outside</string>
+	<string name="request_rationale_title">Why we need permission</string>
+	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.\nYou can also change settings to use IP geolocation instead.</string>
+	<string name="give_permission">Give permission</string>
+	<string name="dismiss">Dismiss</string>
+	<string name="no_search_result">No result.\n\nUse the search bar above or zoom the map enough, then press the search button to show results.</string>
+	<string name="hint_search">Search by name or coordinates</string>
 	<!--locations-->
+	<string name="action_delete_all">Delete all</string>
+	<string name="action_refresh_all">Refresh all</string>
+	<string name="cd_delete">Delete</string>
 	<string name="cd_reorder">Reorder</string>
 	<!--errors-->
+	<string name="retry">Retry</string>
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Please enable location service, then try again</string>
+	<string name="error_location_not_found">Location not found. Try enabling GPS then moving the phone a bit.</string>
 	<string name="error_no_internet">No Internet connection</string>
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
-	<string name="error_parsing_resp">Response parsing error. Try a different location</string>
-	<string name="error_duplicate_location">This location is already available</string>
 	<string name="error_unknown">Unknown error</string>
 	<!--settings-->
-	<string name="def_value" translatable="false">0</string>
 	<string name="cat_header_general">General</string>
 	<string name="key_units" translatable="false">units</string>
 	<string name="title_units">Unit System</string>
-	<string-array name="units_entries">
+	<string-array name="entries_unit_system">
 		<item>Metric</item>
 		<item>Imperial</item>
 	</string-array>
-	<string-array name="units_speed">
-		<item>m/s</item>
-		<item>mph</item>
-	</string-array>
-	<string-array name="units_entry_values">
+	<string-array name="values_unit_system">
 		<item>0</item>
 		<item>1</item>
 	</string-array>
-	<string name="title_reorder">Reorder</string>
-	<string name="summary_reorder">Change location order</string>
-	<string name="cat_header_display">Display</string>
-	<string name="key_theme" translatable="false">theme</string>
-	<string name="title_theme">Theme</string>
-	<string-array name="theme_entries">
-		<item>System default</item>
-		<item>Dark</item>
-		<item>Light</item>
-	</string-array>
-	<string-array name="theme_values">
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-	</string-array>
+	<string name="cat_header_loc">My Location</string>
+	<string name="key_loc_use_device" translatable="false">loc_use_device</string>
+	<string name="title_loc_use_device">Use Device for Location</string>
+	<string name="summary_loc_use_device">Enabled: Use Device (GPS or Network). More accurate, but can be slow and requires permission</string>
+	<string name="summary_loc_use_ip">Disabled: Fall back to using IP geolocation. Fast and does not require permission, but less accurate.</string>
+	<string name="key_loc_accuracy_high" translatable="false">loc_accuracy_high</string>
+	<string name="title_loc_accuracy_high">High Accuracy Location</string>
+	<string name="summary_loc_accuracy_high">Enabled: Almost guarantees success, but requires access to fine location</string>
+	<string name="summary_loc_accuracy_normal">Disabled: Only requires access to coarse location, but less accurate and fails in rare cases</string>
 	<string name="cat_header_sync">Sync</string>
 	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
 	<string name="title_auto_refresh">Auto refresh</string>
-	<string-array name="auto_refresh_entries">
+	<string-array name="entries_auto_refresh">
 		<item>Never</item>
 		<item>Every 6 hours</item>
 		<item>Every 12 hours</item>
 		<item>Everyday</item>
 	</string-array>
-	<string-array name="auto_refresh_values">
+	<string-array name="values_auto_refresh">
 		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
+		<item>6</item>
+		<item>12</item>
+		<item>24</item>
 	</string-array>
 	<string name="cat_header_help">Help</string>
 	<string name="title_about">About</string>

@@ -14,7 +14,7 @@ buildscript {
 		fragmentVer = '1.4.0-alpha02'
 		hiltCompilerVer = '1.0.0'
 		hiltCompilerOldVer = '1.0.0-alpha03'
-		hiltVer = '2.36'
+		hiltVer = '2.37'
 		intuitVer = '1.0.6'
 		javaVer = JavaVersion.VERSION_11
 		junitVer = '4.13.2'
@@ -46,7 +46,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.0.0-beta03'
+		classpath 'com.android.tools.build:gradle:7.1.0-alpha02'
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer"
 		classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVer"
 	}

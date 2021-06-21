@@ -173,8 +173,6 @@ class HomeFragment: Fragment() {
 	private fun updateColors(info: WeatherInfo?) {
 		val newSky = if(info == null) init
 		else {
-			// partOfDay: 0 = night, 1 = pre dawn, 2 = post dawn, 3 = day, 4 = pre dusk, 5 = post dusk
-			// fraction: of pre/pos - dawn/dusk
 			val (partOfDay, fraction) = info.partOfDay
 			// new colors to animate to
 			when(partOfDay) {

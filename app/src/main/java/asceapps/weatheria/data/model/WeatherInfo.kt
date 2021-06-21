@@ -28,9 +28,17 @@ class WeatherInfo(
 	// if daily includes today, get it, else, get last day
 	val today = Instant.now().let { daily.lastOrNull { day -> day.date < it } } ?: daily[0]
 
-	// if hourly includes this hour, get it, else get last hour
-	val thisHour = Instant.now().let { hourly.lastOrNull { hour -> hour.hour < it } } ?: hourly[0]
-
+	/**
+	 * returns one of:
+	 *  * 0:0 = night,
+	 *  * 1:f = pre dawn,
+	 *  * 2:f = post dawn,
+	 *  * 3:0 = day,
+	 *  * 4:f = pre dusk,
+	 *  * 5:f = post dusk.
+	 *
+	 * where f is fraction of transition between day/night and dawn/dusk
+	 */
 	val partOfDay: Pair<Int, Float>
 		get() {
 			val night = 0 to 0f

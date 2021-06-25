@@ -2,16 +2,16 @@
 
 buildscript {
 	ext {
-		activityVer = '1.3.0-beta01'
+		activityVer = '1.3.0-beta02'
 		appCompatVer = '1.3.0'
 		buildToolsVer = '31.0.0-rc4'
 		constraintLayoutVer = '2.1.0-beta02'
-		coreVer = '1.6.0-beta02'
+		coreVer = '1.6.0-rc01'
 		coreAnimationVer = '1.0.0-alpha02'
 		coroutineVer = '1.5.0-native-mt'
 		desugarVer = '1.1.5'
 		espressoCoreVer = '3.3.0'
-		fragmentVer = '1.4.0-alpha02'
+		fragmentVer = '1.4.0-alpha03'
 		hiltCompilerVer = '1.0.0'
 		hiltCompilerOldVer = '1.0.0-alpha03'
 		hiltVer = '2.37'
@@ -19,8 +19,8 @@ buildscript {
 		javaVer = JavaVersion.VERSION_11
 		junitVer = '4.13.2'
 		junitTestVer = '1.1.2'
-		kotlinVer = '1.5.10'
-		lifecycleVer = '2.4.0-alpha01'
+		kotlinVer = '1.5.20'
+		lifecycleVer = '2.4.0-alpha02'
 		locationVer = '18.0.0'
 		mapsVer = '3.1.0-beta'
 		materialVer = '1.3.0'
@@ -31,7 +31,7 @@ buildscript {
 		preferenceVer = '1.1.1'
 		recyclerViewVer = '1.2.1'
 		retrofitVer = '2.9.0'
-		roomVer = '2.4.0-alpha02'
+		roomVer = '2.4.0-alpha03'
 		swipeRefreshVer = '1.1.0'
 		targetSdkVer = 30
 		vectorDrawableAnimVer = '1.1.0'

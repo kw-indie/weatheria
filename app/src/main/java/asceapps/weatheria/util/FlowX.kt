@@ -2,21 +2,20 @@ package asceapps.weatheria.util
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.Success
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 inline fun <T> Flow<T>.observe(lo: LifecycleOwner, crossinline block: suspend (T) -> Unit) =
-	lo.addRepeatingJob(Lifecycle.State.STARTED) {
-		collect(block)
+	lo.lifecycleScope.launch {
+		lo.repeatOnLifecycle(Lifecycle.State.STARTED) {
+			collect(block)
+		}
 	}
 
 inline fun <T> resultFlow(crossinline block: suspend FlowCollector<Result<T>>.() -> T) = flow {

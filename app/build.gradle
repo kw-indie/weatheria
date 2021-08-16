@@ -17,8 +17,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 4
-		versionName "0.3.1"
+		versionCode 5
+		versionName "0.6"
 
 		vectorDrawables.useSupportLibrary = true
 
@@ -89,8 +89,7 @@ android {
 dependencies {
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
-	// kotlin
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVer"
+	// no longer need to add kotlin stdlib here, included by default w/ plugin
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
@@ -109,7 +108,7 @@ dependencies {
 	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
 
 	// viewModel & liveData
-	// runtime offers new flow consumers (e.g addRepeatingJob)
+	// runtime offers new flow consumers (e.g repeatOnLifecycle)
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	// todo remove, we aren't using liveData anywhere

@@ -53,7 +53,7 @@ class Notifier @Inject constructor(@ApplicationContext context: Context) {
 			.setAutoCancel(true)
 			.build()
 		val notificationManager = NotificationManagerCompat.from(context)
-		// Remove prior notifications; only allow one at a time to edit the latest item
+		// Remove prior notifications; only allow one at a time
 		notificationManager.cancelAll()
 		notificationManager.notify(id.toInt(), notification)
 	}

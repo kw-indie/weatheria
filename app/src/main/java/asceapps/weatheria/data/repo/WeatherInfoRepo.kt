@@ -36,11 +36,21 @@ class WeatherInfoRepo @Inject constructor(
 		.asResult() // concerned over 2 consecutive Flow.map()'s
 		.flowOn(ioDispatcher)
 
+	fun get(locationId: Int) = dao.get(locationId)
+		.map { e -> entityToModel(e) }
+		.asResult()
+		.flowOn(ioDispatcher)
+
+	fun getByPos(pos: Int) = dao.getByPos(pos)
+		.map { e -> entityToModel(e) }
+		.asResult()
+		.flowOn(ioDispatcher)
+
 	fun search(q: String? = null) = resultFlow<List<SearchResponse>> {
 		api.search(if(q.isNullOrBlank()) AUTO_IP else q)
 	}
 
-	private suspend fun getForecast(
+	private suspend fun fetchForecast(
 		q: String,
 		days: Int = 10,
 		aqi: String = NO,
@@ -49,7 +59,7 @@ class WeatherInfoRepo @Inject constructor(
 
 	fun add(loc: SearchResponse) = resultFlow<Unit> {
 		val resp = withContext(ioDispatcher) {
-			getForecast(loc.searchTerm)
+			fetchForecast(loc.searchTerm)
 		}
 		val l = with(resp.location) {
 			// or use (System.currentTimeMillis() / 1000).toInt()
@@ -65,7 +75,7 @@ class WeatherInfoRepo @Inject constructor(
 
 	private suspend fun internalRefresh(loc: BaseLocation) {
 		val resp = withContext(ioDispatcher) {
-			getForecast(loc.searchTerm)
+			fetchForecast(loc.searchTerm)
 		}
 		val c = extractCurrent(loc.id, resp)
 		val h = extractHourly(loc.id, resp)
@@ -262,9 +272,9 @@ class WeatherInfoRepo @Inject constructor(
 		private fun conditionIndex(condition: Int) = CONDITIONS.binarySearch(condition)
 
 		private fun conditionIconResId(condition: Int, isDay: Boolean? = null) = when(condition) {
-			1000 -> if(isDay == true) R.drawable.w_clear_d else R.drawable.w_clear_n
-			1003 -> if(isDay == true) R.drawable.w_cloudy_p_d else R.drawable.w_cloudy_p_n
-			1006 -> if(isDay == true) R.drawable.w_cloudy_d else R.drawable.w_cloudy_n
+			1000 -> if(isDay == false) R.drawable.w_clear_n else R.drawable.w_clear_d
+			1003 -> if(isDay == false) R.drawable.w_cloudy_p_n else R.drawable.w_cloudy_p_d
+			1006 -> if(isDay == false) R.drawable.w_cloudy_n else R.drawable.w_cloudy_d
 			1009 -> R.drawable.w_overcast
 			1030 -> R.drawable.w_mist
 			1063, 1180, 1183, 1186, 1189, 1240 -> when(isDay) {
@@ -310,9 +320,9 @@ class WeatherInfoRepo @Inject constructor(
 				false -> R.drawable.w_ice_pellets_l_n
 				else -> R.drawable.w_ice_pellets_l
 			}
-			1246 -> if(isDay == true) R.drawable.w_rain_t_d else R.drawable.w_rain_t_n
-			1252 -> if(isDay == true) R.drawable.w_sleet_h_d else R.drawable.w_sleet_h_n
-			1264 -> if(isDay == true) R.drawable.w_ice_pellets_h_d else R.drawable.w_ice_pellets_h_n
+			1246 -> if(isDay == false) R.drawable.w_rain_t_n else R.drawable.w_rain_t_d
+			1252 -> if(isDay == false) R.drawable.w_sleet_h_n else R.drawable.w_sleet_h_d
+			1264 -> if(isDay == false) R.drawable.w_ice_pellets_h_n else R.drawable.w_ice_pellets_h_d
 			1279, 1282 -> when(isDay) {
 				true -> R.drawable.w_snow_thunder_d
 				false -> R.drawable.w_snow_thunder_n

@@ -121,6 +121,7 @@ class WeatherChart @JvmOverloads constructor(
 	fun setInfo(info: WeatherInfo, dataType: Int) {
 		this.dataType = dataType
 		items = if(dataType == HOURLY) {
+			// todo move formatter to util
 			val formatter = DateTimeFormatter.ofPattern("h a")
 			info.hourly.take(24).filterIndexed { i, _ -> i % 4 == 0 }.map {
 				Item(
@@ -131,6 +132,7 @@ class WeatherChart @JvmOverloads constructor(
 				)
 			}
 		} else {
+			// todo move formatter to util
 			val formatter = DateTimeFormatter.ofPattern("EEE")
 			info.daily.map {
 				val time = if(it == info.today) resources.getString(R.string.today)

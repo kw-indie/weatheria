@@ -2,28 +2,28 @@
 
 buildscript {
 	ext {
-		activityVer = '1.3.0-beta01'
+		activityVer = '1.3.1'
 		appCompatVer = '1.3.0'
-		buildToolsVer = '31.0.0-rc4'
-		constraintLayoutVer = '2.1.0-beta02'
-		coreVer = '1.6.0-beta02'
+		buildToolsVer = '31.0.0'
+		constraintLayoutVer = '2.1.0'
+		coreVer = '1.7.0-alpha01'
 		coreAnimationVer = '1.0.0-alpha02'
-		coroutineVer = '1.5.0-native-mt'
+		coroutineVer = '1.5.1-native-mt'
 		desugarVer = '1.1.5'
 		espressoCoreVer = '3.3.0'
-		fragmentVer = '1.4.0-alpha02'
+		fragmentVer = '1.4.0-alpha06'
 		hiltCompilerVer = '1.0.0'
 		hiltCompilerOldVer = '1.0.0-alpha03'
-		hiltVer = '2.36'
+		hiltVer = '2.38.1'
 		intuitVer = '1.0.6'
 		javaVer = JavaVersion.VERSION_11
 		junitVer = '4.13.2'
-		junitTestVer = '1.1.2'
-		kotlinVer = '1.5.10'
-		lifecycleVer = '2.4.0-alpha01'
+		junitTestVer = '1.1.3'
+		kotlinVer = '1.5.21'
+		lifecycleVer = '2.4.0-alpha03'
 		locationVer = '18.0.0'
 		mapsVer = '3.1.0-beta'
-		materialVer = '1.3.0'
+		materialVer = '1.4.0'
 		minSdkVer = 21
 		navVer = '2.3.5'
 		ndkVer = '22.1.7171670'
@@ -31,13 +31,13 @@ buildscript {
 		preferenceVer = '1.1.1'
 		recyclerViewVer = '1.2.1'
 		retrofitVer = '2.9.0'
-		roomVer = '2.4.0-alpha02'
+		roomVer = '2.4.0-alpha04'
 		swipeRefreshVer = '1.1.0'
 		targetSdkVer = 30
 		vectorDrawableAnimVer = '1.1.0'
 		viewPager2Ver = '1.0.0'
 		volleyVer = '1.2.0'
-		workVer = '2.7.0-alpha04'
+		workVer = '2.7.0-alpha05'
 	}
 
 	repositories {
@@ -46,7 +46,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.0.0-beta03'
+		classpath 'com.android.tools.build:gradle:7.1.0-alpha03'
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer"
 		classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVer"
 	}

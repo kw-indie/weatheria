@@ -151,4 +151,6 @@
 	</string-array>
 	<string name="cat_header_help">مساعدة</string>
 	<string name="title_about">حول</string>
+	<!--widget-->
+	<string name="app_widget_desc">ويدجت لعرض ملخص توقعات الطقس</string>
 </resources>

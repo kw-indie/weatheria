@@ -15,4 +15,9 @@
 		<item name="android:statusBarColor">@android:color/transparent</item>
 		<item name="statusBarBackground">@android:color/transparent</item>
 	</style>
+
+	<style name="Widget.AppWidget.AppWidget.Container" parent="android:Widget">
+		<item name="android:id">@android:id/background</item>
+		<item name="android:background">@drawable/bg_rounded_corners</item>
+	</style>
 </resources>

@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import asceapps.weatheria.data.repo.Error
+import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.WeatherInfoRepo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -21,8 +22,13 @@ class AutoRefreshWorker @AssistedInject constructor(
 	override suspend fun doWork(): Result = coroutineScope {
 		try {
 			repo.refreshAll().collect {
-				// todo show noti on each emission
-				if(it is Error) throw it.t
+				when(it) {
+					is Loading -> { /* todo show progress notification */
+					}
+					is Error -> throw it.t
+					else -> {
+					}
+				}
 			}
 			Result.success()
 		} catch(e: Exception) {

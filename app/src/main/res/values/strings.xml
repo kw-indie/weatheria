@@ -186,4 +186,6 @@
 	</string-array>
 	<string name="cat_header_help">Help</string>
 	<string name="title_about">About</string>
+	<!--widget-->
+	<string name="app_widget_desc">A widget that shows forecast summary.</string>
 </resources>

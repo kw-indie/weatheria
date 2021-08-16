@@ -62,7 +62,7 @@ class HomeFragment: Fragment() {
 				onItemInserted { setCurrentItem(it, true) }
 			}
 			onPageChanged { pos ->
-				mainVM.selectedLocation = pos
+				mainVM.selectedPos = pos
 				updateColors(pagerAdapter.getItem(pos))
 			}
 		}
@@ -105,7 +105,7 @@ class HomeFragment: Fragment() {
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 					if(!isEmpty) {
-						val selected = mainVM.selectedLocation
+						val selected = mainVM.selectedPos
 						// updateColor here fixes issue when fragment is stopped/started,
 						// but onPageChanged not triggered
 						updateColors(list[selected])
@@ -173,8 +173,6 @@ class HomeFragment: Fragment() {
 	private fun updateColors(info: WeatherInfo?) {
 		val newSky = if(info == null) init
 		else {
-			// partOfDay: 0 = night, 1 = pre dawn, 2 = post dawn, 3 = day, 4 = pre dusk, 5 = post dusk
-			// fraction: of pre/pos - dawn/dusk
 			val (partOfDay, fraction) = info.partOfDay
 			// new colors to animate to
 			when(partOfDay) {

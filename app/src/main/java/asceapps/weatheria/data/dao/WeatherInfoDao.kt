@@ -11,6 +11,14 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract fun loadAll(): Flow<List<WeatherInfoEntity>>
 
+	@Transaction
+	@Query("SELECT * FROM locations WHERE id = :locationId")
+	abstract fun get(locationId: Int): Flow<WeatherInfoEntity>
+
+	@Transaction
+	@Query("SELECT * FROM locations WHERE pos = :pos")
+	abstract fun getByPos(pos: Int): Flow<WeatherInfoEntity>
+
 	@Query("SELECT * FROM locations ORDER BY pos")
 	abstract suspend fun getLocations(): List<LocationEntity>
 

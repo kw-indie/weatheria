@@ -9,14 +9,14 @@ import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.AutoRefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@ActivityRetainedScoped
+@Singleton
 class SettingsRepo @Inject constructor(
 	@ApplicationContext appContext: Context,
 	private val prefs: SharedPreferences,
@@ -31,7 +31,7 @@ class SettingsRepo @Inject constructor(
 	private val locAccuracyHigh = appContext.getString(R.string.key_loc_accuracy_high)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
 	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
-	private val selectedLocKey = "selected"
+	private val selectedKey = "selected"
 
 	init {
 		// on reinstall or sth, make sure all settings are reapplied, eg. refreshWorker.
@@ -55,10 +55,10 @@ class SettingsRepo @Inject constructor(
 	private val autoRefreshPeriod: String
 		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr
 
-	var selectedLocation
-		get() = prefs.getInt(selectedLocKey, defVal)
+	var selectedPos
+		get() = prefs.getInt(selectedKey, defVal)
 		set(value) {
-			prefs.edit { putInt(selectedLocKey, value) }
+			prefs.edit { putInt(selectedKey, value) }
 		}
 
 	fun update(key: String) {

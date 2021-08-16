@@ -23,18 +23,28 @@
 			android:value="@string/google_api_key"/>
 		<activity
 			android:name=".ui.MainActivity"
+			android:exported="true"
 			android:label="@string/app_name"
-			android:launchMode="singleTop"
-			android:exported="true">
+			android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<!--to customize work manager initialization-->
+		<receiver
+			android:name=".ui.widget.AppWidget"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+			</intent-filter>
+			<meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/app_widget_info"/>
+		</receiver>
+		<!-- to customize work manager initialization -->
 		<provider
 			android:name="androidx.startup.InitializationProvider"
 			android:authorities="${applicationId}.androidx-startup"
-			tools:node="remove"></provider>
+			tools:node="remove"/>
 	</application>
 </manifest>

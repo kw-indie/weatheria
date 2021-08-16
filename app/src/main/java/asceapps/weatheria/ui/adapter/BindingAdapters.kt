@@ -7,6 +7,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
@@ -40,7 +41,7 @@ fun addDividers(recyclerView: RecyclerView, hasDividers: Boolean) {
 
 @BindingAdapter("accuracy")
 fun setAccuracy(tv: TextView, accuracy: Int) {
-	val color = tv.resources.getColor(
+	val color = ResourcesCompat.getColor(tv.resources,
 		when(accuracy) {
 			0 -> R.color.accuracy_fresh
 			1 -> R.color.accuracy_high

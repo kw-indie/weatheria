@@ -36,7 +36,7 @@ class MyLocationsFragment: Fragment() {
 			}
 
 			override fun onItemClick(pos: Int) {
-				mainVM.selectedLocation = pos
+				mainVM.selectedPos = pos
 				findNavController().navigateUp()
 			}
 

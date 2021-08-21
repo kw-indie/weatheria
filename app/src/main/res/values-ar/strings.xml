@@ -153,4 +153,5 @@
 	<string name="title_about">حول</string>
 	<!--widget-->
 	<string name="app_widget_desc">ويدجت لعرض ملخص توقعات الطقس</string>
+	<string name="cd_refresh">تحديث</string>
 </resources>

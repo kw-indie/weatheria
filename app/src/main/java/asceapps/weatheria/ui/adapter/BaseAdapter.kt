@@ -42,7 +42,7 @@ abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 	private class HashCallback<T: Listable>: DiffUtil.ItemCallback<T>() {
 
 		override fun areItemsTheSame(oldT: T, newT: T) = oldT.id == newT.id
-		override fun areContentsTheSame(oldT: T, newT: T) = oldT.hashCode() == newT.hashCode()
+		override fun areContentsTheSame(oldT: T, newT: T) = oldT.hash == newT.hash
 	}
 
 	class BindingHolder<B: ViewDataBinding>(val binding: B): RecyclerView.ViewHolder(binding.root)

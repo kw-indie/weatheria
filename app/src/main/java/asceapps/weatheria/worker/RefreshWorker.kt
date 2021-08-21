@@ -6,14 +6,16 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
+import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.ui.widget.AppWidget
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 
 @HiltWorker
-class AutoRefreshWorker @AssistedInject constructor(
+class RefreshWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	private val repo: WeatherInfoRepo
@@ -23,15 +25,15 @@ class AutoRefreshWorker @AssistedInject constructor(
 		try {
 			repo.refreshAll().collect {
 				when(it) {
-					is Loading -> { /* todo show progress notification */
-					}
+					// todo when kotlin formatting keeps empty blocks in one line, remove `Unit`
+					is Loading -> Unit /* todo show progress notification */
+					is Success -> AppWidget.sendUpdateBroadcast(applicationContext)
 					is Error -> throw it.t
-					else -> {
-					}
 				}
 			}
 			Result.success()
 		} catch(e: Exception) {
+			e.printStackTrace()
 			Result.retry()
 		}
 	}

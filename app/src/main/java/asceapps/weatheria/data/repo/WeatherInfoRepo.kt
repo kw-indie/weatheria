@@ -1,7 +1,9 @@
 package asceapps.weatheria.data.repo
 
 import asceapps.weatheria.R
-import asceapps.weatheria.data.api.*
+import asceapps.weatheria.data.api.ForecastResponse
+import asceapps.weatheria.data.api.SearchResponse
+import asceapps.weatheria.data.api.WeatherApi
 import asceapps.weatheria.data.base.BaseLocation
 import asceapps.weatheria.data.dao.WeatherInfoDao
 import asceapps.weatheria.data.entity.*
@@ -47,23 +49,17 @@ class WeatherInfoRepo @Inject constructor(
 		.flowOn(ioDispatcher)
 
 	fun search(q: String? = null) = resultFlow<List<SearchResponse>> {
-		api.search(if(q.isNullOrBlank()) AUTO_IP else q)
+		api.search(if(q.isNullOrBlank()) WeatherApi.AUTO_IP else q)
 	}
 
-	private suspend fun fetchForecast(
-		q: String,
-		days: Int = 10,
-		aqi: String = NO,
-		alerts: String = NO,
-	) = api.forecast(q, days, aqi, alerts)
+	private suspend fun fetchForecast(q: String, days: Int = 10) = api.forecast(q, days)
 
 	fun add(loc: SearchResponse) = resultFlow<Unit> {
 		val resp = withContext(ioDispatcher) {
 			fetchForecast(loc.searchTerm)
 		}
 		val l = with(resp.location) {
-			// or use (System.currentTimeMillis() / 1000).toInt()
-			val lastUpdate = resp.current.last_updated_epoch
+			val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
 			val pos = dao.getLocationsCount()
 			LocationEntity(loc.id, lat, lon, name, country, tz_id, lastUpdate, pos)
 		}
@@ -77,12 +73,11 @@ class WeatherInfoRepo @Inject constructor(
 		val resp = withContext(ioDispatcher) {
 			fetchForecast(loc.searchTerm)
 		}
+		val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
 		val c = extractCurrent(loc.id, resp)
 		val h = extractHourly(loc.id, resp)
 		val d = extractDaily(loc.id, resp)
-		// this updates "lastUpdate" in LocationEntity to c.dt. which is in sync with add()'s logic,
-		// don't forget to keep them the same
-		dao.update(c, h, d)
+		dao.update(lastUpdate, c, h, d)
 	}
 
 	fun refresh(info: WeatherInfo) = resultFlow<Unit> {
@@ -269,7 +264,7 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
-		private fun conditionIndex(condition: Int) = CONDITIONS.binarySearch(condition)
+		private fun conditionIndex(condition: Int) = WeatherApi.CONDITIONS.binarySearch(condition)
 
 		private fun conditionIconResId(condition: Int, isDay: Boolean? = null) = when(condition) {
 			1000 -> if(isDay == false) R.drawable.w_clear_n else R.drawable.w_clear_d
@@ -368,42 +363,22 @@ class WeatherInfoRepo @Inject constructor(
 			return String(cps, 0, cps.size)
 		}
 
-		private fun moonPhase(instant: Instant, zone: ZoneId): Int {
-			val day = HijrahDate.from(ZonedDateTime.ofInstant(instant, zone))[ChronoField.DAY_OF_MONTH]
-			val phase = when(day) {
-				in 2..6 -> 0 //"Waxing Crescent Moon"
-				in 6..8 -> 1 //"Quarter Moon"
-				in 8..13 -> 2 //"Waxing Gibbous Moon"
-				in 13..15 -> 3 //"Full Moon"
-				in 15..21 -> 4 //"Waning Gibbous Moon"
-				in 21..23 -> 5 //"Last Quarter Moon"
-				in 23..28 -> 6 //"Waning Crescent Moon"
-				else -> 7 //"New Moon" includes 28.53-29.5 and 0-1
-			}
-			return phase
+		private fun moonAge(instant: Instant): Int {
+			return HijrahDate.from(instant.atZone(ZoneOffset.UTC))[ChronoField.DAY_OF_MONTH]
 		}
 
-		private fun moonPhase2(instant: Instant, zone: ZoneId): Int {
+		private fun moonAge2(instant: Instant): Float {
 			// lunar cycle days
-			val lunarCycle = 29.530588853
-			// a reference new moon
-			val ref = LocalDateTime.of(2000, 1, 6, 18, 14).atZone(zone)
-			// could ask for hour/min for a tiny bit of extra accuracy
-			val now = ZonedDateTime.ofInstant(instant, zone)
+			val lunarCycle = 29.530588853f
+			// a reference new moon at UTC
+			val ref = LocalDateTime.of(2000, 1, 6, 18, 14)
+			// dt at instant
+			val dt = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
 			// this loses a number of hours of accuracy
-			val days = ChronoUnit.DAYS.between(ref, now)
+			val days = ChronoUnit.DAYS.between(ref, dt)
 			val cycles = days / lunarCycle
 			// take fractional part of cycles x full cycle = current lunation
-			return when((cycles % 1) * lunarCycle) {
-				in 1.0..6.38 -> 0 //"Waxing Crescent Moon"
-				in 6.38..8.38 -> 1 //"Quarter Moon"
-				in 8.38..13.765 -> 2 //"Waxing Gibbous Moon"
-				in 13.765..15.765 -> 3 //"Full Moon"
-				in 15.765..21.148 -> 4 //"Waning Gibbous Moon"
-				in 21.148..23.148 -> 5 //"Last Quarter Moon"
-				in 23.148..28.53 -> 6 //"Waning Crescent Moon"
-				else -> 7 //"New Moon" includes 28.53-29.5 and 0-1
-			}
+			return (cycles % 1) * lunarCycle
 		}
 		// endregion
 	}

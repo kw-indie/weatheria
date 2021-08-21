@@ -23,10 +23,10 @@
 
 # Fix maps v3 crash (taken from official docs):
 -keep,allowoptimization class com.google.android.libraries.maps.** {*;}
-# replaces all the @Keep's in response classes
--keepclassmembers class asceapps.weatheria.data.api.*Response** {
-	<fields>;
-	<methods>;
+# Replaces all the @Keep's in response classes
+-keepclassmembers,allowobfuscation class asceapps.weatheria.data.api.**Response** {
+#  @com.google.gson.annotations.SerializedName <fields>;
+  <fields>;
 }
 # Ignore annotation used for build tooling. (specified in okio rules)
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement

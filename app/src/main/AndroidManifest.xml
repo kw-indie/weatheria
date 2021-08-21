@@ -36,6 +36,7 @@
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+				<action android:name="${applicationId}.action_update_widget_data"/>
 			</intent-filter>
 			<meta-data
 				android:name="android.appwidget.provider"

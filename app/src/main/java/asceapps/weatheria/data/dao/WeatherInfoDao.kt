@@ -40,12 +40,13 @@ abstract class WeatherInfoDao {
 
 	@Transaction
 	open suspend fun update(
+		lastUpdate: Int,
 		current: CurrentEntity,
 		hourly: List<HourlyEntity>,
 		daily: List<DailyEntity>
 	) {
 		val locationId = current.locationId
-		updateLocation(locationId, current.dt)
+		updateLocation(locationId, lastUpdate)
 		upsertCurrent(current)
 		deleteHourly(locationId)
 		upsertHourly(hourly)

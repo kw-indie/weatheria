@@ -7,7 +7,7 @@ import androidx.work.*
 import asceapps.weatheria.R
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
-import asceapps.weatheria.worker.AutoRefreshWorker
+import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Duration
 import java.time.LocalDateTime
@@ -31,7 +31,7 @@ class SettingsRepo @Inject constructor(
 	private val locAccuracyHigh = appContext.getString(R.string.key_loc_accuracy_high)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
 	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
-	private val selectedKey = "selected"
+	private val selectedKey = appContext.getString(R.string.key_selected)
 
 	init {
 		// on reinstall or sth, make sure all settings are reapplied, eg. refreshWorker.
@@ -73,10 +73,10 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateAutoRefresh() {
-		val autoRefreshWorkName = AutoRefreshWorker::class.qualifiedName!!
+		val refreshWorkName = RefreshWorker::class.qualifiedName!!
 		val never = autoRefreshValues[0]
 		if(autoRefreshPeriod == never) {
-			workManager.cancelUniqueWork(autoRefreshWorkName)
+			workManager.cancelUniqueWork(refreshWorkName)
 			return
 		}
 
@@ -98,13 +98,13 @@ class SettingsRepo @Inject constructor(
 			nextSection = nextSection.plusHours(periodL)
 		} while(nextSection < now)
 		val secondsUntilNextSection = Duration.between(now, nextSection).seconds
-		val work = PeriodicWorkRequestBuilder<AutoRefreshWorker>(periodL, TimeUnit.HOURS)
+		val work = PeriodicWorkRequestBuilder<RefreshWorker>(periodL, TimeUnit.HOURS)
 			.addTag(autoRefreshPeriod) // to cancel by tag
 			.setConstraints(constraints)
 			.setInitialDelay(secondsUntilNextSection, TimeUnit.SECONDS)
 			.build()
 		workManager.enqueueUniquePeriodicWork(
-			autoRefreshWorkName,
+			refreshWorkName,
 			ExistingPeriodicWorkPolicy.KEEP,
 			work
 		)

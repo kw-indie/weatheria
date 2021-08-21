@@ -20,25 +20,34 @@ class NetworkModule {
 
 	@Provides
 	@Singleton
-	fun provideWeatherApi(): WeatherApi {
-		val interceptor = Interceptor { chain ->
-			val newUrl = chain.request().url.newBuilder()
-				.addQueryParameter("key", BuildConfig.WEATHER_API_KEY)
-				.build()
-			val request = chain.request().newBuilder()
-				.url(newUrl)
-				.build()
-			chain.proceed(request)
-		}
-		val client = OkHttpClient.Builder()
-			.addInterceptor(interceptor)
+	fun provideWeatherApi(): WeatherApi = buildApi(
+		WeatherApi.BASE_URL,
+		WeatherApi.KEY_PARAM, BuildConfig.WEATHER_API_KEY
+	).create()
+
+	private fun buildApi(
+		baseUrl: String,
+		paramName: String? = null, paramValue: String? = null
+	): Retrofit {
+		val clientBuilder = OkHttpClient.Builder()
 			.callTimeout(10, TimeUnit.SECONDS) // throws InterruptedIOException
-			.build()
+		if(paramName != null) {
+			val interceptor = Interceptor { chain ->
+				val newUrl = chain.request().url.newBuilder()
+					.addQueryParameter(paramName, paramValue)
+					.build()
+				val request = chain.request().newBuilder()
+					.url(newUrl)
+					.build()
+				chain.proceed(request)
+			}
+			clientBuilder.addInterceptor(interceptor)
+		}
 		return Retrofit.Builder()
-			.baseUrl("https://api.weatherapi.com/v1/")
-			.client(client)
+			.baseUrl(baseUrl)
+			.client(clientBuilder.build())
+			// for now, all my api's are dealing in json
 			.addConverterFactory(GsonConverterFactory.create())
 			.build()
-			.create()
 	}
 }

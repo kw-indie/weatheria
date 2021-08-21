@@ -17,8 +17,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 5
-		versionName "0.6"
+		versionCode 6
+		versionName "0.7"
 
 		vectorDrawables.useSupportLibrary = true
 
@@ -29,7 +29,7 @@ android {
 		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
-		// removes unused i18n in libs like AppCompat/play services/maps?
+		// removes unused l10n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
 
 		javaCompileOptions {

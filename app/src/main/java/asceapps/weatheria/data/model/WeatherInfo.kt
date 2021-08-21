@@ -20,8 +20,8 @@ class WeatherInfo(
 	val accuracy: Int
 ): Listable {
 
-	override val id = location.id
-	override fun hashCode() = id + location.lastUpdate.epochSecond.toInt()
+	override val id get() = location.id
+	override val hash get() = id + location.lastUpdate.epochSecond.toInt()
 
 	// in both 'today' and 'thisHour', sometimes the first element is some time in the future,
 	// hence the 'orNull()' and '?: x[0]'

@@ -8,7 +8,7 @@ import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.data.repo.WeatherInfoRepo
-import asceapps.weatheria.ui.widget.sendUpdateWidgetsBroadcast
+import asceapps.weatheria.ui.widget.AppWidget
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
@@ -27,7 +27,7 @@ class RefreshWorker @AssistedInject constructor(
 				when(it) {
 					// todo when kotlin formatting keeps empty blocks in one line, remove `Unit`
 					is Loading -> Unit /* todo show progress notification */
-					is Success -> sendUpdateWidgetsBroadcast(applicationContext)
+					is Success -> AppWidget.sendUpdateBroadcast(applicationContext)
 					is Error -> throw it.t
 				}
 			}

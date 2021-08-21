@@ -30,6 +30,21 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AppWidget: AppWidgetProvider() {
 
+	companion object {
+		// if i remove ACTION_APPWIDGET_UPDATE, the widget never gets seen by the system
+		private const val ACTION_UPDATE_DATA = "action_update_widget_data"
+
+		fun sendUpdateBroadcast(appContext: Context) {
+			val ids = AppWidgetManager.getInstance(appContext)
+				.getAppWidgetIds(ComponentName(appContext, AppWidget::class.java))
+			val intent = Intent(appContext, AppWidget::class.java).apply {
+				action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+				putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+			}
+			appContext.sendBroadcast(intent)
+		}
+	}
+
 	@Inject
 	lateinit var infoRepo: WeatherInfoRepo
 
@@ -40,6 +55,9 @@ class AppWidget: AppWidgetProvider() {
 		if(intent.action == "${context.packageName}.$ACTION_UPDATE_DATA") {
 			WorkManager.getInstance(context)
 				.enqueue(OneTimeWorkRequestBuilder<RefreshWorker>().build())
+			val awm = AppWidgetManager.getInstance(context)
+			val ids = awm.getAppWidgetIds(ComponentName(context, AppWidget::class.java))
+			loadingAnimation(context, awm, ids, true)
 		} else super.onReceive(context, intent)
 		// turns out if i don't call super, hilt won't inject
 	}
@@ -118,17 +136,4 @@ class AppWidget: AppWidgetProvider() {
 			setImageViewResource(R.id.iv_icon, iconRes)
 			setTextViewText(R.id.tv_text, text)
 		}
-}
-
-// if i remove ACTION_APPWIDGET_UPDATE, the widget never gets seen by the system
-private const val ACTION_UPDATE_DATA = "action_update_widget_data"
-
-internal fun sendUpdateWidgetsBroadcast(appContext: Context) {
-	val ids = AppWidgetManager.getInstance(appContext)
-		.getAppWidgetIds(ComponentName(appContext, AppWidget::class.java))
-	val intent = Intent(appContext, AppWidget::class.java).apply {
-		action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-		putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-	}
-	appContext.sendBroadcast(intent)
 }

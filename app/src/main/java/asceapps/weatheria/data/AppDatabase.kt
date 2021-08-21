@@ -1,8 +1,6 @@
 package asceapps.weatheria.data
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import asceapps.weatheria.BuildConfig
 import asceapps.weatheria.data.dao.WeatherInfoDao
@@ -23,12 +21,9 @@ import asceapps.weatheria.data.entity.LocationEntity
 )
 abstract class AppDatabase: RoomDatabase() {
 
-	abstract fun weatherInfoDao(): WeatherInfoDao
-
 	companion object {
-
-		fun build(appContext: Context) =
-			Room.databaseBuilder(appContext, AppDatabase::class.java, "weatheria")
-				.build()
+		const val DB_NAME = "weatheria"
 	}
+
+	abstract fun weatherInfoDao(): WeatherInfoDao
 }

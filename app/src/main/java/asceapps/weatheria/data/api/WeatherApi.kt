@@ -1,21 +1,16 @@
 package asceapps.weatheria.data.api
 
-import asceapps.weatheria.BuildConfig
 import asceapps.weatheria.data.base.BaseLocation
 import asceapps.weatheria.data.base.Listable
 import com.google.gson.annotations.SerializedName
-import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherApi {
 
 	companion object {
-
-		fun create(): WeatherApi = buildService(
-			"https://api.weatherapi.com/v1/",
-			"key", BuildConfig.WEATHER_API_KEY
-		).create()
+		const val BASE_URL = "https://api.weatherapi.com/v1/"
+		const val KEY_PARAM = "key"
 
 		const val AUTO_IP = "auto:ip"
 		val CONDITIONS = intArrayOf(

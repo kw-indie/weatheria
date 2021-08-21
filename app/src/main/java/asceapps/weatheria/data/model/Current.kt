@@ -1,5 +1,7 @@
 package asceapps.weatheria.data.model
 
+// todo make values nullable for approximation
+// todo make views show appropriate ui for null values
 class Current(
 	val conditionIndex: Int,
 	val icon: Int,

@@ -16,6 +16,7 @@ import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.ui.MainActivity
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.GlobalScope
@@ -36,24 +37,17 @@ class AppWidget: AppWidgetProvider() {
 	lateinit var settingsRepo: SettingsRepo
 
 	override fun onReceive(context: Context, intent: Intent) {
-		when(intent.action) {
-			"${context.packageName}.$ACTION_UPDATE_DATA" -> {
-				WorkManager.getInstance(context)
-					.enqueue(OneTimeWorkRequestBuilder<RefreshWorker>().build())
-			}
-			AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
-				updateAllWidgets(context)
-			}
-		}
+		if(intent.action == "${context.packageName}.$ACTION_UPDATE_DATA") {
+			WorkManager.getInstance(context)
+				.enqueue(OneTimeWorkRequestBuilder<RefreshWorker>().build())
+		} else super.onReceive(context, intent)
+		// turns out if i don't call super, hilt won't inject
 	}
 
-	private fun updateAllWidgets(context: Context) {
-		val awm = AppWidgetManager.getInstance(context)
-		val ids = awm.getAppWidgetIds(ComponentName(context, AppWidget::class.java))
+	override fun onUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
 		GlobalScope.launch {
 			infoRepo.getByPos(settingsRepo.selectedPos) // also react to unit sys change
-				// take 'loading' and 'success/error' only
-				.take(2).collect {
+				.take(2).collect { // take 'loading' and 'success/error' only
 					loadingAnimation(context, awm, ids, it is Loading)
 					if(it is Success) {
 						updateWidgets(context, awm, ids, it.data)
@@ -84,15 +78,7 @@ class AppWidget: AppWidgetProvider() {
 			)
 			setTextViewText(R.id.tv_uv_value, uvString)
 			setImageViewResource(R.id.iv_icon, info.current.icon)
-			val updateDataBroadcast = PendingIntent.getBroadcast(
-				context,
-				0,
-				Intent(context, AppWidget::class.java).apply {
-					action = "${context.packageName}.$ACTION_UPDATE_DATA"
-				},
-				PendingIntent.FLAG_UPDATE_CURRENT
-			)
-			setOnClickPendingIntent(R.id.iv_refresh, updateDataBroadcast)
+			setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
 			removeAllViews(R.id.ll_forecasts)
 			// todo move formatters to util
 			val timeFormatter = DateTimeFormatter.ofPattern("h a")
@@ -108,10 +94,24 @@ class AppWidget: AppWidgetProvider() {
 			for(i in items) {
 				addView(R.id.ll_forecasts, i)
 			}
+			setOnClickPendingIntent(R.id.root, getOpenAppIntent(context))
 		}
 		// Instruct the widget manager to update the widget
 		awm.updateAppWidget(ids, views)
 	}
+
+	private fun getUpdateDataBroadcastIntent(context: Context) = PendingIntent.getBroadcast(
+		context,
+		0,
+		Intent(context, AppWidget::class.java).apply {
+			action = "${context.packageName}.$ACTION_UPDATE_DATA"
+		},
+		PendingIntent.FLAG_UPDATE_CURRENT
+	)
+
+	private fun getOpenAppIntent(context: Context) = PendingIntent.getActivity(
+		context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+	)
 
 	private fun getItemRemoteView(context: Context, iconRes: Int, text: String) =
 		RemoteViews(context.packageName, R.layout.item_widget_forecast).apply {
@@ -124,8 +124,11 @@ class AppWidget: AppWidgetProvider() {
 private const val ACTION_UPDATE_DATA = "action_update_widget_data"
 
 internal fun sendUpdateWidgetsBroadcast(appContext: Context) {
+	val ids = AppWidgetManager.getInstance(appContext)
+		.getAppWidgetIds(ComponentName(appContext, AppWidget::class.java))
 	val intent = Intent(appContext, AppWidget::class.java).apply {
 		action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+		putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
 	}
 	appContext.sendBroadcast(intent)
 }

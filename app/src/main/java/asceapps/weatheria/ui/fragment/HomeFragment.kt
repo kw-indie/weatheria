@@ -105,7 +105,7 @@ class HomeFragment: Fragment() {
 					binding.tvEmptyPager.isVisible = isEmpty
 					swipeRefresh.isVisible = !isEmpty
 					if(!isEmpty) {
-						val selected = mainVM.selectedPos
+						val selected = mainVM.selectedPos.coerceIn(list.indices)
 						// updateColor here fixes issue when fragment is stopped/started,
 						// but onPageChanged not triggered
 						updateColors(list[selected])

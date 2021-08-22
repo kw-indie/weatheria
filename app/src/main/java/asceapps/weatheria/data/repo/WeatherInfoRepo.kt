@@ -61,7 +61,7 @@ class WeatherInfoRepo @Inject constructor(
 		val l = with(resp.location) {
 			val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
 			val pos = dao.getLocationsCount()
-			LocationEntity(loc.id, lat, lon, name, country, tz_id, lastUpdate, pos)
+			LocationEntity(loc.id, lat, lon, name, country, zoneId, lastUpdate, pos)
 		}
 		val c = extractCurrent(loc.id, resp)
 		val h = extractHourly(loc.id, resp)
@@ -108,15 +108,15 @@ class WeatherInfoRepo @Inject constructor(
 	companion object {
 
 		private fun extractCurrent(locationId: Int, resp: ForecastResponse) = with(resp.current) {
-			val firstHour = resp.forecast.forecastday[0].hour[0]
+			val firstHour = resp.forecast.forecastday[0].hourly[0]
 			CurrentEntity(
 				locationId,
-				last_updated_epoch,
+				lastUpdate,
 				temp_c.roundToInt(),
 				feelslike_c.roundToInt(),
 				// save condition index to reduce later work
 				condition.code,
-				is_day == 1,
+				isDay == 1,
 				wind_kph,
 				meteorologicalToCircular(wind_degree),
 				pressure_mb.roundToInt(),
@@ -131,15 +131,15 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun extractHourly(locationId: Int, resp: ForecastResponse) =
 			resp.forecast.forecastday.flatMap { forecastDay ->
-				forecastDay.hour.map { hour ->
+				forecastDay.hourly.map { hour ->
 					with(hour) {
 						HourlyEntity(
 							locationId,
-							time_epoch,
+							dt,
 							temp_c.roundToInt(),
 							feelslike_c.roundToInt(),
 							condition.code,
-							is_day == 1,
+							isDay == 1,
 							wind_kph,
 							meteorologicalToCircular(wind_degree),
 							pressure_mb.roundToInt(),
@@ -159,10 +159,10 @@ class WeatherInfoRepo @Inject constructor(
 			resp.forecast.forecastday.map { forecastDay ->
 				val day = forecastDay.day
 				val astro = forecastDay.astro
-				val zone = ZoneId.of(resp.location.tz_id)
+				val zone = ZoneId.of(resp.location.zoneId)
 				DailyEntity(
 					locationId,
-					forecastDay.date_epoch,
+					forecastDay.dt,
 					day.mintemp_c.roundToInt(),
 					day.maxtemp_c.roundToInt(),
 					day.condition.code,
@@ -172,10 +172,10 @@ class WeatherInfoRepo @Inject constructor(
 					day.avgvis_km,
 					max(day.daily_chance_of_rain, day.daily_chance_of_snow),
 					day.uv.roundToInt(),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.sunrise, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.sunset, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.moonrise, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.moonset, zone),
+					localTimeToEpochSeconds(forecastDay.dt, astro.sunrise, zone),
+					localTimeToEpochSeconds(forecastDay.dt, astro.sunset, zone),
+					localTimeToEpochSeconds(forecastDay.dt, astro.moonrise, zone),
+					localTimeToEpochSeconds(forecastDay.dt, astro.moonset, zone),
 					moonPhaseIndex(astro.moon_phase)
 				)
 			}

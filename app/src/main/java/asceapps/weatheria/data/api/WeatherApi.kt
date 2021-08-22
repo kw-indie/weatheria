@@ -37,40 +37,38 @@ interface WeatherApi {
 }
 
 class SearchResponse(
-	override val id: Int,
-	override val lat: Float,
+	@SerializedName("id") override val id: Int,
+	@SerializedName("lat") override val lat: Float,
 	@SerializedName("lon") override val lng: Float,
-	override val name: String,
-	override val country: String
+	@SerializedName("name") override val name: String,
+	@SerializedName("country") override val country: String
 ): BaseLocation, Listable {
 
 	override val hash get() = id
 }
 
 class ForecastResponse(
-	val location: Location,
-	val current: Current,
-	val forecast: Forecast
+	@SerializedName("location") val location: Location,
+	@SerializedName("current") val current: Current,
+	@SerializedName("forecast") val forecast: Forecast
 ) {
 
 	/**
 	 * @param country full country name, not just 2 letters
-	 * @param tz_id timezone id, eg. Europe/London
-	 * @param localtime_epoch seconds since epoch
+	 * @param zoneId timezone id, eg. Europe/London
 	 */
 	class Location(
-		val lat: Float,
-		val lon: Float,
-		val name: String,
-		val country: String,
-		val tz_id: String,
-		val localtime_epoch: Int
+		@SerializedName("lat") val lat: Float,
+		@SerializedName("lon") val lon: Float,
+		@SerializedName("name") val name: String,
+		@SerializedName("country") val country: String,
+		@SerializedName("tz_id") val zoneId: String
 	)
 
 	/**
-	 * @param last_updated_epoch unix seconds of data update on server
+	 * @param lastUpdate unix seconds of data update on server
 	 * @param condition weather condition
-	 * @param is_day 1 or 0, true or false
+	 * @param isDay 1 or 0, true or false
 	 * @param pressure_mb in millibars
 	 * @param humidity as percentage [0-100]
 	 * @param cloud same as humidity
@@ -78,72 +76,72 @@ class ForecastResponse(
 	 * @param uv index: 1-2 Low, 3-5 Moderate, 6-7: High, 8-10: Very high, 11+: Extreme
 	 */
 	class Current(
-		val last_updated_epoch: Int,
-		val temp_c: Float,
-		val feelslike_c: Float,
-		val condition: Condition,
-		val is_day: Int, // 1 or 0
-		val wind_kph: Float,
-		val wind_degree: Int,
-		val pressure_mb: Float,
-		val precip_mm: Float,
-		val humidity: Int,
-		val cloud: Int,
-		val vis_km: Float,
-		val uv: Float
+		@SerializedName("last_updated_epoch") val lastUpdate: Int,
+		@SerializedName("temp_c") val temp_c: Float,
+		@SerializedName("feelslike_c") val feelslike_c: Float,
+		@SerializedName("condition") val condition: Condition,
+		@SerializedName("is_day") val isDay: Int, // 1 or 0
+		@SerializedName("wind_kph") val wind_kph: Float,
+		@SerializedName("wind_degree") val wind_degree: Int,
+		@SerializedName("pressure_mb") val pressure_mb: Float,
+		@SerializedName("precip_mm") val precip_mm: Float,
+		@SerializedName("humidity") val humidity: Int,
+		@SerializedName("cloud") val cloud: Int,
+		@SerializedName("vis_km") val vis_km: Float,
+		@SerializedName("uv") val uv: Float
 	)
 
-	class Condition(val code: Int)
+	class Condition(@SerializedName("code") val code: Int)
 
-	class Forecast(val forecastday: List<ForecastDay>)
+	class Forecast(@SerializedName("forecastday") val forecastday: List<ForecastDay>)
 
 	/**
-	 * @param date_epoch dt at the start of this forecast day
-	 * @param hour hourly forecast (24)
+	 * @param dt dt at the start of this forecast day
+	 * @param hourly hourly forecast (24)
 	 * @param day day info
 	 * @param astro astro info
 	 */
 	class ForecastDay(
-		val date_epoch: Int,
-		val hour: List<Hour>,
-		val day: Day,
-		val astro: Astro
+		@SerializedName("date_epoch") val dt: Int,
+		@SerializedName("hour") val hourly: List<Hourly>,
+		@SerializedName("day") val day: Day,
+		@SerializedName("astro") val astro: Astro
 	)
 
 	/**
-	 * @param time_epoch a random? past time < 1 day
+	 * @param dt a random? past time < 1 day
 	 * @param chance_of_rain as percentage (0-100)
 	 */
-	class Hour(
-		val time_epoch: Int,
-		val temp_c: Float,
-		val feelslike_c: Float,
-		val condition: Condition,
-		val is_day: Int,
-		val wind_kph: Float,
-		val wind_degree: Int,
-		val pressure_mb: Float,
-		val precip_mm: Float,
-		val humidity: Int,
-		val dewpoint_c: Float,
-		val cloud: Int,
-		val vis_km: Float,
-		val chance_of_rain: Int,
-		val chance_of_snow: Int,
-		val uv: Float
+	class Hourly(
+		@SerializedName("time_epoch") val dt: Int,
+		@SerializedName("temp_c") val temp_c: Float,
+		@SerializedName("feelslike_c") val feelslike_c: Float,
+		@SerializedName("condition") val condition: Condition,
+		@SerializedName("is_day") val isDay: Int,
+		@SerializedName("wind_kph") val wind_kph: Float,
+		@SerializedName("wind_degree") val wind_degree: Int,
+		@SerializedName("pressure_mb") val pressure_mb: Float,
+		@SerializedName("precip_mm") val precip_mm: Float,
+		@SerializedName("humidity") val humidity: Int,
+		@SerializedName("dewpoint_c") val dewpoint_c: Float,
+		@SerializedName("cloud") val cloud: Int,
+		@SerializedName("vis_km") val vis_km: Float,
+		@SerializedName("chance_of_rain") val chance_of_rain: Int,
+		@SerializedName("chance_of_snow") val chance_of_snow: Int,
+		@SerializedName("uv") val uv: Float
 	)
 
 	class Day(
-		val mintemp_c: Float,
-		val maxtemp_c: Float,
-		val condition: Condition,
-		val maxwind_kph: Float,
-		val totalprecip_mm: Float,
-		val avghumidity: Int,
-		val avgvis_km: Float,
-		val daily_chance_of_rain: Int,
-		val daily_chance_of_snow: Int,
-		val uv: Float,
+		@SerializedName("mintemp_c") val mintemp_c: Float,
+		@SerializedName("maxtemp_c") val maxtemp_c: Float,
+		@SerializedName("condition") val condition: Condition,
+		@SerializedName("maxwind_kph") val maxwind_kph: Float,
+		@SerializedName("totalprecip_mm") val totalprecip_mm: Float,
+		@SerializedName("avghumidity") val avghumidity: Int,
+		@SerializedName("avgvis_km") val avgvis_km: Float,
+		@SerializedName("daily_chance_of_rain") val daily_chance_of_rain: Int,
+		@SerializedName("daily_chance_of_snow") val daily_chance_of_snow: Int,
+		@SerializedName("uv") val uv: Float,
 	)
 
 	/**
@@ -151,10 +149,10 @@ class ForecastResponse(
 	 * @param moon_phase 8 phases
 	 */
 	class Astro(
-		val sunrise: String,
-		val sunset: String,
-		val moonrise: String,
-		val moonset: String,
-		val moon_phase: String
+		@SerializedName("sunrise") val sunrise: String,
+		@SerializedName("sunset") val sunset: String,
+		@SerializedName("moonrise") val moonrise: String,
+		@SerializedName("moonset") val moonset: String,
+		@SerializedName("moon_phase") val moon_phase: String
 	)
 }

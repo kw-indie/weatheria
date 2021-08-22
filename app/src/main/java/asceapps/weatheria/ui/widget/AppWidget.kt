@@ -64,7 +64,7 @@ class AppWidget: AppWidgetProvider() {
 
 	override fun onUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
 		GlobalScope.launch {
-			infoRepo.getByPos(settingsRepo.selectedPos) // also react to unit sys change
+			infoRepo.getByPos(settingsRepo.selectedPos) // todo react to selectedPos and unit sys change
 				.take(2).collect { // take 'loading' and 'success/error' only
 					loadingAnimation(context, awm, ids, it is Loading)
 					if(it is Success) {

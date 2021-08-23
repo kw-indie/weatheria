@@ -1,7 +1,11 @@
 package asceapps.weatheria.di
 
 import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.api.AccuWeatherApi
+import asceapps.weatheria.data.api.FlattenTypeAdapterFactory
+import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,11 +47,14 @@ class NetworkModule {
 			}
 			clientBuilder.addInterceptor(interceptor)
 		}
+		val gson = GsonBuilder()
+			.registerTypeAdapterFactory(FlattenTypeAdapterFactory())
+			.create()
 		return Retrofit.Builder()
 			.baseUrl(baseUrl)
 			.client(clientBuilder.build())
 			// for now, all my api's are dealing in json
-			.addConverterFactory(GsonConverterFactory.create())
+			.addConverterFactory(GsonConverterFactory.create(gson))
 			.build()
 	}
 }

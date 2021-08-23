@@ -111,7 +111,7 @@ class WeatherInfoRepo @Inject constructor(
 			val firstHour = resp.forecastDays[0].hourly[0]
 			CurrentEntity(
 				locationId,
-				lastUpdate,
+				dt,
 				temp_c.roundToInt(),
 				feelsLike_c.roundToInt(),
 				// save condition index to reduce later work

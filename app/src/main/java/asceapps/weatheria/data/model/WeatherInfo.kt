@@ -121,7 +121,7 @@ class WeatherInfo(
 		// adds localized percent char
 		private val pFormat = NumberFormat.getPercentInstance()
 
-		// trash java never localizes the xxx part // old pattern: EEE, MMMM d, h:mm a (xxx)
+		// trash java never localizes the xxx (e.g +3:00) part // old pattern: EEE, MMMM d, h:mm a (xxx)
 		private val dtFormatter = DateTimeFormatter.ofPattern("EEE h:mm a (xxx)")
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
 		private val tFormatter = DateTimeFormatter.ofPattern("h:mm a")

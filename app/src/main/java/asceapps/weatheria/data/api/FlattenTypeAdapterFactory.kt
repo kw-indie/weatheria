@@ -43,20 +43,16 @@ class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAd
 					// dive down the path to find the right element
 					for(node in field.path) {
 						// can't dive down null elements, break
-						if(element != null) {
-							// reassign element to next node down
-							element = when {
-								element.isJsonObject -> element.asJsonObject[node]
-								element.isJsonArray -> try {
-									element.asJsonArray[node.toInt()]
-								} catch(e: Exception) {
-									// NumberFormatException | IndexOutOfBoundsException
-									null
-								}
-								else -> null
+						if(element == null) break
+						// reassign element to next node down
+						element = when {
+							element.isJsonObject -> element.asJsonObject[node]
+							element.isJsonArray -> try {
+								element.asJsonArray[node.toInt()]
+							} catch(e: Exception) { // NumberFormatException | IndexOutOfBoundsException
+								null
 							}
-						} else {
-							break
+							else -> null
 						}
 					}
 					// lift deep element to root element level
@@ -73,25 +69,18 @@ class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAd
 		}.nullSafe()
 	}
 
-	// Find annotated fields of the class and any superclasses
-	private fun getAnnotatedFields(klass: Class<*>, annotationClass: Class<out Annotation>): List<Field> {
-		var superClass: Class<*>? = klass
-		val fields = ArrayList<Field>()
-		while(superClass != null && superClass != Any::class.java) {
-			for(field in klass.declaredFields) {
-				if(field.isAnnotationPresent(annotationClass)) {
-					fields.add(field)
-				}
-			}
-			// Walk up class hierarchy
-			superClass = superClass.superclass
-		}
-		return fields
-	}
-
 	// build a cache for flattened fields's paths and names (reflection happens only here)
 	private fun buildFlattenedFieldsCache(root: Class<*>): Array<FlattenedField> {
-		val flattenedFields = getAnnotatedFields(root, Flatten::class.java)
+		// get all flattened fields of this class
+		var clazz: Class<*>? = root
+		val flattenedFields = ArrayList<Field>()
+		while(clazz != null) {
+			clazz.declaredFields.filterTo(flattenedFields) {
+				it.isAnnotationPresent(Flatten::class.java)
+			}
+			clazz = clazz.superclass
+		}
+
 		if(flattenedFields.isEmpty()) {
 			return emptyArray()
 		}
@@ -99,13 +88,12 @@ class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAd
 		return Array(flattenedFields.size) { i ->
 			val ff = flattenedFields[i]
 			val a = ff.getAnnotation(Flatten::class.java)!!
-			val path = a.path
-			val nodes = path.split(delimiter)
+			val nodes = a.path.split(delimiter)
 				.filterNot { it.isEmpty() } // ignore multiple or trailing dots
 				.toTypedArray()
-			FlattenedField(nodes, ff.name)
+			FlattenedField(ff.name, nodes)
 		}
 	}
 
-	private class FlattenedField(val path: Array<String>, val name: String)
+	private class FlattenedField(val name: String, val path: Array<String>)
 }

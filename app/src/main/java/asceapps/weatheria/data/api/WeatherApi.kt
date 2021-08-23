@@ -66,21 +66,20 @@ class ForecastResponse(
 	)
 
 	/**
-	 * @param lastUpdate unix seconds of data update on server
 	 * @param condition weather condition
 	 * @param isDay 1 or 0, true or false
+	 * @param wind_degree meteorological, aka CW and 0 is N
 	 * @param pressure_mb in millibars
 	 * @param humidity as percentage [0-100]
 	 * @param clouds same as humidity
 	 * @param vis_km visibility
 	 * @param uv index: 1-2 Low, 3-5 Moderate, 6-7: High, 8-10: Very high, 11+: Extreme
 	 */
-	class Current(
-		@SerializedName("last_updated_epoch") val lastUpdate: Int,
+	sealed class BaseData(
 		@SerializedName("temp_c") val temp_c: Float,
 		@SerializedName("feelslike_c") val feelsLike_c: Float,
 		@Flatten("condition.code") val condition: Int,
-		@SerializedName("is_day") val isDay: Int, // 1 or 0
+		@SerializedName("is_day") val isDay: Int,
 		@SerializedName("wind_kph") val wind_kph: Float,
 		@SerializedName("wind_degree") val wind_degree: Int,
 		@SerializedName("pressure_mb") val pressure_mb: Float,
@@ -90,6 +89,25 @@ class ForecastResponse(
 		@SerializedName("vis_km") val vis_km: Float,
 		@SerializedName("uv") val uv: Float
 	)
+
+	/**
+	 * @param dt unix seconds of data update on server
+	 */
+	class Current(
+		@SerializedName("last_updated_epoch") val dt: Int,
+		temp_c: Float,
+		feelsLike_c: Float,
+		condition: Int,
+		isDay: Int,
+		wind_kph: Float,
+		wind_degree: Int,
+		pressure_mb: Float,
+		precip_mm: Float,
+		humidity: Int,
+		clouds: Int,
+		vis_km: Float,
+		uv: Float
+	): BaseData(temp_c, feelsLike_c, condition, isDay, wind_kph, wind_degree, pressure_mb, precip_mm, humidity, clouds, vis_km, uv)
 
 	/**
 	 * @param dt dt at the start of this forecast day
@@ -123,21 +141,21 @@ class ForecastResponse(
 	 */
 	class Hourly(
 		@SerializedName("time_epoch") val dt: Int,
-		@SerializedName("temp_c") val temp_c: Float,
-		@SerializedName("feelslike_c") val feelsLike_c: Float,
-		@Flatten("condition.code") val condition: Int,
-		@SerializedName("is_day") val isDay: Int,
-		@SerializedName("wind_kph") val wind_kph: Float,
-		@SerializedName("wind_degree") val wind_degree: Int,
-		@SerializedName("pressure_mb") val pressure_mb: Float,
-		@SerializedName("precip_mm") val precip_mm: Float,
-		@SerializedName("humidity") val humidity: Int,
+		temp_c: Float,
+		feelsLike_c: Float,
+		condition: Int,
+		isDay: Int,
+		wind_kph: Float,
+		wind_degree: Int,
+		pressure_mb: Float,
+		precip_mm: Float,
+		humidity: Int,
 		@SerializedName("dewpoint_c") val dewPoint_c: Float,
-		@SerializedName("cloud") val clouds: Int,
-		@SerializedName("vis_km") val vis_km: Float,
+		clouds: Int,
+		vis_km: Float,
 		@SerializedName("chance_of_rain") val chanceOfRain: Int,
 		@SerializedName("chance_of_snow") val chanceOfSnow: Int,
-		@SerializedName("uv") val uv: Float
-	)
+		uv: Float
+	): BaseData(temp_c, feelsLike_c, condition, isDay, wind_kph, wind_degree, pressure_mb, precip_mm, humidity, clouds, vis_km, uv)
 
 }

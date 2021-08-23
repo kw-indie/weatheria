@@ -137,6 +137,7 @@
 		<item>متري</item>
 		<item>إمبراطوري</item>
 	</string-array>
+	<string name="title_api">مزود البيانات</string>
 	<string name="cat_header_loc">موقعي</string>
 	<string name="title_loc_provider">مزود الموقع</string>
 	<string-array name="entries_loc_providers">

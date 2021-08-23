@@ -22,12 +22,30 @@ class SettingsRepo @Inject constructor(
 	private val workManager: WorkManager
 ) {
 
-	private val defVal = 0
-	private val defValStr = "0"
+	companion object {
+		private const val defVal = 0
+		private const val defValStr = "0"
+
+		const val UNITS_METRIC = 0
+		const val UNITS_IMPERIAL = 1
+
+		const val LOCATION_PROVIDER_IP = 0
+		const val LOCATION_PROVIDER_NETWORK = 1
+		const val LOCATION_PROVIDER_ALL = 2
+
+		const val AUTO_REFRESH_NEVER = 0
+		const val AUTO_REFRESH_ONCE = 1
+		const val AUTO_REFRESH_TWICE = 2
+
+		const val API_OPEN_WEATHER_MAP = 0
+		const val API_ACCU_WEATHER = 1
+		const val API_WEATHER_API = 2
+	}
+
 	private val unitsKey = appContext.getString(R.string.key_units)
+	private val apiKey = appContext.getString(R.string.key_api)
 	private val locProviderKey = appContext.getString(R.string.key_loc_provider)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
-	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
 	private val selectedKey = appContext.getString(R.string.key_selected)
 
 	init {
@@ -39,26 +57,21 @@ class SettingsRepo @Inject constructor(
 
 	val changesFlow get() = prefs.onChangeFlow()
 
-	/**
-	 *  0 = metric, 1 = imperial
-	 */
 	private val units: Int
 		get() = prefs.getString(unitsKey, defValStr)!!.toInt()
 
-	/**
-	 * 0 = IP, 1 = coarse location, 2 = fine location
-	 */
-	private val locProvider: Int
+	val api: Int
+		get() = prefs.getString(apiKey, defValStr)!!.toInt()
+
+	private val locationProvider: Int
 		get() = prefs.getString(locProviderKey, defValStr)!!.toInt()
-
 	val useDeviceForLocation: Boolean
-		get() = locProvider > 0
-
+		get() = locationProvider != LOCATION_PROVIDER_IP
 	val useHighAccuracyLocation: Boolean
-		get() = locProvider == 2
+		get() = locationProvider == LOCATION_PROVIDER_ALL
 
-	private val autoRefreshPeriod: String
-		get() = prefs.getString(autoRefreshKey, defValStr)!!
+	private val autoRefresh: Int
+		get() = prefs.getString(autoRefreshKey, defValStr)!!.toInt()
 
 	var selectedPos: Int
 		get() = prefs.getInt(selectedKey, defVal)
@@ -78,18 +91,19 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateAutoRefresh() {
-		val refreshWorkName = RefreshWorker::class.qualifiedName!!
-		val period = autoRefreshPeriod
-		val never = autoRefreshValues[0]
-		if(period == never) {
-			workManager.cancelUniqueWork(refreshWorkName)
-			return
-		}
-
-		// cancel any previous different work
-		autoRefreshValues.forEach {
-			if(it != never && it != period) {
-				workManager.cancelAllWorkByTag(it)
+		val workName = RefreshWorker::class.qualifiedName!!
+		val period = when(autoRefresh) {
+			AUTO_REFRESH_NEVER -> {
+				workManager.cancelUniqueWork(workName)
+				return
+			}
+			AUTO_REFRESH_ONCE -> {
+				workManager.cancelAllWorkByTag(AUTO_REFRESH_TWICE.toString())
+				24L
+			}
+			else -> { // twice a day
+				workManager.cancelAllWorkByTag(AUTO_REFRESH_ONCE.toString())
+				12L
 			}
 		}
 		// About constraints: leave decision to user (who can disable auto updates)
@@ -98,15 +112,14 @@ class SettingsRepo @Inject constructor(
 
 		// don't start for all users at midnight or some other $h!t
 		// let users sync at random times so we don't hit api limits
-		val periodL = period.toLong()
-		val work = PeriodicWorkRequestBuilder<RefreshWorker>(periodL, TimeUnit.HOURS)
+		val work = PeriodicWorkRequestBuilder<RefreshWorker>(period, TimeUnit.HOURS)
 			// if we don't set a delay, it will run once immediately
-			.setInitialDelay(periodL, TimeUnit.HOURS)
+			.setInitialDelay(period, TimeUnit.HOURS)
 			// to cancel by tag
-			.addTag(period)
+			.addTag(period.toString())
 			.build()
 		workManager.enqueueUniquePeriodicWork(
-			refreshWorkName,
+			workName,
 			ExistingPeriodicWorkPolicy.KEEP,
 			work
 		)

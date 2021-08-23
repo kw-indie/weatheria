@@ -1,9 +1,7 @@
 package asceapps.weatheria.di
 
 import asceapps.weatheria.BuildConfig
-import asceapps.weatheria.data.api.AccuWeatherApi
 import asceapps.weatheria.data.api.FlattenTypeAdapterFactory
-import asceapps.weatheria.data.api.IPApi
 import asceapps.weatheria.data.api.WeatherApi
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -29,17 +27,19 @@ class NetworkModule {
 		WeatherApi.KEY_PARAM, BuildConfig.WEATHER_API_KEY
 	).create()
 
-	private fun buildApi(
-		baseUrl: String,
-		paramName: String? = null, paramValue: String? = null
-	): Retrofit {
+	/**
+	 * @param params key-value pairs of url params.
+	 */
+	private fun buildApi(baseUrl: String, vararg params: String): Retrofit {
 		val clientBuilder = OkHttpClient.Builder()
 			.callTimeout(10, TimeUnit.SECONDS) // throws InterruptedIOException
-		if(paramName != null) {
+		if(params.isNotEmpty()) {
 			val interceptor = Interceptor { chain ->
-				val newUrl = chain.request().url.newBuilder()
-					.addQueryParameter(paramName, paramValue)
-					.build()
+				val newUrl = chain.request().url.newBuilder().apply {
+					for(i in params.indices step 2) {
+						addQueryParameter(params[i], params[i + 1])
+					}
+				}.build()
 				val request = chain.request().newBuilder()
 					.url(newUrl)
 					.build()

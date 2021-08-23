@@ -5,8 +5,15 @@
 			app:key="@string/key_units"
 			app:title="@string/title_units"
 			app:entries="@array/entries_unit_system"
-			app:entryValues="@array/values_unit_system"
+			app:entryValues="@array/values_indices_2"
 			app:defaultValue="0"
+			app:useSimpleSummaryProvider="true"/>
+		<ListPreference
+			app:key="@string/key_api"
+			app:title="@string/title_api"
+			app:entries="@array/entries_api"
+			app:entryValues="@array/values_indices_3"
+			app:defaultValue="2"
 			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_loc">
@@ -14,7 +21,7 @@
 			app:key="@string/key_loc_provider"
 			app:title="@string/title_loc_provider"
 			app:entries="@array/entries_loc_providers"
-			app:entryValues="@array/values_loc_providers"
+			app:entryValues="@array/values_indices_3"
 			app:defaultValue="0"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_sync">
@@ -22,8 +29,8 @@
 			app:key="@string/key_auto_refresh"
 			app:title="@string/title_auto_refresh"
 			app:entries="@array/entries_auto_refresh"
-			app:entryValues="@array/values_auto_refresh"
-			app:defaultValue="24"
+			app:entryValues="@array/values_indices_3"
+			app:defaultValue="0"
 			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_help">

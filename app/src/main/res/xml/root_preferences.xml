@@ -10,19 +10,12 @@
 			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_loc">
-		<SwitchPreference
-			app:key="@string/key_loc_use_device"
-			app:title="@string/title_loc_use_device"
-			app:summaryOn="@string/summary_loc_use_device"
-			app:summaryOff="@string/summary_loc_use_ip"
-			app:defaultValue="true"/>
-		<SwitchPreference
-			app:key="@string/key_loc_accuracy_high"
-			app:title="@string/title_loc_accuracy_high"
-			app:summaryOn="@string/summary_loc_accuracy_high"
-			app:summaryOff="@string/summary_loc_accuracy_normal"
-			app:defaultValue="false"
-			app:dependency="@string/key_loc_use_device"/>
+		<ListPreference
+			app:key="@string/key_loc_provider"
+			app:title="@string/title_loc_provider"
+			app:entries="@array/entries_loc_providers"
+			app:entryValues="@array/values_loc_providers"
+			app:defaultValue="0"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_sync">
 		<ListPreference
@@ -30,7 +23,7 @@
 			app:title="@string/title_auto_refresh"
 			app:entries="@array/entries_auto_refresh"
 			app:entryValues="@array/values_auto_refresh"
-			app:defaultValue="0"
+			app:defaultValue="24"
 			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_help">

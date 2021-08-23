@@ -28,14 +28,13 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:ellipsize="end"
-				android:gravity="center_horizontal"
 				android:maxLines="1"
 				android:text="@{item.location.name}"
 				android:textSize="@dimen/_16ssp"
 				android:textStyle="bold"
+				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintWidth_max="@dimen/_100sdp"
 				tools:text="@tools:sample/cities"/>
 			<TextView
 				android:id="@+id/tv_time"

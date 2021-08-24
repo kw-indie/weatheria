@@ -3,15 +3,14 @@ package asceapps.weatheria.data.repo
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.work.*
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,14 +22,30 @@ class SettingsRepo @Inject constructor(
 	private val workManager: WorkManager
 ) {
 
-	private val defVal = 0
-	private val defValStr = "0"
-	private val defValBool = false
+	companion object {
+		private const val defVal = 0
+		private const val defValStr = "0"
+
+		const val UNITS_METRIC = 0
+		const val UNITS_IMPERIAL = 1
+
+		const val LOCATION_PROVIDER_IP = 0
+		const val LOCATION_PROVIDER_NETWORK = 1
+		const val LOCATION_PROVIDER_ALL = 2
+
+		const val AUTO_REFRESH_NEVER = 0
+		const val AUTO_REFRESH_ONCE = 1
+		const val AUTO_REFRESH_TWICE = 2
+
+		const val API_OPEN_WEATHER_MAP = 0
+		const val API_ACCU_WEATHER = 1
+		const val API_WEATHER_API = 2
+	}
+
 	private val unitsKey = appContext.getString(R.string.key_units)
-	private val locUseDevice = appContext.getString(R.string.key_loc_use_device)
-	private val locAccuracyHigh = appContext.getString(R.string.key_loc_accuracy_high)
+	private val apiKey = appContext.getString(R.string.key_api)
+	private val locProviderKey = appContext.getString(R.string.key_loc_provider)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
-	private val autoRefreshValues = appContext.resources.getStringArray(R.array.values_auto_refresh)
 	private val selectedKey = appContext.getString(R.string.key_selected)
 
 	init {
@@ -42,20 +57,23 @@ class SettingsRepo @Inject constructor(
 
 	val changesFlow get() = prefs.onChangeFlow()
 
-	// 0 = metric, 1 = imperial
 	private val units: Int
-		get() = (prefs.getString(unitsKey, defValStr) ?: defValStr).toInt()
+		get() = prefs.getString(unitsKey, defValStr)!!.toInt()
 
+	val api: Int
+		get() = prefs.getString(apiKey, defValStr)!!.toInt()
+
+	private val locationProvider: Int
+		get() = prefs.getString(locProviderKey, defValStr)!!.toInt()
 	val useDeviceForLocation: Boolean
-		get() = prefs.getBoolean(locUseDevice, defValBool)
-
+		get() = locationProvider != LOCATION_PROVIDER_IP
 	val useHighAccuracyLocation: Boolean
-		get() = prefs.getBoolean(locAccuracyHigh, defValBool)
+		get() = locationProvider == LOCATION_PROVIDER_ALL
 
-	private val autoRefreshPeriod: String
-		get() = prefs.getString(autoRefreshKey, defValStr) ?: defValStr
+	private val autoRefresh: Int
+		get() = prefs.getString(autoRefreshKey, defValStr)!!.toInt()
 
-	var selectedPos
+	var selectedPos: Int
 		get() = prefs.getInt(selectedKey, defVal)
 		set(value) {
 			prefs.edit { putInt(selectedKey, value) }
@@ -73,38 +91,35 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateAutoRefresh() {
-		val refreshWorkName = RefreshWorker::class.qualifiedName!!
-		val never = autoRefreshValues[0]
-		if(autoRefreshPeriod == never) {
-			workManager.cancelUniqueWork(refreshWorkName)
-			return
-		}
-
-		// cancel any previous different work
-		autoRefreshValues.filterNot { it == never || it == autoRefreshPeriod }
-			.forEach {
-				workManager.cancelAllWorkByTag(it)
+		val workName = RefreshWorker::class.qualifiedName!!
+		val period = when(autoRefresh) {
+			AUTO_REFRESH_NEVER -> {
+				workManager.cancelUniqueWork(workName)
+				return
 			}
+			AUTO_REFRESH_ONCE -> {
+				workManager.cancelAllWorkByTag(AUTO_REFRESH_TWICE.toString())
+				24L
+			}
+			else -> { // twice a day
+				workManager.cancelAllWorkByTag(AUTO_REFRESH_ONCE.toString())
+				12L
+			}
+		}
+		// About constraints: leave decision to user (who can disable auto updates)
+		// NetworkType.UNMETERED: let's be honest, nobody cares about a few kb's even on data
+		// BatteryNotLow: this process takes way too little energy to care about low battery
 
-		val periodL = autoRefreshPeriod.toLong()
-		val constraints = Constraints.Builder()
-			.setRequiredNetworkType(NetworkType.UNMETERED)
-			.setRequiresBatteryNotLow(true)
-			.build()
-		val now = LocalDateTime.now()
-		val lastMidnight = now.truncatedTo(ChronoUnit.DAYS)
-		var nextSection = lastMidnight
-		do {
-			nextSection = nextSection.plusHours(periodL)
-		} while(nextSection < now)
-		val secondsUntilNextSection = Duration.between(now, nextSection).seconds
-		val work = PeriodicWorkRequestBuilder<RefreshWorker>(periodL, TimeUnit.HOURS)
-			.addTag(autoRefreshPeriod) // to cancel by tag
-			.setConstraints(constraints)
-			.setInitialDelay(secondsUntilNextSection, TimeUnit.SECONDS)
+		// don't start for all users at midnight or some other $h!t
+		// let users sync at random times so we don't hit api limits
+		val work = PeriodicWorkRequestBuilder<RefreshWorker>(period, TimeUnit.HOURS)
+			// if we don't set a delay, it will run once immediately
+			.setInitialDelay(period, TimeUnit.HOURS)
+			// to cancel by tag
+			.addTag(period.toString())
 			.build()
 		workManager.enqueueUniquePeriodicWork(
-			refreshWorkName,
+			workName,
 			ExistingPeriodicWorkPolicy.KEEP,
 			work
 		)

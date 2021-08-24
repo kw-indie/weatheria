@@ -1,17 +1,15 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
-	<string name="noti_def_channel_name">Default channel</string>
-	<string name="noti_def_channel_desc">All app notifications use this channel</string>
 	<!--main-->
 	<string name="action_settings">Settings</string>
-	<!--home-->
+	<!--region home-->
 	<string name="action_my_locations">My locations</string>
 	<string name="action_add_location">Add location</string>
 	<string name="no_saved_locations">You don\'t have any saved locations.\nWhy not add one?</string>
 	<string name="f_last_update">Last update: %s</string>
 	<string name="f_feels_like">Feels like %s</string>
-	<string name="f_2s" translatable="false">%s %s</string>
-	<string name="f_2s_p" translatable="false">%s (%s)</string>
+	<string name="f_2s" translatable="false">%1$s %2$s</string>
+	<string name="f_2s_p" translatable="false">%1$s (%2$s)</string>
 	<string name="cd_weather_icon">Weather icon</string>
 	<string name="cd_pop">Probability of Precipitation</string>
 	<string name="cd_pressure">Pressure</string>
@@ -107,7 +105,8 @@
 		<item>Last Quarter</item>
 		<item>Waning Crescent</item>
 	</string-array>
-	<!--icon paths-->
+	<!--endregion-->
+	<!--region icon paths-->
 	<string name="sun_path" translatable="false">M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z</string>
 	<string name="moon_path" translatable="false">M17.6 14.1a6 6 0 1 1 -8.2-7.5 6 6 0 0 0 8.2 7.5z</string>
 	<string name="cloud_path" translatable="false">M17.96 16.71c4.03-0.29 3.64-5.8-0.08-5.86a3.9 3.9 0 0 0-7.49-0.31 3.16 3.16 0 0 0-3.98 2.38c-2.5 0.46-1.92 3.64 0.06 3.8z</string>
@@ -125,7 +124,8 @@
 	<string name="freezing_rain_path" translatable="false">M7.76 18.76h2.28L8.9 21.54zm2.28 0L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
 	<string name="ice_pellet_path" translatable="false">M12.5 18.35a1.5 1.5 0 0 1 0 3 1.5 1.5 0 0 1 0-3z</string>
 	<string name="torrential_rain_path" translatable="false">M8.04 18.76L6.9 21.54m3.14-2.78L8.9 21.54m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78m3.14-2.78l-1.14 2.78</string>
-	<!--add location-->
+	<!--endregion-->
+	<!--region add location-->
 	<string name="action_search">Search</string>
 	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
 	<string name="request_rationale_title">Why we need permission</string>
@@ -134,12 +134,14 @@
 	<string name="dismiss">Dismiss</string>
 	<string name="no_search_result">No result.\n\nUse the search bar above or zoom the map enough, then press the search button to show results.</string>
 	<string name="hint_search">Search by name or coordinates</string>
-	<!--locations-->
+	<!--endregion-->
+	<!--region locations-->
 	<string name="action_delete_all">Delete all</string>
 	<string name="action_refresh_all">Refresh all</string>
 	<string name="cd_delete">Delete</string>
 	<string name="cd_reorder">Reorder</string>
-	<!--errors-->
+	<!--endregion-->
+	<!--region errors-->
 	<string name="retry">Retry</string>
 	<string name="error_location_denied">Location permission not granted</string>
 	<string name="error_location_disabled">Please enable location service, then try again</string>
@@ -148,7 +150,17 @@
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
 	<string name="error_unknown">Unknown error</string>
-	<!--settings-->
+	<!--endregion-->
+	<!--region settings-->
+	<string-array name="values_indices_2">
+		<item>0</item>
+		<item>1</item>
+	</string-array>
+	<string-array name="values_indices_3">
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+	</string-array>
 	<string name="cat_header_general">General</string>
 	<string name="key_units" translatable="false">units</string>
 	<string name="title_units">Unit System</string>
@@ -156,38 +168,44 @@
 		<item>Metric</item>
 		<item>Imperial</item>
 	</string-array>
-	<string-array name="values_unit_system">
-		<item>0</item>
-		<item>1</item>
+	<string name="key_api" translatable="false">api</string>
+	<string name="title_api">Weather API</string>
+	<string-array name="entries_api">
+		<item>OpenWeatherMap</item>
+		<item>AccuWeather</item>
+		<item>WeatherApi</item>
 	</string-array>
 	<string name="cat_header_loc">My Location</string>
-	<string name="key_loc_use_device" translatable="false">loc_use_device</string>
-	<string name="title_loc_use_device">Use Device for Location</string>
-	<string name="summary_loc_use_device">Enabled: Use Device (GPS or Network). More accurate, but can be slow and requires permission</string>
-	<string name="summary_loc_use_ip">Disabled: Fall back to using IP geolocation. Fast and does not require permission, but less accurate.</string>
-	<string name="key_loc_accuracy_high" translatable="false">loc_accuracy_high</string>
-	<string name="title_loc_accuracy_high">High Accuracy Location</string>
-	<string name="summary_loc_accuracy_high">Enabled: Almost guarantees success, but requires access to fine location</string>
-	<string name="summary_loc_accuracy_normal">Disabled: Only requires access to coarse location, but less accurate and fails in rare cases</string>
+	<string name="key_loc_provider" translatable="false">loc_provider</string>
+	<string name="title_loc_provider">Location Provider</string>
+	<string-array name="entries_loc_providers">
+		<item>IP Address</item>
+		<item>Network</item>
+		<item>Network and GPS</item>
+	</string-array>
+	<string-array name="summaries_loc_provider">
+		<item>%s: Fast and does not require permission, but less accurate.</item>
+		<item>%s: Uses WiFi and mobile networks to estimate location. Good accuracy, but requires coarse location permission.</item>
+		<item>%s: Uses everything to get the best accuracy. Can be slow and requires fine location permission.</item>
+	</string-array>
 	<string name="cat_header_sync">Sync</string>
 	<string name="key_auto_refresh" translatable="false">auto_refresh</string>
 	<string name="title_auto_refresh">Auto refresh</string>
 	<string-array name="entries_auto_refresh">
 		<item>Never</item>
-		<item>Every 6 hours</item>
-		<item>Every 12 hours</item>
-		<item>Everyday</item>
-	</string-array>
-	<string-array name="values_auto_refresh">
-		<item>0</item>
-		<item>6</item>
-		<item>12</item>
-		<item>24</item>
+		<item>Once a day</item>
+		<item>Twice a day</item>
 	</string-array>
 	<string name="cat_header_help">Help</string>
 	<string name="title_about">About</string>
 	<string name="key_selected" translatable="false">selected</string>
-	<!--widget-->
+	<!--endregion-->
+	<!--region widget-->
 	<string name="app_widget_desc">A widget that shows forecast summary.</string>
 	<string name="cd_refresh">Refresh</string>
+	<!--endregion-->
+	<!--region notifications-->
+	<string name="noti_def_channel_name">Default channel</string>
+	<string name="noti_def_channel_desc">All app notifications use this channel</string>
+	<!--endregion-->
 </resources>

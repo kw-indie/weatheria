@@ -3,6 +3,8 @@ package asceapps.weatheria.ui.fragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.preference.ListPreference
+import androidx.preference.Preference.SummaryProvider
 import androidx.preference.PreferenceFragmentCompat
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
@@ -23,6 +25,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+		val locProviderPref = findPreference<ListPreference>(getString(R.string.key_loc_provider))
+		val locProviderSummaries = resources.getStringArray(R.array.summaries_loc_provider)
+		locProviderPref?.summaryProvider = SummaryProvider<ListPreference> { pref ->
+			val index = pref.value.toInt()
+			locProviderSummaries[index].format(pref.entry)
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,7 +1,9 @@
 package asceapps.weatheria.di
 
 import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.api.FlattenTypeAdapterFactory
 import asceapps.weatheria.data.api.WeatherApi
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,17 +27,19 @@ class NetworkModule {
 		WeatherApi.KEY_PARAM, BuildConfig.WEATHER_API_KEY
 	).create()
 
-	private fun buildApi(
-		baseUrl: String,
-		paramName: String? = null, paramValue: String? = null
-	): Retrofit {
+	/**
+	 * @param params key-value pairs of url params.
+	 */
+	private fun buildApi(baseUrl: String, vararg params: String): Retrofit {
 		val clientBuilder = OkHttpClient.Builder()
 			.callTimeout(10, TimeUnit.SECONDS) // throws InterruptedIOException
-		if(paramName != null) {
+		if(params.isNotEmpty()) {
 			val interceptor = Interceptor { chain ->
-				val newUrl = chain.request().url.newBuilder()
-					.addQueryParameter(paramName, paramValue)
-					.build()
+				val newUrl = chain.request().url.newBuilder().apply {
+					for(i in params.indices step 2) {
+						addQueryParameter(params[i], params[i + 1])
+					}
+				}.build()
 				val request = chain.request().newBuilder()
 					.url(newUrl)
 					.build()
@@ -43,11 +47,14 @@ class NetworkModule {
 			}
 			clientBuilder.addInterceptor(interceptor)
 		}
+		val gson = GsonBuilder()
+			.registerTypeAdapterFactory(FlattenTypeAdapterFactory())
+			.create()
 		return Retrofit.Builder()
 			.baseUrl(baseUrl)
 			.client(clientBuilder.build())
 			// for now, all my api's are dealing in json
-			.addConverterFactory(GsonConverterFactory.create())
+			.addConverterFactory(GsonConverterFactory.create(gson))
 			.build()
 	}
 }

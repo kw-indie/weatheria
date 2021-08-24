@@ -17,15 +17,15 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdkVersion minSdkVer
 		targetSdkVersion targetSdkVer
-		versionCode 6
-		versionName "0.7"
+		versionCode 7
+		versionName "0.7.2"
 
 		vectorDrawables.useSupportLibrary = true
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 		Properties ps = new Properties()
-		new File("local.properties").withInputStream { ps.load(it) }
+		rootProject.file("local.properties").withInputStream { ps.load(it) }
 		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
@@ -135,7 +135,8 @@ dependencies {
 	implementation "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
 
-	// retrofit
+	// retrofit.
+	// using gson partly because it's already a transient dep in many other google libs
 	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
 	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
 	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"

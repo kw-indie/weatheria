@@ -8,5 +8,6 @@
 	android:minHeight="110dp"
 	android:previewImage="@drawable/appwidget_preview"
 	android:resizeMode="horizontal"
-	android:updatePeriodMillis="0"
-	android:widgetCategory="home_screen"/>
+	android:updatePeriodMillis="3600000"
+	android:widgetCategory="home_screen"/><!--updating every hour to get data of approximation and not show same data until manual refresh-->
+	<!--todo add config activity to select location-->

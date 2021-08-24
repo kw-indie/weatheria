@@ -64,7 +64,7 @@ class AppWidget: AppWidgetProvider() {
 
 	override fun onUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
 		GlobalScope.launch {
-			infoRepo.getByPos(settingsRepo.selectedPos) // also react to unit sys change
+			infoRepo.getByPos(settingsRepo.selectedPos) // todo react to selectedPos and unit sys change
 				.take(2).collect { // take 'loading' and 'success/error' only
 					loadingAnimation(context, awm, ids, it is Loading)
 					if(it is Success) {
@@ -97,6 +97,8 @@ class AppWidget: AppWidgetProvider() {
 			setTextViewText(R.id.tv_uv_value, uvString)
 			setImageViewResource(R.id.iv_icon, info.current.icon)
 			setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
+			val lastUpdate = context.getString(R.string.f_last_update, info.lastUpdate)
+			setTextViewText(R.id.tv_last_update, lastUpdate)
 			removeAllViews(R.id.ll_forecasts)
 			// todo move formatters to util
 			val timeFormatter = DateTimeFormatter.ofPattern("h a")

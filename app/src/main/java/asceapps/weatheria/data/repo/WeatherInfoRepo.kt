@@ -61,7 +61,7 @@ class WeatherInfoRepo @Inject constructor(
 		val l = with(resp.location) {
 			val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
 			val pos = dao.getLocationsCount()
-			LocationEntity(loc.id, lat, lon, name, country, tz_id, lastUpdate, pos)
+			LocationEntity(loc.id, lat, lng, name, country, zoneId, lastUpdate, pos)
 		}
 		val c = extractCurrent(loc.id, resp)
 		val h = extractHourly(loc.id, resp)
@@ -108,47 +108,47 @@ class WeatherInfoRepo @Inject constructor(
 	companion object {
 
 		private fun extractCurrent(locationId: Int, resp: ForecastResponse) = with(resp.current) {
-			val firstHour = resp.forecast.forecastday[0].hour[0]
+			val firstHour = resp.forecastDays[0].hourly[0]
 			CurrentEntity(
 				locationId,
-				last_updated_epoch,
+				dt,
 				temp_c.roundToInt(),
-				feelslike_c.roundToInt(),
+				feelsLike_c.roundToInt(),
 				// save condition index to reduce later work
-				condition.code,
-				is_day == 1,
+				condition,
+				isDay == 1,
 				wind_kph,
 				meteorologicalToCircular(wind_degree),
 				pressure_mb.roundToInt(),
 				precip_mm.roundToInt(),
 				humidity,
-				firstHour.dewpoint_c.roundToInt(),
-				cloud,
+				firstHour.dewPoint_c.roundToInt(),
+				clouds,
 				vis_km,
 				firstHour.uv.roundToInt()
 			)
 		}
 
 		private fun extractHourly(locationId: Int, resp: ForecastResponse) =
-			resp.forecast.forecastday.flatMap { forecastDay ->
-				forecastDay.hour.map { hour ->
+			resp.forecastDays.flatMap { forecastDay ->
+				forecastDay.hourly.map { hour ->
 					with(hour) {
 						HourlyEntity(
 							locationId,
-							time_epoch,
+							dt,
 							temp_c.roundToInt(),
-							feelslike_c.roundToInt(),
-							condition.code,
-							is_day == 1,
+							feelsLike_c.roundToInt(),
+							condition,
+							isDay == 1,
 							wind_kph,
 							meteorologicalToCircular(wind_degree),
 							pressure_mb.roundToInt(),
 							precip_mm.roundToInt(),
 							humidity,
-							dewpoint_c.roundToInt(),
-							cloud,
+							dewPoint_c.roundToInt(),
+							clouds,
 							vis_km,
-							max(chance_of_rain, chance_of_snow),
+							max(chanceOfRain, chanceOfSnow),
 							uv.roundToInt()
 						)
 					}
@@ -156,28 +156,28 @@ class WeatherInfoRepo @Inject constructor(
 			}
 
 		private fun extractDaily(locationId: Int, resp: ForecastResponse) =
-			resp.forecast.forecastday.map { forecastDay ->
-				val day = forecastDay.day
-				val astro = forecastDay.astro
-				val zone = ZoneId.of(resp.location.tz_id)
-				DailyEntity(
-					locationId,
-					forecastDay.date_epoch,
-					day.mintemp_c.roundToInt(),
-					day.maxtemp_c.roundToInt(),
-					day.condition.code,
-					day.maxwind_kph,
-					day.totalprecip_mm.roundToInt(),
-					day.avghumidity,
-					day.avgvis_km,
-					max(day.daily_chance_of_rain, day.daily_chance_of_snow),
-					day.uv.roundToInt(),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.sunrise, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.sunset, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.moonrise, zone),
-					localTimeToEpochSeconds(forecastDay.date_epoch, astro.moonset, zone),
-					moonPhaseIndex(astro.moon_phase)
-				)
+			resp.forecastDays.map { day ->
+				val zone = ZoneId.of(resp.location.zoneId)
+				with(day) {
+					DailyEntity(
+						locationId,
+						dt,
+						minTemp_c.roundToInt(),
+						maxTemp_c.roundToInt(),
+						condition,
+						wind_kph,
+						precip_mm.roundToInt(),
+						humidity,
+						vis_km,
+						max(chanceOfRain, chanceOfSnow),
+						uv.roundToInt(),
+						localTimeToEpochSeconds(dt, sunrise, zone),
+						localTimeToEpochSeconds(dt, sunset, zone),
+						localTimeToEpochSeconds(dt, moonrise, zone),
+						localTimeToEpochSeconds(dt, moonset, zone),
+						moonPhaseIndex(moonPhase)
+					)
+				}
 			}
 
 		private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {

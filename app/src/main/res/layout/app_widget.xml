@@ -32,6 +32,14 @@
 		android:layout_alignParentEnd="true"
 		android:contentDescription="@string/cd_refresh"
 		android:src="@drawable/ic_refresh"/>
+	<TextView
+		android:id="@+id/tv_last_update"
+		android:layout_width="144dp"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/tv_location"
+		android:layout_toStartOf="@id/iv_refresh"
+		android:textSize="11sp"
+		tools:text="Last update: 59 minutes ago"/>
 	<ImageView
 		android:id="@+id/iv_icon"
 		android:layout_width="56dp"

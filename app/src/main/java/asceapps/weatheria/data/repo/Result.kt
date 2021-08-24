@@ -10,5 +10,5 @@ sealed class Result<out T> {
 }
 
 class Loading(val percent: Int = -1): Result<Nothing>()
-class Success<T>(val data: T): Result<T>()
+class Success<out T>(val data: T): Result<T>()
 class Error(val t: Throwable): Result<Nothing>()

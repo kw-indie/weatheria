@@ -29,7 +29,7 @@
 -keepclassmembers,allowoptimization,allowobfuscation class asceapps.weatheria.data.api.**Response** {
 #  @com.google.gson.annotations.SerializedName <fields>;
 #  @asceapps.weatheria.data.api.Flatten <fields>;
-  # the above 2 lines are effectively like the one below
+# the above 2 lines are effectively like the one below
   <fields>;
 }
 

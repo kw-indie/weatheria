@@ -203,6 +203,8 @@
 	<!--region widget-->
 	<string name="app_widget_desc">A widget that shows forecast summary.</string>
 	<string name="cd_refresh">Refresh</string>
+	<string name="ph_location">Location name</string>
+	<string name="ph_value" translatable="false">--</string>
 	<!--endregion-->
 	<!--region notifications-->
 	<string name="noti_def_channel_name">Default channel</string>

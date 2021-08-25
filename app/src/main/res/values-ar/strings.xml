@@ -163,6 +163,7 @@
 	<!--region widget-->
 	<string name="app_widget_desc">ويدجت لعرض ملخص توقعات الطقس</string>
 	<string name="cd_refresh">تحديث</string>
+	<string name="ph_location">اسم المكان</string>
 	<!--endregion-->
 	<!--region notifications-->
 	<string name="noti_def_channel_name">القناة الافتراضية</string>

@@ -5,5 +5,5 @@ appWidgetRadius attribute value
 <shape
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<corners android:radius="?attr/appWidgetRadius"/>
-	<solid android:color="?android:attr/colorBackground"/>
+	<solid android:color="#7000"/>
 </shape>

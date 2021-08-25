@@ -103,14 +103,21 @@ class AppWidget: AppWidgetProvider() {
 			// todo move formatters to util
 			val timeFormatter = DateTimeFormatter.ofPattern("h a")
 			val dayFormatter = DateTimeFormatter.ofPattern("EEE")
-			// add 3 views for hourly (each 6 hrs), and 2 for daily
-			val items = info.hourly.take(24).filterIndexed { i, _ -> i % 6 == 0 }.drop(1).map {
-				val text = LocalDateTime.ofInstant(it.hour, info.location.zoneId).format(timeFormatter)
-				getItemRemoteView(context, it.icon, text)
-			} + info.daily.drop(1).map {
-				val text = LocalDateTime.ofInstant(it.date, info.location.zoneId).format(dayFormatter)
-				getItemRemoteView(context, it.icon, text)
-			}
+			// add 3 views for hourly (each 6 hrs apart), and 2 for daily
+			val items = ArrayList<RemoteViews>(5)
+			info.hourly.take(24)
+				.filterIndexed { i, _ -> i % 6 == 0 }
+				.drop(1)
+				.mapTo(items) {
+					val text = LocalDateTime.ofInstant(it.hour, info.location.zoneId).format(timeFormatter)
+					getItemRemoteView(context, it.icon, text)
+				}
+			items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
+			info.daily.drop(1)
+				.mapTo(items) {
+					val text = LocalDateTime.ofInstant(it.date, info.location.zoneId).format(dayFormatter)
+					getItemRemoteView(context, it.icon, text)
+				}
 			for(i in items) {
 				addView(R.id.ll_forecasts, i)
 			}
@@ -134,7 +141,7 @@ class AppWidget: AppWidgetProvider() {
 	)
 
 	private fun getItemRemoteView(context: Context, iconRes: Int, text: String) =
-		RemoteViews(context.packageName, R.layout.item_widget_forecast).apply {
+		RemoteViews(context.packageName, R.layout.item_app_widget_forecast).apply {
 			setImageViewResource(R.id.iv_icon, iconRes)
 			setTextViewText(R.id.tv_text, text)
 		}

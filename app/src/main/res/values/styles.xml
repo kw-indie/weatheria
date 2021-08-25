@@ -18,6 +18,6 @@
 
 	<style name="Widget.AppWidget.AppWidget.Container" parent="android:Widget">
 		<item name="android:id">@android:id/background</item>
-		<item name="android:background">@drawable/bg_rounded_corners</item>
+		<item name="android:background">@drawable/bg_app_widget</item>
 	</style>
 </resources>

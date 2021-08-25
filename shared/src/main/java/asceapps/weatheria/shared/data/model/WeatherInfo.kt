@@ -1,7 +1,7 @@
-package asceapps.weatheria.data.model
+package asceapps.weatheria.shared.data.model
 
 import android.text.format.DateUtils
-import asceapps.weatheria.data.base.Listable
+import asceapps.weatheria.shared.data.base.Listable
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.ZoneId

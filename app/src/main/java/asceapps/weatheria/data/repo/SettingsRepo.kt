@@ -7,7 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext

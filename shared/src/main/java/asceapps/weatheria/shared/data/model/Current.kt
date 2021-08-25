@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.model
+package asceapps.weatheria.shared.data.model
 
 // todo make values nullable for approximation
 // todo make views show appropriate ui for null values

@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.base
+package asceapps.weatheria.shared.data.base
 
 interface BaseLocation {
 

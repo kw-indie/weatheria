@@ -1,13 +1,13 @@
-package asceapps.weatheria.data
+package asceapps.weatheria.shared.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import asceapps.weatheria.BuildConfig
-import asceapps.weatheria.data.dao.WeatherInfoDao
-import asceapps.weatheria.data.entity.CurrentEntity
-import asceapps.weatheria.data.entity.DailyEntity
-import asceapps.weatheria.data.entity.HourlyEntity
-import asceapps.weatheria.data.entity.LocationEntity
+import asceapps.weatheria.shared.BuildConfig
+import asceapps.weatheria.shared.data.dao.WeatherInfoDao
+import asceapps.weatheria.shared.data.entity.CurrentEntity
+import asceapps.weatheria.shared.data.entity.DailyEntity
+import asceapps.weatheria.shared.data.entity.HourlyEntity
+import asceapps.weatheria.shared.data.entity.LocationEntity
 
 @Database(
 	entities = [

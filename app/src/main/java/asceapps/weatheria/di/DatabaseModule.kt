@@ -2,7 +2,7 @@ package asceapps.weatheria.di
 
 import android.content.Context
 import androidx.room.Room
-import asceapps.weatheria.data.AppDatabase
+import asceapps.weatheria.shared.data.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.BR
-import asceapps.weatheria.data.base.Listable
+import asceapps.weatheria.shared.data.base.Listable
 
 abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 	ListAdapter<T, BaseAdapter.BindingHolder<B>>(HashCallback<T>()) {

@@ -5,8 +5,8 @@ import android.view.MotionEvent
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemMyLocationsBinding
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import java.util.*
 
 class MyLocationsAdapter(

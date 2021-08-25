@@ -1,7 +1,7 @@
 package asceapps.weatheria.data.api
 
-import asceapps.weatheria.data.base.BaseLocation
-import asceapps.weatheria.data.base.Listable
+import asceapps.weatheria.shared.data.base.BaseLocation
+import asceapps.weatheria.shared.data.base.Listable
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Query

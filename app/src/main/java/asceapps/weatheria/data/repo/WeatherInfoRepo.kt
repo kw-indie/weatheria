@@ -4,11 +4,11 @@ import asceapps.weatheria.R
 import asceapps.weatheria.data.api.ForecastResponse
 import asceapps.weatheria.data.api.SearchResponse
 import asceapps.weatheria.data.api.WeatherApi
-import asceapps.weatheria.data.base.BaseLocation
-import asceapps.weatheria.data.dao.WeatherInfoDao
-import asceapps.weatheria.data.entity.*
-import asceapps.weatheria.data.model.*
 import asceapps.weatheria.di.IoDispatcher
+import asceapps.weatheria.shared.data.base.BaseLocation
+import asceapps.weatheria.shared.data.dao.WeatherInfoDao
+import asceapps.weatheria.shared.data.entity.*
+import asceapps.weatheria.shared.data.model.*
 import asceapps.weatheria.util.asResult
 import asceapps.weatheria.util.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher

@@ -1,7 +1,7 @@
-package asceapps.weatheria.data.dao
+package asceapps.weatheria.shared.data.dao
 
 import androidx.room.*
-import asceapps.weatheria.data.entity.*
+import asceapps.weatheria.shared.data.entity.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao

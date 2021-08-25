@@ -1,6 +1,6 @@
-package asceapps.weatheria.data.model
+package asceapps.weatheria.shared.data.model
 
-import asceapps.weatheria.data.base.BaseLocation
+import asceapps.weatheria.shared.data.base.BaseLocation
 import java.time.Instant
 import java.time.ZoneId
 

@@ -1,8 +1,8 @@
 package asceapps.weatheria.ui.adapter
 
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.ui.view.WeatherChart
 
 class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {

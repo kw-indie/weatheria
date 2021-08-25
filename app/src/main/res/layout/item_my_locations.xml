@@ -6,7 +6,7 @@
 	<data>
 		<variable
 			name="item"
-			type="asceapps.weatheria.data.model.WeatherInfo"/>
+			type="asceapps.weatheria.shared.data.model.WeatherInfo"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"

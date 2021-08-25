@@ -8,8 +8,8 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.get
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.databinding.ItemChartBinding
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

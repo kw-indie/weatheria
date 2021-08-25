@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.model
+package asceapps.weatheria.shared.data.model
 
 import java.time.Instant
 

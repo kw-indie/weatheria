@@ -13,11 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
 import asceapps.weatheria.data.repo.Error
 import asceapps.weatheria.data.repo.Loading
 import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.getColors

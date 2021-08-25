@@ -1,8 +1,8 @@
-package asceapps.weatheria.data.entity
+package asceapps.weatheria.shared.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import asceapps.weatheria.data.base.BaseLocation
+import asceapps.weatheria.shared.data.base.BaseLocation
 
 @Entity(tableName = "locations")
 class LocationEntity(

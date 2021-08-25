@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.entity
+package asceapps.weatheria.shared.data.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

@@ -78,28 +78,36 @@ android {
 		jvmTarget = javaVer
 		// IR compiler: default (since AS 4.2) kotlin compiler backend (supposedly faster, needed for Compose)
 		freeCompilerArgs += [
-			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // todo find out what for
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // many flow operators
 			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
-			"-Xopt-in=kotlin.time.ExperimentalTime" // for kotlin duration
 		]
 	}
 
 }
 
 dependencies {
+	implementation project(path: ':shared')
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
 	// no longer need to add kotlin stdlib here, included by default w/ plugin
+	// libs marked with * are ones that if u don't explicitly add, they add 2 diff versions
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
+	// *
+	implementation "androidx.collection:collection-ktx:$collectionVer"
 	// general & ui
 	implementation "androidx.core:core-ktx:$coreVer"
+	// *
+	implementation "androidx.appcompat:appcompat:$appCompatVer"
 	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
 	implementation "androidx.viewpager2:viewpager2:$viewPager2Ver"
 	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
+	// *
+	implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVer"
+	// *
 	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
 	implementation "com.google.android.material:material:$materialVer"
 
@@ -108,10 +116,16 @@ dependencies {
 	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
 
 	// viewModel & liveData
-	// runtime offers new flow consumers (e.g repeatOnLifecycle)
+	// runtime offers lifecycleOwner val, new flow consumers (e.g repeatOnLifecycle), etc.
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
-	// todo remove, we aren't using liveData anywhere
+	// if i don't include these 2, older versions will load anyway
+	implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVer"
+	implementation "androidx.lifecycle:lifecycle-process:$lifecycleVer"
+	// *
+	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVer"
+	// tried to remove livedata-ktx but seems like room will keep it from deleting
+	// todo try again after u move room to shared
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
@@ -120,6 +134,8 @@ dependencies {
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
+	// *
+	implementation "androidx.transition:transition:$transitionVer"
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
 	implementation "androidx.core:core-animation:$coreAnimationVer"

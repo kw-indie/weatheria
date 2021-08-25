@@ -19,6 +19,11 @@ android {
 			minifyEnabled true
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'release-rules.pro'
 		}
+		staging {
+			minifyEnabled true
+			debuggable true
+			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro", "staging-rules.pro"
+		}
 	}
 
 	compileOptions {
@@ -32,9 +37,15 @@ android {
 }
 
 dependencies {
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
+
+	// *
+	implementation "androidx.collection:collection-ktx:$collectionVer"
+	// core: latest and backward compatible android apis
 	implementation "androidx.core:core-ktx:$coreVer"
-	implementation "androidx.appcompat:appcompat:$appCompatVer"
-	implementation "com.google.android.material:material:$materialVer"
+	// *
+	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 
 	testImplementation "junit:junit:$junitVer"
 	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"

@@ -2,21 +2,23 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="wrap_content"
+	android:layout_width="0dp"
 	android:layout_height="wrap_content"
+	android:layout_weight="1"
 	android:orientation="vertical"
-	android:padding="4dp">
+	android:padding="4dp"
+	tools:layout_width="wrap_content">
 	<ImageView
 		android:id="@+id/iv_icon"
-		android:layout_width="48dp"
+		android:layout_width="match_parent"
 		android:layout_height="48dp"
 		android:contentDescription="@string/cd_weather_icon"
-		tools:src="@drawable/w_rain_f"/>
+		android:src="@drawable/w_clear_d"/>
 	<TextView
 		android:id="@+id/tv_text"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:gravity="center_horizontal"
 		android:maxLines="1"
-		tools:text="00 AM"/>
+		android:text="@string/ph_value"/>
 </LinearLayout>

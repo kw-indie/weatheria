@@ -128,8 +128,9 @@ class WeatherInfo(
 			.withDecimalStyle(DecimalStyle.ofDefaultLocale())
 
 		// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build() for arabic numbers
-		private fun relativeTime(instant: Instant): CharSequence =
-			DateUtils.getRelativeTimeSpanString(instant.toEpochMilli())
+		private fun relativeTime(instant: Instant): CharSequence = DateUtils.getRelativeTimeSpanString(
+			instant.toEpochMilli(), System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS
+		)
 
 		private fun localDateTime(zone: ZoneId): String =
 			dtFormatter.format(Instant.now().atZone(zone))

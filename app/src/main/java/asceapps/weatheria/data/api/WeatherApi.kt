@@ -157,5 +157,5 @@ class ForecastResponse(
 		@SerializedName("chance_of_snow") val chanceOfSnow: Int,
 		uv: Float
 	): BaseData(temp_c, feelsLike_c, condition, isDay, wind_kph, wind_degree, pressure_mb, precip_mm, humidity, clouds, vis_km, uv)
-	 
+
 }

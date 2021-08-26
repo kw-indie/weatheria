@@ -1,7 +1,6 @@
 package asceapps.weatheria.di
 
 import android.content.Context
-import androidx.room.Room
 import asceapps.weatheria.shared.data.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -16,9 +15,7 @@ class DatabaseModule {
 
 	@Provides
 	@Singleton
-	fun provideAppDB(@ApplicationContext appContext: Context) = Room.databaseBuilder(
-		appContext, AppDatabase::class.java, AppDatabase.DB_NAME
-	).build()
+	fun provideAppDB(@ApplicationContext appContext: Context) = AppDatabase.create(appContext)
 
 	@Provides
 	@Singleton

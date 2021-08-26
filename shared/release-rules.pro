@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# todo test without this rule since we only need annotations and they should be preserved with other android rules
+# Replaces all the @Keep's in response classes
+-keepclassmembers,allowoptimization,allowobfuscation class asceapps.weatheria.shared.api.**Response** {
+#  @com.google.gson.annotations.SerializedName <fields>;
+#  @asceapps.weatheria.shared.api.Flatten <fields>;
+# the above 2 lines are effectively like the one below
+  <fields>;
+}
+
+# Ignore annotation used for build tooling. (specified in okio rules)
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement

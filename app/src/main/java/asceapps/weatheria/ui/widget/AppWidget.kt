@@ -12,10 +12,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
-import asceapps.weatheria.data.repo.WeatherInfoRepo
 import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
 import asceapps.weatheria.ui.MainActivity
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.AndroidEntryPoint

@@ -4,12 +4,12 @@ import android.content.Context
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import asceapps.weatheria.data.api.SearchResponse
 import asceapps.weatheria.data.repo.SettingsRepo
-import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.api.SearchResponse
 import asceapps.weatheria.shared.data.repo.Result
+import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.util.resultFlow
 import asceapps.weatheria.util.awaitCurrentLocation
-import asceapps.weatheria.util.resultFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

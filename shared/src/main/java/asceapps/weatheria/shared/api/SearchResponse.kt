@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.api
+package asceapps.weatheria.shared.api
 
 import asceapps.weatheria.shared.data.base.BaseLocation
 import asceapps.weatheria.shared.data.base.Listable

@@ -1,8 +1,8 @@
 package asceapps.weatheria.ui.adapter
 
 import asceapps.weatheria.R
-import asceapps.weatheria.data.api.SearchResponse
 import asceapps.weatheria.databinding.ItemAddLocationBinding
+import asceapps.weatheria.shared.api.SearchResponse
 
 class AddLocationAdapter(
 	private val onItemClick: (SearchResponse) -> Unit

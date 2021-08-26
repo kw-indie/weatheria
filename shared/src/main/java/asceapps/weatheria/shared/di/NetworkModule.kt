@@ -1,9 +1,9 @@
-package asceapps.weatheria.di
+package asceapps.weatheria.shared.di
 
-import asceapps.weatheria.BuildConfig
-import asceapps.weatheria.data.api.AccuWeatherApi
-import asceapps.weatheria.data.api.FlattenTypeAdapterFactory
-import asceapps.weatheria.data.api.IPWhoisApi
+import asceapps.weatheria.shared.BuildConfig
+import asceapps.weatheria.shared.api.AccuWeatherApi
+import asceapps.weatheria.shared.api.FlattenTypeAdapterFactory
+import asceapps.weatheria.shared.api.IPWhoisApi
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides

@@ -3,7 +3,7 @@
 	<data>
 		<variable
 			name="item"
-			type="asceapps.weatheria.data.api.SearchResponse"/>
+			type="asceapps.weatheria.shared.api.SearchResponse"/>
 	</data>
 	<androidx.constraintlayout.widget.ConstraintLayout
 		xmlns:android="http://schemas.android.com/apk/res/android"

@@ -9,6 +9,7 @@ buildscript {
 		coreVer = '1.7.0-alpha01'
 		coreAnimationVer = '1.0.0-alpha02'
 		coroutineVer = '1.5.1-native-mt'
+		customViewVer = '1.1.0'
 		desugarVer = '1.1.5'
 		espressoCoreVer = '3.3.0'
 		fragmentVer = '1.4.0-alpha06'

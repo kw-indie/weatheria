@@ -1,4 +1,4 @@
-package asceapps.weatheria.di
+package asceapps.weatheria.shared.di
 
 import android.content.Context
 import asceapps.weatheria.shared.data.AppDatabase

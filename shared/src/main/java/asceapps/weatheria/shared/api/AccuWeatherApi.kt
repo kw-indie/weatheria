@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.api
+package asceapps.weatheria.shared.api
 
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -10,8 +10,11 @@ interface AccuWeatherApi {
 		const val BASE_URL = "https://dataservice.accuweather.com"
 		const val KEY_PARAM = "apikey"
 
-		// todo conditions and icons
-		val CONDITIONS = intArrayOf()
+		// 40 conditions
+		val CONDITIONS = intArrayOf(
+			1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+			24, 25, 26, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44
+		)
 	}
 
 	// possible 'language' param for all these requests

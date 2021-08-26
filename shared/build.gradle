@@ -2,6 +2,7 @@ plugins {
 	id 'com.android.library'
 	id 'kotlin-android'
 	id 'kotlin-kapt' // for annotations: room
+	id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -13,6 +14,10 @@ android {
 		targetSdk targetSdkVer
 
 		consumerProguardFiles "consumer-rules.pro"
+
+		Properties ps = new Properties()
+		rootProject.file("local.properties").withInputStream { ps.load(it) }
+		buildConfigField("String", "ACCU_WEATHER_KEY", ps.accu_weather_key)
 
 		javaCompileOptions {
 			annotationProcessorOptions {
@@ -60,6 +65,12 @@ dependencies {
 	// *
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 
+	// retrofit.
+	// using gson partly because it's already a transient dep in many other google libs
+	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
+	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
+	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"
+
 	// room
 	// runtime is core
 	// ktx adds suspend and Flow support
@@ -67,4 +78,16 @@ dependencies {
 	// fixme only needed here and app module, other modules don't wanna see
 	api "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
+
+	// hilt
+	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
+	implementation "com.google.dagger:hilt-android:$hiltVer"
+
+	// all below required transitively by hilt
+	implementation "androidx.customview:customview:$customViewVer"
+	implementation "androidx.activity:activity-ktx:$activityVer"
+	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
+	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVer"
 }

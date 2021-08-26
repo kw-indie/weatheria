@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.api
+package asceapps.weatheria.shared.api
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -9,14 +9,6 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import java.io.IOException
 import java.lang.reflect.Field
-
-/**
- * credits to https://github.com/Tishka17/gson-flatten
- */
-
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FIELD)
-annotation class Flatten(val path: String)
 
 class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAdapterFactory {
 

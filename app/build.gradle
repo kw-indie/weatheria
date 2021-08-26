@@ -24,7 +24,6 @@ android {
 
 		Properties ps = new Properties()
 		rootProject.file("local.properties").withInputStream { ps.load(it) }
-		buildConfigField("String", "ACCU_WEATHER_KEY", ps.accu_weather_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused l10n in libs like AppCompat/play services/maps?
@@ -113,11 +112,9 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
 	// if i don't include these 2, older versions will load anyway
 	implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleExVer"
+	// * all 3 below
 	implementation "androidx.lifecycle:lifecycle-process:$lifecycleVer"
-	// *
 	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVer"
-	// tried to remove livedata-ktx but seems like room will keep it from deleting
-	// todo try again after u move room to shared
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
@@ -136,12 +133,6 @@ dependencies {
 	// new preferences (fragment, etc.)
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
 
-	// retrofit.
-	// using gson partly because it's already a transient dep in many other google libs
-	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
-	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"
-
 	// maps & location
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
 	// flp (+ activity recognition + geofencing)
@@ -152,7 +143,7 @@ dependencies {
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"
 
-	// hilt
+	// hilt todo remove if not needed
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 

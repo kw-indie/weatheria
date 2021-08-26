@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.api
+package asceapps.weatheria.shared.api
 
 import com.google.gson.annotations.SerializedName
 

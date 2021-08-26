@@ -26,7 +26,6 @@ import asceapps.weatheria.util.onItemInserted
 import asceapps.weatheria.util.onPageChanged
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
 import java.io.IOException
 import java.io.InterruptedIOException
 
@@ -81,8 +80,9 @@ class HomeFragment: Fragment() {
 								is InterruptedIOException -> R.string.error_timed_out
 								// others like UnknownHostException when it can't resolve hostname
 								is IOException -> R.string.error_no_internet
-								// others like http error codes (400, 404, etc.)
-								is HttpException -> R.string.error_server_error
+								// others like http error codes (400, 404, etc.).
+								// fixme originally HttpException from retrofit
+								is RuntimeException -> R.string.error_server_error
 								else -> R.string.error_unknown
 							}
 							showMessage(msg)

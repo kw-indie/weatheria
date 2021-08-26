@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-	compileSdkVersion targetSdkVer
+	compileSdk targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
 	buildToolsVersion buildToolsVer
 	ndkVersion ndkVer
@@ -15,14 +15,12 @@ android {
 	defaultConfig {
 		// if not specified, package name from manifest will be used, will change when that one changes
 		applicationId "asceapps.weatheria"
-		minSdkVersion minSdkVer
-		targetSdkVersion targetSdkVer
+		minSdk minSdkVer
+		targetSdk targetSdkVer
 		versionCode 7
 		versionName "0.7.2"
 
 		vectorDrawables.useSupportLibrary = true
-
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 		Properties ps = new Properties()
 		rootProject.file("local.properties").withInputStream { ps.load(it) }
@@ -38,6 +36,9 @@ android {
 	}
 
 	buildTypes {
+		// anything related to applicationId is only specified in app module
+		// minifyEnabled (and supposedly similar properties) are controlled only by app module
+		// no need to copy them into other modules
 		debug {
 			applicationIdSuffix ".debug"
 		}
@@ -77,11 +78,11 @@ android {
 }
 
 dependencies {
-	implementation project(path: ':shared')
+	implementation project(":shared")
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
-	// no longer need to add kotlin stdlib here, included by default w/ plugin
-	// libs marked with * are ones that if u don't explicitly add, they add 2 diff versions
+	// - no longer need to add kotlin stdlib here, included by default w/ plugin
+	// - libs marked with * are ones that if u don't explicitly add, they add 2 diff versions
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
@@ -164,8 +165,4 @@ dependencies {
 	// multi screen size support
 	implementation "com.intuit.sdp:sdp-android:$intuitVer"
 	implementation "com.intuit.ssp:ssp-android:$intuitVer"
-
-	// android tests
-	testImplementation "junit:junit:$junitVer"
-	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"
 }

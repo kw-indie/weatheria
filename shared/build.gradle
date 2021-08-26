@@ -12,8 +12,6 @@ android {
 		minSdk minSdkVer
 		targetSdk targetSdkVer
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
 		consumerProguardFiles "consumer-rules.pro"
 
 		javaCompileOptions {
@@ -28,12 +26,9 @@ android {
 
 	buildTypes {
 		release {
-			minifyEnabled true
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'release-rules.pro'
 		}
 		staging {
-			minifyEnabled true
-			debuggable true
 			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro", "staging-rules.pro"
 		}
 	}
@@ -53,6 +48,8 @@ android {
 dependencies {
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
+	// todo make all shared libs 'api' to avoid repetition in other modules
+	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
@@ -67,10 +64,7 @@ dependencies {
 	// runtime is core
 	// ktx adds suspend and Flow support
 	kapt "androidx.room:room-compiler:$roomVer"
-	// todo change back to impl if possible
+	// fixme only needed here and app module, other modules don't wanna see
 	api "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
-
-	testImplementation "junit:junit:$junitVer"
-	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"
 }

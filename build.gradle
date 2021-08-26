@@ -17,8 +17,6 @@ buildscript {
 		hiltVer = '2.38.1'
 		intuitVer = '1.0.6'
 		javaVer = JavaVersion.VERSION_11
-		junitVer = '4.13.2'
-		junitTestVer = '1.1.3'
 		kotlinVer = '1.5.30'
 		lifecycleVer = '2.4.0-alpha03'
 		lifecycleExVer = '2.2.0'

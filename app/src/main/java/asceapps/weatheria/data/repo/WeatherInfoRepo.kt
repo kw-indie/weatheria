@@ -1,26 +1,21 @@
 package asceapps.weatheria.data.repo
 
 import asceapps.weatheria.R
-import asceapps.weatheria.data.api.ForecastResponse
-import asceapps.weatheria.data.api.SearchResponse
-import asceapps.weatheria.data.api.WeatherApi
+import asceapps.weatheria.data.api.*
 import asceapps.weatheria.di.IoDispatcher
-import asceapps.weatheria.shared.data.base.BaseLocation
 import asceapps.weatheria.shared.data.dao.WeatherInfoDao
 import asceapps.weatheria.shared.data.entity.*
 import asceapps.weatheria.shared.data.model.*
+import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.util.asResult
 import asceapps.weatheria.util.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.time.*
-import java.time.chrono.HijrahDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.time.temporal.ChronoField
-import java.time.temporal.ChronoUnit
+import java.time.Duration
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.max
@@ -28,11 +23,13 @@ import kotlin.math.roundToInt
 
 @Singleton
 class WeatherInfoRepo @Inject constructor(
-	private val api: WeatherApi,
+	private val weatherApi: AccuWeatherApi,
+	private val whoisApi: IPWhoisApi,
 	private val dao: WeatherInfoDao,
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
+	// todo optimize these so they only return needed data, especially
 	fun getAll() = dao.loadAll()
 		.map { list -> list.map { e -> entityToModel(e) } }
 		.asResult() // concerned over 2 consecutive Flow.map()'s
@@ -48,49 +45,51 @@ class WeatherInfoRepo @Inject constructor(
 		.asResult()
 		.flowOn(ioDispatcher)
 
+	// todo need to return listable
 	fun search(q: String? = null) = resultFlow<List<SearchResponse>> {
-		api.search(if(q.isNullOrBlank()) WeatherApi.AUTO_IP else q)
+		withContext(ioDispatcher) {
+			val query = if(q.isNullOrBlank()) {
+				with(whoisApi.whois()) { "$lat,$lng" }
+			} else q
+			weatherApi.search(query)
+		}
 	}
 
-	private suspend fun fetchForecast(q: String, days: Int = 10) = api.forecast(q, days)
-
-	fun add(loc: SearchResponse) = resultFlow<Unit> {
-		val resp = withContext(ioDispatcher) {
-			fetchForecast(loc.searchTerm)
-		}
-		val l = with(resp.location) {
-			val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
-			val pos = dao.getLocationsCount()
-			LocationEntity(loc.id, lat, lng, name, country, zoneId, lastUpdate, pos)
-		}
-		val c = extractCurrent(loc.id, resp)
-		val h = extractHourly(loc.id, resp)
-		val d = extractDaily(loc.id, resp)
-		dao.insert(l, c, h, d)
-	}
-
-	private suspend fun internalRefresh(loc: BaseLocation) {
-		val resp = withContext(ioDispatcher) {
-			fetchForecast(loc.searchTerm)
-		}
+	fun add(l: SearchResponse) = resultFlow<Unit> {
 		val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
-		val c = extractCurrent(loc.id, resp)
-		val h = extractHourly(loc.id, resp)
-		val d = extractDaily(loc.id, resp)
-		dao.update(lastUpdate, c, h, d)
+		val pos = dao.getLocationsCount()
+		val loc = with(l) {
+			LocationEntity(id, lat, lng, name, country, zoneId, lastUpdate, pos)
+		}
+		val (c, h, d) = fetchForecast(l.id)
+		dao.insert(loc, c, h, d)
 	}
 
 	fun refresh(info: WeatherInfo) = resultFlow<Unit> {
-		internalRefresh(info.location)
+		internalRefresh(info.id)
 	}
 
 	fun refreshAll() = resultFlow<Unit> {
-		val locations = dao.getLocations()
-		val size = locations.size
-		locations.forEachIndexed { i, e ->
-			internalRefresh(e)
-			emit(Loading(100 / size * (i + 1)))
+		val ids = dao.getLocationIds()
+		ids.forEachIndexed { i, id ->
+			internalRefresh(id)
+			emit(Loading(100 / ids.size * (i + 1)))
 		}
+	}
+
+	private suspend fun internalRefresh(locationId: Int) {
+		// todo make this call worker with ids as workData
+		val (c, h, d) = fetchForecast(locationId)
+		// keep this value in sync with 'add()'
+		val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
+		dao.update(lastUpdate, c, h, d)
+	}
+
+	private suspend fun fetchForecast(locationId: Int) = withContext(ioDispatcher) {
+		val c = extractCurrent(locationId, weatherApi.currentWeather(locationId))
+		val h = extractHourly(locationId, weatherApi.hourlyForecast(locationId))
+		val d = extractDaily(locationId, weatherApi.dailyForecast(locationId))
+		Triple(c, h, d)
 	}
 
 	suspend fun reorder(info: WeatherInfo, toPos: Int) {
@@ -107,75 +106,71 @@ class WeatherInfoRepo @Inject constructor(
 
 	companion object {
 
-		private fun extractCurrent(locationId: Int, resp: ForecastResponse) = with(resp.current) {
-			val firstHour = resp.forecastDays[0].hourly[0]
-			CurrentEntity(
-				locationId,
-				dt,
-				temp_c.roundToInt(),
-				feelsLike_c.roundToInt(),
-				// save condition index to reduce later work
-				condition,
-				isDay == 1,
-				wind_kph,
-				meteorologicalToCircular(wind_degree),
-				pressure_mb.roundToInt(),
-				precip_mm.roundToInt(),
-				humidity,
-				firstHour.dewPoint_c.roundToInt(),
-				clouds,
-				vis_km,
-				firstHour.uv.roundToInt()
-			)
-		}
+		private fun extractCurrent(locationId: Int, resp: List<CurrentWeatherResponse>) =
+			with(resp[0]) {
+				CurrentEntity(
+					locationId,
+					lastUpdate,
+					temp_c.roundToInt(),
+					feelsLike_c.roundToInt(),
+					condition,
+					isDay,
+					wind_kph,
+					wind_degree,
+					pressure_mb,
+					precip_mm,
+					humidity,
+					dewPoint_c.roundToInt(),
+					clouds,
+					vis_km,
+					uv
+				)
+			}
 
-		private fun extractHourly(locationId: Int, resp: ForecastResponse) =
-			resp.forecastDays.flatMap { forecastDay ->
-				forecastDay.hourly.map { hour ->
-					with(hour) {
-						HourlyEntity(
-							locationId,
-							dt,
-							temp_c.roundToInt(),
-							feelsLike_c.roundToInt(),
-							condition,
-							isDay == 1,
-							wind_kph,
-							meteorologicalToCircular(wind_degree),
-							pressure_mb.roundToInt(),
-							precip_mm.roundToInt(),
-							humidity,
-							dewPoint_c.roundToInt(),
-							clouds,
-							vis_km,
-							max(chanceOfRain, chanceOfSnow),
-							uv.roundToInt()
-						)
-					}
+		private fun extractHourly(locationId: Int, resp: List<HourlyForecastResponse>) =
+			resp.map { hourly ->
+				with(hourly) {
+					HourlyEntity(
+						locationId,
+						dt,
+						temp_c.roundToInt(),
+						feelsLike_c.roundToInt(),
+						condition,
+						isDay,
+						wind_kph,
+						wind_degrees,
+						0, // fixme remove
+						precip_mm,
+						humidity,
+						dewPoint_c.roundToInt(),
+						clouds,
+						vis_km,
+						pop,
+						uv
+					)
 				}
 			}
 
-		private fun extractDaily(locationId: Int, resp: ForecastResponse) =
-			resp.forecastDays.map { day ->
-				val zone = ZoneId.of(resp.location.zoneId)
-				with(day) {
+		private fun extractDaily(locationId: Int, resp: DailyForecastResponse) =
+			resp.forecasts.map { daily ->
+				with(daily) {
 					DailyEntity(
 						locationId,
 						dt,
 						minTemp_c.roundToInt(),
 						maxTemp_c.roundToInt(),
-						condition,
-						wind_kph,
-						precip_mm.roundToInt(),
-						humidity,
-						vis_km,
-						max(chanceOfRain, chanceOfSnow),
-						uv.roundToInt(),
-						localTimeToEpochSeconds(dt, sunrise, zone),
-						localTimeToEpochSeconds(dt, sunset, zone),
-						localTimeToEpochSeconds(dt, moonrise, zone),
-						localTimeToEpochSeconds(dt, moonset, zone),
-						moonPhaseIndex(moonPhase)
+						day.condition, // fixme add night condition
+						day.wind_kph, // fixme add night data
+						day.precip_mm, // fixme add night data
+						0, // fixme remove
+						0f, // fixme remove
+						max(day.pop, night.pop),
+						uv,
+						sunrise,
+						sunrise,
+						moonrise,
+						moonset,
+						moonPhaseIndex(moonAge.toFloat())
 					)
 				}
 			}
@@ -239,7 +234,7 @@ class WeatherInfoRepo @Inject constructor(
 						uv
 					)
 				}
-			} else {
+			} else { // todo also approximate from day if possible
 				// approximation logic: we have hourly data for the next 3 days
 				val hour = info.hourly.last { it.dt < now.epochSecond }
 				with(hour) {
@@ -264,7 +259,7 @@ class WeatherInfoRepo @Inject constructor(
 
 		private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
-		private fun conditionIndex(condition: Int) = WeatherApi.CONDITIONS.binarySearch(condition)
+		private fun conditionIndex(condition: Int) = AccuWeatherApi.CONDITIONS.binarySearch(condition)
 
 		private fun conditionIconResId(condition: Int, isDay: Boolean? = null) = when(condition) {
 			1000 -> if(isDay == false) R.drawable.w_clear_n else R.drawable.w_clear_d
@@ -326,60 +321,22 @@ class WeatherInfoRepo @Inject constructor(
 			else -> throw IllegalArgumentException()
 		}
 
-		private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
-
-		private fun localTimeToEpochSeconds(dayEpochSeconds: Int, time: String, zone: ZoneId): Int {
-			return try {
-				// stupid shits give startOfDaySeconds in utc and times in local
-				val startOfDay = Instant.ofEpochSecond(dayEpochSeconds.toLong())
-				val localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a"))
-				val zonedDt = ZonedDateTime.ofInstant(startOfDay, zone)
-					.withHour(localTime.hour)
-					.withMinute(localTime.minute)
-				zonedDt.toEpochSecond().toInt()
-			} catch(e: DateTimeParseException) {
-				// when 'No sunrise/moonset/etc.' is sent
-				e.printStackTrace()
-				-1
-			}
+		private fun moonPhaseIndex(age: Float) = when(age) {
+			in 1f..6.38f -> 1
+			in 6.38f..8.38f -> 2
+			in 8.38f..13.77f -> 3
+			in 13.77f..15.77f -> 4
+			in 15.77f..21.15f -> 5
+			in 21.15f..23.15f -> 6
+			in 23.15f..28.5f -> 7
+			else -> 0
 		}
 
-		private fun moonPhaseIndex(phase: String) = when(phase) {
-			"New Moon" -> 0
-			"Waxing Crescent" -> 1
-			"First Quarter" -> 2
-			"Waxing Gibbous" -> 3
-			"Full Moon" -> 4
-			"Waning Gibbous" -> 5
-			"Last Quarter" -> 6
-			"Waning Crescent" -> 7
-			else -> throw IllegalArgumentException("unrecognized moon phase")
-		}
-
-		// region todo unused
+		// todo use in search results?
 		private fun countryCodeToFlag(cc: String): String {
 			val offset = 0x1F1E6 - 0x41 // tiny A - normal A
 			val cps = IntArray(2) { i -> cc[i].code + offset }
 			return String(cps, 0, cps.size)
 		}
-
-		private fun moonAge(instant: Instant): Int {
-			return HijrahDate.from(instant.atZone(ZoneOffset.UTC))[ChronoField.DAY_OF_MONTH]
-		}
-
-		private fun moonAge2(instant: Instant): Float {
-			// lunar cycle days
-			val lunarCycle = 29.530588853f
-			// a reference new moon at UTC
-			val ref = LocalDateTime.of(2000, 1, 6, 18, 14)
-			// dt at instant
-			val dt = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
-			// this loses a number of hours of accuracy
-			val days = ChronoUnit.DAYS.between(ref, dt)
-			val cycles = days / lunarCycle
-			// take fractional part of cycles x full cycle = current lunation
-			return (cycles % 1) * lunarCycle
-		}
-		// endregion
 	}
 }

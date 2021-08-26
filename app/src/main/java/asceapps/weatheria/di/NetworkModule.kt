@@ -1,8 +1,9 @@
 package asceapps.weatheria.di
 
 import asceapps.weatheria.BuildConfig
+import asceapps.weatheria.data.api.AccuWeatherApi
 import asceapps.weatheria.data.api.FlattenTypeAdapterFactory
-import asceapps.weatheria.data.api.WeatherApi
+import asceapps.weatheria.data.api.IPWhoisApi
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -22,10 +23,14 @@ class NetworkModule {
 
 	@Provides
 	@Singleton
-	fun provideWeatherApi(): WeatherApi = buildApi(
-		WeatherApi.BASE_URL,
-		WeatherApi.KEY_PARAM, BuildConfig.WEATHER_API_KEY
+	fun provideAccuWeatherApi(): AccuWeatherApi = buildApi(
+		AccuWeatherApi.BASE_URL,
+		AccuWeatherApi.KEY_PARAM, BuildConfig.ACCU_WEATHER_KEY
 	).create()
+
+	@Provides
+	@Singleton
+	fun provideIPWhoisApi(): IPWhoisApi = buildApi(IPWhoisApi.BASE_URL).create()
 
 	/**
 	 * @param params key-value pairs of url params.

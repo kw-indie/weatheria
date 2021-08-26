@@ -4,10 +4,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import asceapps.weatheria.data.repo.Error
-import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Result
-import asceapps.weatheria.data.repo.Success
+import asceapps.weatheria.shared.data.repo.Error
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Result
+import asceapps.weatheria.shared.data.repo.Success
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -18,6 +18,7 @@ inline fun <T> Flow<T>.observe(lo: LifecycleOwner, crossinline block: suspend (T
 		}
 	}
 
+// todo move to repo
 inline fun <T> resultFlow(crossinline block: suspend FlowCollector<Result<T>>.() -> T) = flow {
 	emit(Loading())
 	try {

@@ -36,14 +36,9 @@ class SettingsRepo @Inject constructor(
 		const val AUTO_REFRESH_NEVER = 0
 		const val AUTO_REFRESH_ONCE = 1
 		const val AUTO_REFRESH_TWICE = 2
-
-		const val API_OPEN_WEATHER_MAP = 0
-		const val API_ACCU_WEATHER = 1
-		const val API_WEATHER_API = 2
 	}
 
 	private val unitsKey = appContext.getString(R.string.key_units)
-	private val apiKey = appContext.getString(R.string.key_api)
 	private val locProviderKey = appContext.getString(R.string.key_loc_provider)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
 	private val selectedKey = appContext.getString(R.string.key_selected)
@@ -59,9 +54,6 @@ class SettingsRepo @Inject constructor(
 
 	private val units: Int
 		get() = prefs.getString(unitsKey, defValStr)!!.toInt()
-
-	val api: Int
-		get() = prefs.getString(apiKey, defValStr)!!.toInt()
 
 	private val locationProvider: Int
 		get() = prefs.getString(locProviderKey, defValStr)!!.toInt()

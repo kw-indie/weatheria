@@ -7,9 +7,9 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.annotation.RequiresPermission
-import asceapps.weatheria.data.repo.Error
-import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Success
+import asceapps.weatheria.shared.data.repo.Error
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow

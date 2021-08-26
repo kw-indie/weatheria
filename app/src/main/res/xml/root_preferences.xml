@@ -8,13 +8,6 @@
 			app:entryValues="@array/values_indices_2"
 			app:defaultValue="0"
 			app:useSimpleSummaryProvider="true"/>
-		<ListPreference
-			app:key="@string/key_api"
-			app:title="@string/title_api"
-			app:entries="@array/entries_api"
-			app:entryValues="@array/values_indices_3"
-			app:defaultValue="2"
-			app:useSimpleSummaryProvider="true"/>
 	</PreferenceCategory>
 	<PreferenceCategory app:title="@string/cat_header_loc">
 		<ListPreference

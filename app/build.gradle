@@ -24,7 +24,7 @@ android {
 
 		Properties ps = new Properties()
 		rootProject.file("local.properties").withInputStream { ps.load(it) }
-		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
+		buildConfigField("String", "ACCU_WEATHER_KEY", ps.accu_weather_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused l10n in libs like AppCompat/play services/maps?

@@ -1,4 +1,4 @@
-package asceapps.weatheria.data.repo
+package asceapps.weatheria.shared.data.repo
 
 sealed class Result<out T> {
 

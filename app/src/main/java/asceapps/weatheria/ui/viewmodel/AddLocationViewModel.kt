@@ -5,9 +5,9 @@ import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.api.SearchResponse
-import asceapps.weatheria.data.repo.Result
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.repo.Result
 import asceapps.weatheria.util.awaitCurrentLocation
 import asceapps.weatheria.util.resultFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,5 +46,5 @@ class AddLocationViewModel @Inject constructor(
 		ctx.awaitCurrentLocation(accuracy)
 	}
 
-	fun add(loc: SearchResponse) = infoRepo.add(loc)
+	fun add(l: SearchResponse) = infoRepo.add(l)
 }

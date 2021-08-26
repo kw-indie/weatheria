@@ -168,13 +168,6 @@
 		<item>Metric</item>
 		<item>Imperial</item>
 	</string-array>
-	<string name="key_api" translatable="false">api</string>
-	<string name="title_api">Weather API</string>
-	<string-array name="entries_api">
-		<item>OpenWeatherMap</item>
-		<item>AccuWeather</item>
-		<item>WeatherApi</item>
-	</string-array>
 	<string name="cat_header_loc">My Location</string>
 	<string name="key_loc_provider" translatable="false">loc_provider</string>
 	<string name="title_loc_provider">Location Provider</string>

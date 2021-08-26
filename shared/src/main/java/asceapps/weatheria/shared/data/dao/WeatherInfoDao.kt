@@ -19,8 +19,8 @@ abstract class WeatherInfoDao {
 	@Query("SELECT * FROM locations WHERE pos = :pos")
 	abstract fun getByPos(pos: Int): Flow<WeatherInfoEntity>
 
-	@Query("SELECT * FROM locations ORDER BY pos")
-	abstract suspend fun getLocations(): List<LocationEntity>
+	@Query("SELECT id FROM locations ORDER BY pos")
+	abstract suspend fun getLocationIds(): List<Int>
 
 	@Query("SELECT COUNT() FROM locations")
 	abstract suspend fun getLocationsCount(): Int

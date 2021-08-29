@@ -15,7 +15,7 @@ import androidx.room.ForeignKey
 		)
 	]
 )
-class CurrentEntity(
+internal class CurrentEntity(
 	val locationId: Int,
 	val dt: Int,
 	val temp: Int,
@@ -25,7 +25,6 @@ class CurrentEntity(
 	val windSpeed: Float,
 	val windDir: Int,
 	val pressure: Int,
-	val precipitation: Int,
 	val humidity: Int,
 	val dewPoint: Int,
 	val clouds: Int,

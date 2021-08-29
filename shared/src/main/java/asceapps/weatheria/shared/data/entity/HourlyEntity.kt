@@ -15,7 +15,7 @@ import androidx.room.ForeignKey
 		)
 	]
 )
-class HourlyEntity(
+internal class HourlyEntity(
 	val locationId: Int,
 	val dt: Int,
 	val temp: Int,
@@ -24,8 +24,6 @@ class HourlyEntity(
 	val isDay: Boolean,
 	val windSpeed: Float,
 	val windDir: Int,
-	val pressure: Int,
-	val precipitation: Int,
 	val humidity: Int,
 	val dewPoint: Int,
 	val clouds: Int,

@@ -10,8 +10,9 @@ import androidx.core.view.get
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemChartBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import asceapps.weatheria.shared.data.model.zonedDay
+import asceapps.weatheria.shared.data.model.zonedHour
+import asceapps.weatheria.shared.data.repo.today
 
 class WeatherChart @JvmOverloads constructor(
 	context: Context,
@@ -19,7 +20,7 @@ class WeatherChart @JvmOverloads constructor(
 	defStyleAttr: Int = 0
 ): LinearLayoutCompat(context, attrs, defStyleAttr) {
 
-	private class Item(val time: String, val imgResId: Int, val pop: Int, val v1: Int, val v2: Int = 0)
+	private class Item(val time: String, val imgResId: Int, val pop: Int, val v1: Int, val v2: Int)
 
 	private var items = emptyList<Item>()
 	private val paths = mutableListOf<Path>()
@@ -101,7 +102,7 @@ class WeatherChart @JvmOverloads constructor(
 			val tempRange = hiTempRange + loTempRange
 			items = if(dataType == HOURLY) {
 				sampleHours.mapIndexed { i, h ->
-					Item(h, sampleIcons[i], popRange.random(), tempRange.random())
+					Item(h, sampleIcons[i], popRange.random(), tempRange.random(), 0)
 				}
 			} else {
 				val start = (0..5).random()
@@ -121,28 +122,26 @@ class WeatherChart @JvmOverloads constructor(
 	fun setInfo(info: WeatherInfo, dataType: Int) {
 		this.dataType = dataType
 		items = if(dataType == HOURLY) {
-			// todo move formatter to util
-			val formatter = DateTimeFormatter.ofPattern("h a")
 			info.hourly.take(24).filterIndexed { i, _ -> i % 4 == 0 }.map {
 				Item(
-					LocalDateTime.ofInstant(it.hour, info.location.zoneId).format(formatter).uppercase(),
-					it.icon,
-					it.pop,
-					it.temp
+					zonedHour(it.hour, info.location.zoneId).uppercase(),
+					it.iconResId,
+					it.pop.v,
+					it.temp.v,
+					0
 				)
 			}
 		} else {
-			// todo move formatter to util
-			val formatter = DateTimeFormatter.ofPattern("EEE")
+			val today = today(info.daily)
 			info.daily.map {
-				val time = if(it == info.today) resources.getString(R.string.today)
-				else LocalDateTime.ofInstant(it.date, info.location.zoneId).format(formatter)
+				val day = if(it == today) resources.getString(R.string.today)
+				else zonedDay(it.date, info.location.zoneId)
 				Item(
-					time.uppercase(),
-					it.icon,
-					it.pop,
-					it.min,
-					it.max
+					day.uppercase(),
+					it.dayIconResId,
+					it.pop.v,
+					it.min.v,
+					it.max.v
 				)
 			}
 		}
@@ -157,10 +156,9 @@ class WeatherChart @JvmOverloads constructor(
 		val inflater = LayoutInflater.from(context)
 		items.forEach {
 			val view = ItemChartBinding.inflate(inflater, this, false).apply {
-				time.text = it.time
-				icon.setImageResource(it.imgResId)
-				// todo use VALUE CLASSES ALREADY
-				pop.text = "${it.pop}%"
+				tvTime.text = it.time
+				ivIcon.setImageResource(it.imgResId)
+				tvPop.text = it.pop.toString()
 			}.root
 			addView(view)
 		}

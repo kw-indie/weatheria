@@ -1,7 +1,7 @@
 plugins {
 	id 'com.android.application'
 	id 'kotlin-android' // for kotlin support
-	id 'kotlin-kapt' // for annotations: data binding, room, hilt, etc
+	id 'kotlin-kapt' // for annotations: room, hilt, etc
 	id 'dagger.hilt.android.plugin'
 }
 
@@ -31,7 +31,7 @@ android {
 	}
 
 	buildFeatures {
-		dataBinding true
+		viewBinding true
 	}
 
 	buildTypes {

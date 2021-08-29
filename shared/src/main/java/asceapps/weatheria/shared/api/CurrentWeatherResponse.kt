@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName
  *
  * @param wind_degree mathematical, aka CCW and 0 is E
  */
-class CurrentWeatherResponse(
+internal class CurrentWeatherResponse(
 	@SerializedName("EpochTime") val lastUpdate: Int,
 	@Flatten("Temperature.Metric.Value") val temp_c: Float,
 	@Flatten("RealFeelTemperature.Metric.Value") val feelsLike_c: Float,

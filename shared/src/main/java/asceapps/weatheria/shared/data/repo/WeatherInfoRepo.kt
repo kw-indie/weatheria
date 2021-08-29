@@ -5,13 +5,12 @@ import asceapps.weatheria.shared.data.dao.WeatherInfoDao
 import asceapps.weatheria.shared.data.entity.*
 import asceapps.weatheria.shared.data.model.*
 import asceapps.weatheria.shared.di.IoDispatcher
-import asceapps.weatheria.shared.util.asResult
-import asceapps.weatheria.shared.util.resultFlow
+import asceapps.weatheria.shared.ext.asResult
+import asceapps.weatheria.shared.ext.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
@@ -20,7 +19,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Singleton
-class WeatherInfoRepo @Inject constructor(
+class WeatherInfoRepo @Inject internal constructor(
 	private val weatherApi: AccuWeatherApi,
 	private val whoisApi: IPWhoisApi,
 	private val dao: WeatherInfoDao,
@@ -43,21 +42,25 @@ class WeatherInfoRepo @Inject constructor(
 		.asResult()
 		.flowOn(ioDispatcher)
 
-	// todo need to return listable
-	fun search(q: String? = null) = resultFlow<List<SearchResponse>> {
+	fun search(q: String? = null) = resultFlow<List<Location>> {
 		withContext(ioDispatcher) {
 			val query = if(q.isNullOrBlank()) {
 				with(whoisApi.whois()) { "$lat,$lng" }
 			} else q
-			weatherApi.search(query)
+			val resp = weatherApi.search(query)
+			resp.map {
+				with(it) {
+					Location(id, lat, lng, name, country, ZoneId.of(zoneId))
+				}
+			}
 		}
 	}
 
-	fun add(l: SearchResponse) = resultFlow<Unit> {
+	fun add(l: Location) = resultFlow<Unit> {
 		val lastUpdate = (System.currentTimeMillis() / 1000).toInt()
 		val pos = dao.getLocationsCount()
 		val loc = with(l) {
-			LocationEntity(id, lat, lng, name, country, zoneId, lastUpdate, pos)
+			LocationEntity(id, lat, lng, name, country, zoneId.id, lastUpdate, pos)
 		}
 		val (c, h, d) = fetchForecast(l.id)
 		dao.insert(loc, c, h, d)
@@ -84,18 +87,18 @@ class WeatherInfoRepo @Inject constructor(
 	}
 
 	private suspend fun fetchForecast(locationId: Int) = withContext(ioDispatcher) {
-		val c = extractCurrent(locationId, weatherApi.currentWeather(locationId))
-		val h = extractHourly(locationId, weatherApi.hourlyForecast(locationId))
-		val d = extractDaily(locationId, weatherApi.dailyForecast(locationId))
+		val c = extractCurrentEntity(locationId, weatherApi.currentWeather(locationId))
+		val h = extractHourlyEntity(locationId, weatherApi.hourlyForecast(locationId))
+		val d = extractDailyEntity(locationId, weatherApi.dailyForecast(locationId))
 		Triple(c, h, d)
 	}
 
 	suspend fun reorder(info: WeatherInfo, toPos: Int) {
-		with(info.location) { dao.reorder(id, pos, toPos) }
+		with(info.location) { dao.reorder(id, info.pos, toPos) }
 	}
 
 	suspend fun delete(info: WeatherInfo) {
-		with(info.location) { dao.delete(id, pos) }
+		with(info.location) { dao.delete(id, info.pos) }
 	}
 
 	suspend fun deleteAll() {
@@ -104,7 +107,7 @@ class WeatherInfoRepo @Inject constructor(
 
 }
 
-private fun extractCurrent(locationId: Int, resp: List<CurrentWeatherResponse>) =
+private fun extractCurrentEntity(locationId: Int, resp: List<CurrentWeatherResponse>) =
 	with(resp[0]) {
 		CurrentEntity(
 			locationId,
@@ -116,7 +119,6 @@ private fun extractCurrent(locationId: Int, resp: List<CurrentWeatherResponse>) 
 			wind_kph,
 			wind_degree,
 			pressure_mb,
-			precip_mm,
 			humidity,
 			dewPoint_c.roundToInt(),
 			clouds,
@@ -125,7 +127,7 @@ private fun extractCurrent(locationId: Int, resp: List<CurrentWeatherResponse>) 
 		)
 	}
 
-private fun extractHourly(locationId: Int, resp: List<HourlyForecastResponse>) =
+private fun extractHourlyEntity(locationId: Int, resp: List<HourlyForecastResponse>) =
 	resp.map { hourly ->
 		with(hourly) {
 			HourlyEntity(
@@ -137,8 +139,6 @@ private fun extractHourly(locationId: Int, resp: List<HourlyForecastResponse>) =
 				isDay,
 				wind_kph,
 				wind_degrees,
-				0, // fixme remove
-				precip_mm,
 				humidity,
 				dewPoint_c.roundToInt(),
 				clouds,
@@ -149,7 +149,7 @@ private fun extractHourly(locationId: Int, resp: List<HourlyForecastResponse>) =
 		}
 	}
 
-private fun extractDaily(locationId: Int, resp: DailyForecastResponse) =
+private fun extractDailyEntity(locationId: Int, resp: DailyForecastResponse) =
 	resp.forecasts.map { daily ->
 		with(daily) {
 			DailyEntity(
@@ -157,12 +157,14 @@ private fun extractDaily(locationId: Int, resp: DailyForecastResponse) =
 				dt,
 				minTemp_c.roundToInt(),
 				maxTemp_c.roundToInt(),
-				day.condition, // fixme add night condition
-				day.wind_kph, // fixme add night data
-				day.precip_mm, // fixme add night data
-				0, // fixme remove
-				0f, // fixme remove
-				max(day.pop, night.pop),
+				day.condition,
+				night.condition,
+				day.wind_kph,
+				night.wind_kph,
+				day.pop,
+				night.pop,
+				day.clouds,
+				night.clouds,
 				uv,
 				sunrise,
 				sunrise,
@@ -174,85 +176,107 @@ private fun extractDaily(locationId: Int, resp: DailyForecastResponse) =
 	}
 
 private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
-	val location = with(info.location) {
-		Location(id, lat, lng, name, country, ZoneId.of(zoneId), toInstant(lastUpdate), pos)
+	val l = with(info.location) {
+		Location(id, lat, lng, name, country, ZoneId.of(zoneId))
 	}
-	val daily = info.daily.map {
+	val d = info.daily.map {
 		with(it) {
 			Daily(
 				toInstant(dt),
-				minTemp,
-				maxTemp,
-				conditionIconResId(condition),
-				pop,
-				uv,
+				Temp(minTemp),
+				Temp(maxTemp),
+				conditionIconResId(dayCondition),
+				conditionIconResId(nightCondition),
+				Percent(max(dayPop, nightPop)),
+				UV(uv),
 				toInstant(sunrise),
 				toInstant(sunset),
 				toInstant(moonrise),
 				toInstant(moonset),
-				moonphase
+				moonPhaseIndex
 			)
 		}
 	}
-	val hourly = info.hourly.map {
+	val h = info.hourly.map {
 		with(it) {
-			val hour = toInstant(dt)
-			// hourly data are only from first 48 hours, starting from this hour not 00:00
 			Hourly(
-				hour,
+				toInstant(dt),
 				conditionIconResId(condition, isDay),
-				temp,
-				pop
+				Temp(temp),
+				Percent(pop)
 			)
 		}
 	}
-	val now = Instant.now()
-	val elapsedHours = Duration.between(location.lastUpdate, now).toHours()
+	val nowSeconds = currentSeconds()
+	val elapsedHours = nowSeconds - info.location.lastUpdate / 3600
 	val accuracy = when {
-		elapsedHours < 1 -> 0
-		elapsedHours < 24 -> 1
-		elapsedHours < 48 -> 2
-		elapsedHours < 72 -> 3
-		else -> 4 // no data to approximate from
+		elapsedHours < 1 -> ACCURACY_FRESH
+		elapsedHours < info.hourly.size -> ACCURACY_HIGH
+		elapsedHours < info.daily.size * 24 -> ACCURACY_LOW
+		else -> ACCURACY_OUTDATED // no data to approximate from
 	}
-	val current = if(accuracy == 0) {
-		with(info.current) {
-			Current(
-				conditionIndex(condition),
-				conditionIconResId(condition, isDay),
-				temp,
-				feelsLike,
-				pressure,
-				humidity,
-				dewPoint,
-				clouds,
-				visibility,
-				windSpeed,
-				windDir,
-				uv
-			)
+	val c = when(accuracy) {
+		ACCURACY_FRESH -> {
+			with(info.current) {
+				Current(
+					conditionIndex(condition),
+					conditionIconResId(condition, isDay),
+					Temp(temp),
+					Temp(feelsLike),
+					Distance(windSpeed),
+					windDir,
+					Pressure(pressure),
+					Percent(humidity),
+					Temp(dewPoint),
+					Percent(clouds),
+					Distance(visibility),
+					UV(uv)
+				)
+			}
 		}
-	} else { // todo also approximate from day if possible
-		// approximation logic: we have hourly data for the next 3 days
-		val hour = info.hourly.last { it.dt < now.epochSecond }
-		with(hour) {
-			Current(
-				conditionIndex(condition),
-				conditionIconResId(condition, isDay),
-				temp,
-				feelsLike,
-				pressure,
-				humidity,
-				dewPoint,
-				clouds,
-				visibility,
-				windSpeed,
-				windDir,
-				uv
-			)
+		ACCURACY_HIGH -> { // approximate
+			val thisHourEntity = thisHourEntity(info.hourly) ?: info.hourly.last()
+			thisHourEntity.run {
+				Current(
+					conditionIndex(condition),
+					conditionIconResId(condition, isDay),
+					Temp(temp),
+					Temp(feelsLike),
+					Distance(windSpeed),
+					windDir,
+					Pressure(UNKNOWN_INT),
+					Percent(humidity),
+					Temp(dewPoint),
+					Percent(clouds),
+					Distance(visibility),
+					UV(uv)
+				)
+			}
+		}
+		else -> { // ACCURACY_MEDIUM, ACCURACY_LOW, ACCURACY_OUTDATE
+			// it's prolly better and less work to show old data from last update
+			// than have null when data is outdated
+			val todayEntity = todayEntity(info.daily) ?: info.daily.last()
+			todayEntity.run {
+				val isDay = nowSeconds in sunrise..sunset
+				Current(
+					conditionIndex(if(isDay) dayCondition else nightCondition),
+					conditionIconResId(dayCondition, isDay), // fixme
+					if(isDay) Temp(maxTemp) else Temp(minTemp),  // too simple approximation
+					Temp(UNKNOWN_INT),
+					if(isDay) Distance(dayWindSpeed) else Distance(nightWindSpeed),
+					UNKNOWN_INT,
+					Pressure(UNKNOWN_INT),
+					Percent(UNKNOWN_INT),
+					Temp(UNKNOWN_INT),
+					if(isDay) Percent(dayClouds) else Percent(nightClouds),
+					Distance(UNKNOWN_FLT),
+					UV(uv)
+				)
+			}
 		}
 	}
-	return WeatherInfo(location, current, hourly, daily, accuracy)
+	return WeatherInfo(l, c, h, d, toInstant(info.location.lastUpdate), accuracy, info.location.pos)
 }
 
 private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())

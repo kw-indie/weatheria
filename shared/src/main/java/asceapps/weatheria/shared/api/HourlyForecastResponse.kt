@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * @see [CurrentWeatherResponse] for field meanings
  */
-class HourlyForecastResponse(
+internal class HourlyForecastResponse(
 	@SerializedName("EpochDateTime") val dt: Int,
 	@Flatten("Temperature.Value") val temp_c: Float,
 	@Flatten("RealFeelTemperature.Value") val feelsLike_c: Float,

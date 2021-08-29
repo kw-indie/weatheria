@@ -3,7 +3,7 @@ package asceapps.weatheria.shared.api
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 
-interface IPWhoisApi {
+internal interface IPWhoisApi {
 
 	companion object {
 		// chose this cuz: SSL, IP, location info and free 10k req/month

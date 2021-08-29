@@ -22,6 +22,7 @@ import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
+import asceapps.weatheria.util.addDividers
 import asceapps.weatheria.util.hideKeyboard
 import asceapps.weatheria.util.observe
 import asceapps.weatheria.util.onSubmit
@@ -81,6 +82,8 @@ class AddLocationFragment: Fragment() {
 			}
 		})
 		binding.rvResult.apply {
+			setHasFixedSize(true)
+			addDividers()
 			adapter = addLocationAdapter
 		}
 

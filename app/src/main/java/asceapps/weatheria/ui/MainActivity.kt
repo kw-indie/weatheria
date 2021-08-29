@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -19,7 +18,8 @@ class MainActivity: AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+		val binding = ActivityMainBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 		binding.navHost.edgeToEdge(statusBar = false)

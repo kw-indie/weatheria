@@ -2,42 +2,35 @@ package asceapps.weatheria.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import asceapps.weatheria.BR
+import androidx.viewbinding.ViewBinding
 import asceapps.weatheria.shared.data.base.Listable
 
-abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
-	ListAdapter<T, BaseAdapter.BindingHolder<B>>(HashCallback<T>()) {
+abstract class BaseAdapter<T: Listable, B: ViewBinding>:
+	ListAdapter<T, BaseAdapter.BindingHolder<T, B>>(HashCallback<T>()) {
 
 	init {
 		stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 	}
 
-	final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<B> {
-		val binding = DataBindingUtil.inflate<B>(
-			LayoutInflater.from(parent.context), viewType, parent, false
-		)
-		val holder = BindingHolder(binding)
+	final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<T, B> {
+		val binding = createBinding(LayoutInflater.from(parent.context), parent)
+		val holder = BindingHolder<T, B>(binding)
 		onHolderCreated(holder)
 		return holder
 	}
 
-	final override fun onBindViewHolder(holder: BindingHolder<B>, position: Int) {
+	final override fun onBindViewHolder(holder: BindingHolder<T, B>, position: Int) {
 		val item = getItem(position)
-		with(holder.binding) {
-			setVariable(BR.item, item)
-			onBindHolder(holder, item)
-			executePendingBindings()
-		}
+		holder.item = item
+		onHolderBound(holder, item)
 	}
 
-	abstract override fun getItemViewType(position: Int): Int
-	open fun onHolderCreated(holder: BindingHolder<B>) {}
-	open fun onBindHolder(holder: BindingHolder<B>, item: T) {}
+	abstract fun createBinding(inflater: LayoutInflater, parent: ViewGroup): B
+	open fun onHolderCreated(holder: BindingHolder<T, B>) {}
+	open fun onHolderBound(holder: BindingHolder<T, B>, item: T) {}
 
 	private class HashCallback<T: Listable>: DiffUtil.ItemCallback<T>() {
 
@@ -45,5 +38,7 @@ abstract class BaseAdapter<T: Listable, B: ViewDataBinding>:
 		override fun areContentsTheSame(oldT: T, newT: T) = oldT.hash == newT.hash
 	}
 
-	class BindingHolder<B: ViewDataBinding>(val binding: B): RecyclerView.ViewHolder(binding.root)
+	class BindingHolder<T: Listable, B: ViewBinding>(val binding: B): RecyclerView.ViewHolder(binding.root) {
+		var item: T? = null
+	}
 }

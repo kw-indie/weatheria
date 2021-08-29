@@ -13,6 +13,10 @@ import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.shared.data.model.WeatherInfo
+import asceapps.weatheria.shared.data.model.relativeTime
+import asceapps.weatheria.shared.data.model.zonedDay
+import asceapps.weatheria.shared.data.model.zonedHour
+import asceapps.weatheria.shared.data.repo.ACCURACY_OUTDATED
 import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
@@ -23,8 +27,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -86,42 +88,45 @@ class AppWidget: AppWidgetProvider() {
 
 	private fun updateWidgets(context: Context, awm: AppWidgetManager, ids: IntArray, info: WeatherInfo) {
 		val views = RemoteViews(context.packageName, R.layout.app_widget).apply {
-			setTextViewText(R.id.tv_location, info.location.name)
-			setTextViewText(R.id.tv_temp, info.currentTemp)
-			setTextViewText(R.id.tv_humidity_value, info.currentHumidity)
-			val uvString = context.getString(
-				R.string.f_2s_p,
-				info.currentUVIndex,
-				context.resources.getStringArray(R.array.uv_levels)[info.currentUVLevelIndex]
-			)
-			setTextViewText(R.id.tv_uv_value, uvString)
-			setImageViewResource(R.id.iv_icon, info.current.icon)
-			setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
-			val lastUpdate = context.getString(R.string.f_last_update, info.lastUpdate)
-			setTextViewText(R.id.tv_last_update, lastUpdate)
-			removeAllViews(R.id.ll_forecasts)
-			// todo move formatters to util
-			val timeFormatter = DateTimeFormatter.ofPattern("h a")
-			val dayFormatter = DateTimeFormatter.ofPattern("EEE")
-			// add 3 views for hourly (each 6 hrs apart), and 2 for daily
-			val items = ArrayList<RemoteViews>(5)
-			info.hourly.take(24)
-				.filterIndexed { i, _ -> i % 6 == 0 }
-				.drop(1)
-				.mapTo(items) {
-					val text = LocalDateTime.ofInstant(it.hour, info.location.zoneId).format(timeFormatter)
-					getItemRemoteView(context, it.icon, text)
+			if(info.accuracy == ACCURACY_OUTDATED) {
+				// todo show warning/remove views
+			} else {
+				val current = info.current
+				setTextViewText(R.id.tv_location, info.location.name)
+				setTextViewText(R.id.tv_temp, current.temp.toString())
+				setTextViewText(R.id.tv_humidity_value, current.humidity.toString())
+				val uvString = context.getString(
+					R.string.f_2s_p,
+					current.uv.toString(),
+					context.resources.getStringArray(R.array.uv_levels)[current.uv.level]
+				)
+				setTextViewText(R.id.tv_uv_value, uvString)
+				setImageViewResource(R.id.iv_icon, current.iconResId)
+				setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
+				val lastUpdate = context.getString(R.string.f_last_update, relativeTime(info.lastUpdate))
+				setTextViewText(R.id.tv_last_update, lastUpdate)
+				removeAllViews(R.id.ll_forecasts)
+				// add 3 views for hourly (each 6 hrs apart), and 2 for daily
+				val items = ArrayList<RemoteViews>(6)
+				info.hourly.take(24)
+					.filterIndexed { i, _ -> i % 6 == 0 } // returns 4
+					.drop(1) // keep 3
+					.mapTo(items) {
+						val text = zonedHour(it.hour, info.location.zoneId)
+						getItemRemoteView(context, it.iconResId, text)
+					}
+				items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
+				info.daily.take(3)
+					.drop(1) // keep 2
+					.mapTo(items) {
+						val text = zonedDay(it.date, info.location.zoneId)
+						getItemRemoteView(context, it.dayIconResId, text) // todo use both icons
+					}
+				for(i in items) {
+					addView(R.id.ll_forecasts, i)
 				}
-			items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
-			info.daily.drop(1)
-				.mapTo(items) {
-					val text = LocalDateTime.ofInstant(it.date, info.location.zoneId).format(dayFormatter)
-					getItemRemoteView(context, it.icon, text)
-				}
-			for(i in items) {
-				addView(R.id.ll_forecasts, i)
+				setOnClickPendingIntent(R.id.root, getOpenAppIntent(context))
 			}
-			setOnClickPendingIntent(R.id.root, getOpenAppIntent(context))
 		}
 		// Instruct the widget manager to update the widget
 		awm.updateAppWidget(ids, views)

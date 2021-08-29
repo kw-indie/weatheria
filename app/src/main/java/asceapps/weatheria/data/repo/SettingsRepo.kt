@@ -7,7 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
-import asceapps.weatheria.shared.data.model.WeatherInfo
+import asceapps.weatheria.shared.data.model.unitSystem
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,9 +25,6 @@ class SettingsRepo @Inject constructor(
 	companion object {
 		private const val defVal = 0
 		private const val defValStr = "0"
-
-		const val UNITS_METRIC = 0
-		const val UNITS_IMPERIAL = 1
 
 		const val LOCATION_PROVIDER_IP = 0
 		const val LOCATION_PROVIDER_NETWORK = 1
@@ -79,7 +76,7 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateUnits() {
-		WeatherInfo.setUnitsSystem(units)
+		unitSystem = units
 	}
 
 	private fun updateAutoRefresh() {

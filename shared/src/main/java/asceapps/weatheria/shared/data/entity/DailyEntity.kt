@@ -15,21 +15,23 @@ import androidx.room.ForeignKey
 		)
 	]
 )
-class DailyEntity(
+internal class DailyEntity(
 	val locationId: Int,
 	val dt: Int,
 	val minTemp: Int,
 	val maxTemp: Int,
-	val condition: Int,
-	val windSpeed: Float,
-	val precipitation: Int,
-	val humidity: Int,
-	val visibility: Float,
-	val pop: Int,
+	val dayCondition: Int,
+	val nightCondition: Int,
+	val dayWindSpeed: Float,
+	val nightWindSpeed: Float,
+	val dayPop: Int,
+	val nightPop: Int,
+	val dayClouds: Int,
+	val nightClouds: Int,
 	val uv: Int,
 	val sunrise: Int,
 	val sunset: Int,
 	val moonrise: Int,
 	val moonset: Int,
-	val moonphase: Int
+	val moonPhaseIndex: Int
 )

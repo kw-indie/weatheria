@@ -18,6 +18,7 @@ import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.shared.data.repo.Error
 import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.repo.partOfDay
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import asceapps.weatheria.util.getColors
@@ -173,7 +174,7 @@ class HomeFragment: Fragment() {
 	private fun updateColors(info: WeatherInfo?) {
 		val newSky = if(info == null) init
 		else {
-			val (partOfDay, fraction) = info.partOfDay
+			val (partOfDay, fraction) = partOfDay(info)
 			// new colors to animate to
 			when(partOfDay) {
 				1 -> gradientEvaluator.evaluate(fraction, night, dawn)

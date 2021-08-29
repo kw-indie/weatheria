@@ -1,12 +1,26 @@
 package asceapps.weatheria.util
 
 import android.content.res.Configuration
+import android.graphics.Rect
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.TextViewCompat
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import asceapps.weatheria.R
+import asceapps.weatheria.shared.data.repo.ACCURACY_FRESH
+import asceapps.weatheria.shared.data.repo.ACCURACY_HIGH
+import asceapps.weatheria.shared.data.repo.ACCURACY_LOW
+import asceapps.weatheria.ui.drawable.DirectionDrawable
 
 fun hideKeyboard(any: View) {
 	ViewCompat.getWindowInsetsController(any)?.hide(WindowInsetsCompat.Type.ime())
@@ -73,4 +87,35 @@ inline fun ViewPager2.onPageChanged(crossinline block: (pos: Int) -> Unit) {
 		}
 	}
 	registerOnPageChangeCallback(callback)
+}
+
+fun RecyclerView.addDividers() {
+	val layoutManager = layoutManager as LinearLayoutManager
+	val divider = DividerItemDecoration(context, layoutManager.orientation)
+	addItemDecoration(divider)
+}
+
+fun TextView.setDirectionDrawable(deg: Int) {
+	val compDs = compoundDrawablesRelative
+	val d = compDs[2] as? DirectionDrawable ?: DirectionDrawable().apply {
+		val size = compDs[0].intrinsicHeight
+		bounds = Rect(0, 0, size, size)
+		setTintList(TextViewCompat.getCompoundDrawableTintList(this@setDirectionDrawable))
+		setCompoundDrawablesRelative(compDs[0], null, this, null)
+	}
+	d.deg = deg
+}
+
+fun TextView.appendAccuracy(accuracy: Int) {
+	val color = ResourcesCompat.getColor(resources,
+		when(accuracy) {
+			ACCURACY_FRESH -> R.color.accuracy_fresh
+			ACCURACY_HIGH -> R.color.accuracy_high
+			ACCURACY_LOW -> R.color.accuracy_low
+			else -> R.color.accuracy_outdated
+		},
+		context.theme
+	)
+	append(SpannableStringBuilder().append(" ⦿", ForegroundColorSpan(color), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+	)
 }

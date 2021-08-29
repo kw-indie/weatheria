@@ -1,4 +1,4 @@
-package asceapps.weatheria.shared.util
+package asceapps.weatheria.shared.ext
 
 import asceapps.weatheria.shared.data.repo.Error
 import asceapps.weatheria.shared.data.repo.Loading

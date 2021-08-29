@@ -14,6 +14,7 @@ import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.ui.adapter.MyLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
+import asceapps.weatheria.util.addDividers
 import asceapps.weatheria.util.observe
 
 class MyLocationsFragment: Fragment() {
@@ -45,6 +46,8 @@ class MyLocationsFragment: Fragment() {
 			}
 		})
 		binding.locationList.apply {
+			setHasFixedSize(true)
+			addDividers()
 			adapter = myLocationsAdapter
 		}
 

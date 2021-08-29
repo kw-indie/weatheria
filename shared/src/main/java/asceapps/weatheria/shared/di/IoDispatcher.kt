@@ -4,4 +4,5 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
+internal annotation class IoDispatcher
+// had to move here, di in shared wouldn't work otherwise

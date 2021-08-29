@@ -21,7 +21,7 @@ import asceapps.weatheria.shared.data.entity.LocationEntity
 	version = 1,
 	exportSchema = BuildConfig.BUILD_TYPE == "debug"
 )
-abstract class AppDatabase: RoomDatabase() {
+internal abstract class AppDatabase: RoomDatabase() {
 
 	companion object {
 		fun create(appContext: Context) = Room.databaseBuilder(

@@ -3,7 +3,7 @@ package asceapps.weatheria.shared.data.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 
-class WeatherInfoEntity(
+internal class WeatherInfoEntity(
 	@Embedded val location: LocationEntity,
 	@Relation(parentColumn = "id", entityColumn = "locationId")
 	val current: CurrentEntity,

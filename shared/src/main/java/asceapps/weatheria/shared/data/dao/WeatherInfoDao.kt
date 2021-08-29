@@ -5,7 +5,7 @@ import asceapps.weatheria.shared.data.entity.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class WeatherInfoDao {
+internal abstract class WeatherInfoDao {
 
 	@Transaction
 	@Query("SELECT * FROM locations ORDER BY pos")

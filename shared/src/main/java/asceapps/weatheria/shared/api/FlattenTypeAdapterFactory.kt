@@ -10,7 +10,7 @@ import com.google.gson.stream.JsonWriter
 import java.io.IOException
 import java.lang.reflect.Field
 
-class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAdapterFactory {
+internal class FlattenTypeAdapterFactory(private val pathDelimiter: String = "."): TypeAdapterFactory {
 
 	override fun <T: Any?> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T> {
 		val delegateAdapter = gson.getDelegateAdapter(this, type)

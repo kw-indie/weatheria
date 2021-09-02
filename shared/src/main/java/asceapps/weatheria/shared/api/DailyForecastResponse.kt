@@ -8,6 +8,9 @@ import com.google.gson.annotations.SerializedName
 internal class DailyForecastResponse(
 	@SerializedName("DailyForecasts") val forecasts: List<DailyForecast>
 ) {
+	/**
+	 * @param dt does not start at 00:00, but at a random? previous time
+	 */
 	class DailyForecast(
 		@SerializedName("EpochDate") val dt: Int,
 		@Flatten("Temperature.Minimum.Value") val minTemp_c: Float,

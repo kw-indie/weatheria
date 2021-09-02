@@ -10,18 +10,18 @@ import kotlin.math.min
 
 fun today(daily: List<Daily>): Daily? {
 	val today = thisDaySeconds()
-	val index = daily.binarySearch { (it.date.epochSecond - today).toInt() }
+	val index = daily.binarySearch { truncateToDaySeconds(it.date) - today }
 	return if(index < 0) null else daily[index]
 }
 
 internal fun todayEntity(daily: List<DailyEntity>): DailyEntity? {
 	val today = thisDaySeconds()
-	val index = daily.binarySearch { it.dt - today }
+	val index = daily.binarySearch { truncateToDaySeconds(it.dt) - today }
 	return if(index < 0) null else daily[index]
 }
 
 fun thisHour(hourly: List<Hourly>): Hourly? {
-	val thisHour = thisHourSeconds()
+	val thisHour = thisHourSeconds() + 3600 // start from next hour
 	val index = hourly.binarySearch { (it.hour.epochSecond - thisHour).toInt() }
 	return if(index < 0) null else hourly[index]
 }
@@ -34,9 +34,12 @@ internal fun thisHourEntity(hourly: List<HourlyEntity>): HourlyEntity? {
 
 internal fun currentSeconds() = (System.currentTimeMillis() / 1000).toInt()
 
-internal fun thisHourSeconds() = (System.currentTimeMillis().let { it - it % 3_600_000 }).toInt()
+internal fun thisHourSeconds() = (System.currentTimeMillis() / 1000).toInt().let { it - it % 3_600 }
 
-internal fun thisDaySeconds() = (System.currentTimeMillis().let { it - it % 86_400_000 }).toInt()
+internal fun thisDaySeconds() = truncateToDaySeconds((System.currentTimeMillis() / 1000).toInt())
+
+private fun truncateToDaySeconds(i: Instant) = (i.epochSecond - i.epochSecond % 86_400).toInt()
+private fun truncateToDaySeconds(sec: Int) = sec - sec % 86_400
 
 /**
  * returns one of:
@@ -52,9 +55,8 @@ internal fun thisDaySeconds() = (System.currentTimeMillis().let { it - it % 86_4
 fun partOfDay(info: WeatherInfo): Pair<Int, Float> {
 	val today = info.today
 	val night = 0 to 0f
-	val secondsInDay = 24 * 60 * 60f
-	val now = Instant.now()
-	val nowSecondOfDay = now.epochSecond % secondsInDay
+	val secondsInDay = 86_400f
+	val nowSecondOfDay = currentSeconds() % secondsInDay
 	// all values below are in fractions and not seconds
 	val nowF = nowSecondOfDay / secondsInDay
 	// sunrise/set are taken from approx of `today`

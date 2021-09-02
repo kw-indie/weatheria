@@ -1,6 +1,7 @@
 package asceapps.weatheria.shared.data.repo
 
 import asceapps.weatheria.shared.api.*
+import asceapps.weatheria.shared.data.base.IconMapper
 import asceapps.weatheria.shared.data.dao.WeatherInfoDao
 import asceapps.weatheria.shared.data.entity.*
 import asceapps.weatheria.shared.data.model.*
@@ -23,8 +24,13 @@ class WeatherInfoRepo @Inject internal constructor(
 	private val weatherApi: AccuWeatherApi,
 	private val whoisApi: IPWhoisApi,
 	private val dao: WeatherInfoDao,
+	private val iconMapper: IconMapper,
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
+
+	init {
+		initialize() // fixme really?
+	}
 
 	// todo optimize these so they only return needed data, especially
 	fun getAll() = dao.loadAll()
@@ -105,6 +111,109 @@ class WeatherInfoRepo @Inject internal constructor(
 		dao.deleteAll()
 	}
 
+	private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
+		val l = with(info.location) {
+			Location(id, lat, lng, name, country, ZoneId.of(zoneId))
+		}
+		val d = info.daily.map {
+			with(it) {
+				Daily(
+					toInstant(dt),
+					Temp(minTemp),
+					Temp(maxTemp),
+					iconMapper[dayCondition],
+					iconMapper[nightCondition],
+					Percent(max(dayPop, nightPop)),
+					UV(uv),
+					toInstant(sunrise),
+					toInstant(sunset),
+					toInstant(moonrise),
+					toInstant(moonset),
+					moonPhaseIndex
+				)
+			}
+		}
+		val h = info.hourly.map {
+			with(it) {
+				Hourly(
+					toInstant(dt),
+					iconMapper[condition],
+					Temp(temp),
+					Percent(pop)
+				)
+			}
+		}
+		val nowSeconds = currentSeconds()
+		val elapsedHours = (nowSeconds - info.location.lastUpdate) / 3600
+		val accuracy = when {
+			elapsedHours < 1 -> ACCURACY_FRESH
+			elapsedHours < info.hourly.size -> ACCURACY_HIGH
+			elapsedHours < info.daily.size * 24 -> ACCURACY_LOW
+			else -> ACCURACY_OUTDATED // no data to approximate from
+		}
+		val c = when(accuracy) {
+			ACCURACY_FRESH -> {
+				with(info.current) {
+					Current(
+						conditionIndex(condition),
+						iconMapper[condition],
+						Temp(temp),
+						Temp(feelsLike),
+						Distance(windSpeed),
+						meteorologicalToCircular(windDir),
+						Pressure(pressure),
+						Percent(humidity),
+						Temp(dewPoint),
+						Percent(clouds),
+						Distance(visibility),
+						UV(uv)
+					)
+				}
+			}
+			ACCURACY_HIGH -> { // approximate
+				val thisHourEntity = thisHourEntity(info.hourly) ?: info.hourly.last()
+				thisHourEntity.run {
+					Current(
+						conditionIndex(condition),
+						iconMapper[condition],
+						Temp(temp),
+						Temp(feelsLike),
+						Distance(windSpeed),
+						meteorologicalToCircular(windDir),
+						Pressure(UNKNOWN_INT),
+						Percent(humidity),
+						Temp(dewPoint),
+						Percent(clouds),
+						Distance(visibility),
+						UV(uv)
+					)
+				}
+			}
+			else -> { // ACCURACY_MEDIUM, ACCURACY_LOW, ACCURACY_OUTDATE
+				// it's prolly better and less work to show old data from last update
+				// than have null when data is outdated
+				val todayEntity = todayEntity(info.daily) ?: info.daily.last()
+				todayEntity.run {
+					val isDay = nowSeconds in sunrise..sunset
+					Current(
+						conditionIndex(if(isDay) dayCondition else nightCondition),
+						iconMapper[dayCondition],
+						if(isDay) Temp(maxTemp) else Temp(minTemp),  // too simple approximation
+						Temp(UNKNOWN_INT),
+						if(isDay) Distance(dayWindSpeed) else Distance(nightWindSpeed),
+						UNKNOWN_INT,
+						Pressure(UNKNOWN_INT),
+						Percent(UNKNOWN_INT),
+						Temp(UNKNOWN_INT),
+						if(isDay) Percent(dayClouds) else Percent(nightClouds),
+						Distance(UNKNOWN_FLT),
+						UV(uv)
+					)
+				}
+			}
+		}
+		return WeatherInfo(l, c, h, d, toInstant(info.location.lastUpdate), accuracy, info.location.pos)
+	}
 }
 
 private fun extractCurrentEntity(locationId: Int, resp: List<CurrentWeatherResponse>) =
@@ -167,7 +276,7 @@ private fun extractDailyEntity(locationId: Int, resp: DailyForecastResponse) =
 				night.clouds,
 				uv,
 				sunrise,
-				sunrise,
+				sunset,
 				moonrise,
 				moonset,
 				moonPhaseIndex(moonAge.toFloat())
@@ -175,158 +284,11 @@ private fun extractDailyEntity(locationId: Int, resp: DailyForecastResponse) =
 		}
 	}
 
-private fun entityToModel(info: WeatherInfoEntity): WeatherInfo {
-	val l = with(info.location) {
-		Location(id, lat, lng, name, country, ZoneId.of(zoneId))
-	}
-	val d = info.daily.map {
-		with(it) {
-			Daily(
-				toInstant(dt),
-				Temp(minTemp),
-				Temp(maxTemp),
-				conditionIconResId(dayCondition),
-				conditionIconResId(nightCondition),
-				Percent(max(dayPop, nightPop)),
-				UV(uv),
-				toInstant(sunrise),
-				toInstant(sunset),
-				toInstant(moonrise),
-				toInstant(moonset),
-				moonPhaseIndex
-			)
-		}
-	}
-	val h = info.hourly.map {
-		with(it) {
-			Hourly(
-				toInstant(dt),
-				conditionIconResId(condition, isDay),
-				Temp(temp),
-				Percent(pop)
-			)
-		}
-	}
-	val nowSeconds = currentSeconds()
-	val elapsedHours = nowSeconds - info.location.lastUpdate / 3600
-	val accuracy = when {
-		elapsedHours < 1 -> ACCURACY_FRESH
-		elapsedHours < info.hourly.size -> ACCURACY_HIGH
-		elapsedHours < info.daily.size * 24 -> ACCURACY_LOW
-		else -> ACCURACY_OUTDATED // no data to approximate from
-	}
-	val c = when(accuracy) {
-		ACCURACY_FRESH -> {
-			with(info.current) {
-				Current(
-					conditionIndex(condition),
-					conditionIconResId(condition, isDay),
-					Temp(temp),
-					Temp(feelsLike),
-					Distance(windSpeed),
-					windDir,
-					Pressure(pressure),
-					Percent(humidity),
-					Temp(dewPoint),
-					Percent(clouds),
-					Distance(visibility),
-					UV(uv)
-				)
-			}
-		}
-		ACCURACY_HIGH -> { // approximate
-			val thisHourEntity = thisHourEntity(info.hourly) ?: info.hourly.last()
-			thisHourEntity.run {
-				Current(
-					conditionIndex(condition),
-					conditionIconResId(condition, isDay),
-					Temp(temp),
-					Temp(feelsLike),
-					Distance(windSpeed),
-					windDir,
-					Pressure(UNKNOWN_INT),
-					Percent(humidity),
-					Temp(dewPoint),
-					Percent(clouds),
-					Distance(visibility),
-					UV(uv)
-				)
-			}
-		}
-		else -> { // ACCURACY_MEDIUM, ACCURACY_LOW, ACCURACY_OUTDATE
-			// it's prolly better and less work to show old data from last update
-			// than have null when data is outdated
-			val todayEntity = todayEntity(info.daily) ?: info.daily.last()
-			todayEntity.run {
-				val isDay = nowSeconds in sunrise..sunset
-				Current(
-					conditionIndex(if(isDay) dayCondition else nightCondition),
-					conditionIconResId(dayCondition, isDay), // fixme
-					if(isDay) Temp(maxTemp) else Temp(minTemp),  // too simple approximation
-					Temp(UNKNOWN_INT),
-					if(isDay) Distance(dayWindSpeed) else Distance(nightWindSpeed),
-					UNKNOWN_INT,
-					Pressure(UNKNOWN_INT),
-					Percent(UNKNOWN_INT),
-					Temp(UNKNOWN_INT),
-					if(isDay) Percent(dayClouds) else Percent(nightClouds),
-					Distance(UNKNOWN_FLT),
-					UV(uv)
-				)
-			}
-		}
-	}
-	return WeatherInfo(l, c, h, d, toInstant(info.location.lastUpdate), accuracy, info.location.pos)
-}
-
 private fun toInstant(epochSeconds: Int) = Instant.ofEpochSecond(epochSeconds.toLong())
 
 private fun conditionIndex(condition: Int) = AccuWeatherApi.CONDITIONS.binarySearch(condition)
 
-private fun conditionIconResId(condition: Int, isDay: Boolean? = null) = when(condition) {
-	// todo
-	1 -> 0 // sunny d
-	2 -> 0 // mostly sunny d
-	3 -> 0 // partly sunny d
-	4 -> 0 // intermittent clouds d
-	5 -> 0 // hazy sunshine d
-	6 -> 0 // mostly cloudy d
-	7 -> 0 // cloudy d/n
-	8 -> 0 // overcast d/n
-	11 -> 0 // fog d/n
-	12 -> 0 // showers d/n
-	13 -> 0 // mostly cloudy w/ showers d
-	14 -> 0 // partly sunny w/ showers d
-	15 -> 0 // t storms d/n
-	16 -> 0 // mostly cloudy w/ t storms d
-	17 -> 0 // partly sunny w/ t storms d
-	18 -> 0 // rain d/n
-	19 -> 0 // flurries d/n
-	20 -> 0 // mostly cloudy w/ flurries d
-	21 -> 0 // partly sunny w/ flurries d
-	22 -> 0 // snow d/n
-	23 -> 0 // mostly cloudy w/ snow d
-	24 -> 0 // ice d/n
-	25 -> 0 // sleet d/n
-	26 -> 0 // freezing rain d/n
-	29 -> 0 // rain n snow d/n
-	30 -> 0 // hot d/n
-	31 -> 0 // cold d/n
-	32 -> 0 // windy d/n
-	33 -> 0 // clear n
-	34 -> 0 // mostly clear n
-	35 -> 0 // partly cloudy n
-	36 -> 0 // intermittent clouds n
-	37 -> 0 // hazy moonshine n
-	38 -> 0 // mostly cloudy n
-	39 -> 0 // partly cloudy w/ showers n
-	40 -> 0 // mostly cloudy w/ showers n
-	41 -> 0 // partly cloudy w/ t storms n
-	42 -> 0 // mostly cloudy w/ t storms n
-	43 -> 0 // mostly cloudy w/ flurries n
-	44 -> 0 // mostly cloudy w/ snow n
-	else -> throw IllegalArgumentException()
-}
+private fun meteorologicalToCircular(deg: Int) = (-deg + 90).mod(360)
 
 private fun moonPhaseIndex(age: Float) = when(age) {
 	in 1f..6.38f -> 1

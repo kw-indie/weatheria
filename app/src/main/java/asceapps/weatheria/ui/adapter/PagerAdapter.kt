@@ -23,7 +23,7 @@ class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 			tvLocation.text = item.location.name
 			tvTime.text = zonedNow(item.location.zoneId)
 			val res = root.resources
-			tvLastUpdate.text = res.getText(R.string.f_last_update, relativeTime(item.lastUpdate))
+			tvLastUpdate.text = res.getString(R.string.f_last_update, relativeTime(item.lastUpdate))
 			tvLastUpdate.appendAccuracy(item.accuracy)
 			ivIcon.setImageResource(item.current.iconResId)
 			tvTemp.text = item.current.temp.toString()

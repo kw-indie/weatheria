@@ -23,58 +23,50 @@
 	<string name="cd_sunset">Sunset time</string>
 	<string name="cd_moonrise">Moonrise time</string>
 	<string name="cd_moonset">Moonset time</string>
-	<string name="hourly_label">Later Today</string>
-	<string name="daily_label">Later This Week</string>
+	<string name="hourly_label">Hourly</string>
+	<string name="daily_label">Daily</string>
 	<string name="today">Today</string>
 	<string-array name="weather_conditions">
-		<item>Clear</item>
-		<item>Partly cloudy</item>
+		<item>Sunny</item>
+		<item>Mostly Sunny</item>
+		<item>Partly Cloudy</item>
+		<item>Intermittent Clouds</item>
+		<item>Hazy Sunshine</item>
+		<item>Mostly Cloudy</item>
 		<item>Cloudy</item>
 		<item>Overcast</item>
-		<item>Mist</item>
-		<item>Patchy rain possible</item>
-		<item>Patchy snow possible</item>
-		<item>Patchy sleet possible</item>
-		<item>Patchy freezing drizzle possible</item>
-		<item>Thundery outbreaks possible</item>
-		<item>Blowing snow</item>
-		<item>Blizzard</item>
 		<item>Fog</item>
-		<item>Freezing fog</item>
-		<item>Patchy light drizzle</item>
-		<item>Light drizzle</item>
-		<item>Freezing drizzle</item>
-		<item>Heavy freezing drizzle</item>
-		<item>Patchy light rain</item>
-		<item>Light rain</item>
-		<item>Moderate rain at times</item>
-		<item>Moderate rain</item>
-		<item>Heavy rain at times</item>
-		<item>Heavy rain</item>
-		<item>Light freezing rain</item>
-		<item>Moderate or heavy freezing rain</item>
-		<item>Light sleet</item>
-		<item>Moderate or heavy sleet</item>
-		<item>Patchy light snow</item>
-		<item>Light snow</item>
-		<item>Patchy moderate snow</item>
-		<item>Moderate snow</item>
-		<item>Patchy heavy snow</item>
-		<item>Heavy snow</item>
-		<item>Ice pellets</item>
-		<item>Light rain shower</item>
-		<item>Moderate or heavy rain shower</item>
-		<item>Torrential rain shower</item>
-		<item>Light sleet showers</item>
-		<item>Moderate or heavy sleet showers</item>
-		<item>Light snow showers</item>
-		<item>Moderate or heavy snow showers</item>
-		<item>Light showers of ice pellets</item>
-		<item>Moderate or heavy showers of ice pellets</item>
-		<item>Patchy light rain with thunder</item>
-		<item>Moderate or heavy rain with thunder</item>
-		<item>Patchy light snow with thunder</item>
-		<item>Moderate or heavy snow with thunder</item>
+		<item>Showers</item>
+		<item>Mostly Cloudy w/ Showers</item>
+		<item>Partly Sunny w/ Showers</item>
+		<item>Thunderstorms</item>
+		<item>Mostly Cloudy w/ TStorms</item>
+		<item>Partly Sunny w/ TStorms</item>
+		<item>Rain</item>
+		<item>Flurries</item>
+		<item>Mostly Cloudy w/ Flurries</item>
+		<item>Partly Sunny w/ Flurries</item>
+		<item>Snow</item>
+		<item>Mostly Cloudy w/ Snow</item>
+		<item>Ice</item>
+		<item>Sleet</item>
+		<item>Freezing Rain</item>
+		<item>Rain and Snow</item>
+		<item>Hot</item>
+		<item>Cold</item>
+		<item>Windy</item>
+		<item>Clear</item>
+		<item>Mostly Clear</item>
+		<item>Partly Cloudy</item>
+		<item>Intermittent Clouds</item>
+		<item>Hazy Moonshine</item>
+		<item>Mostly Cloudy</item>
+		<item>Partly Cloudy w/ Showers</item>
+		<item>Mostly Cloudy w/ Showers</item>
+		<item>Partly Cloudy w/ TStorms</item>
+		<item>Mostly Cloudy w/ TStorms</item>
+		<item>Mostly Cloudy w/ Flurries</item>
+		<item>Mostly Cloudy w/ Snow</item>
 	</string-array>
 	<string-array name="uv_levels">
 		<item>Low</item>

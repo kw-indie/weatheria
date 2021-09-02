@@ -50,6 +50,11 @@ android {
 	}
 }
 
+hilt {
+	// https://dagger.dev/hilt/gradle-setup#aggregating-task
+	enableAggregatingTask = true
+}
+
 dependencies {
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 

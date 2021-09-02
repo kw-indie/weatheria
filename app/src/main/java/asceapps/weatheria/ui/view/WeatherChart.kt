@@ -12,6 +12,7 @@ import asceapps.weatheria.databinding.ItemChartBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.shared.data.model.zonedDay
 import asceapps.weatheria.shared.data.model.zonedHour
+import asceapps.weatheria.shared.data.repo.thisHour
 import asceapps.weatheria.shared.data.repo.today
 
 class WeatherChart @JvmOverloads constructor(
@@ -122,17 +123,23 @@ class WeatherChart @JvmOverloads constructor(
 	fun setInfo(info: WeatherInfo, dataType: Int) {
 		this.dataType = dataType
 		items = if(dataType == HOURLY) {
-			info.hourly.take(24).filterIndexed { i, _ -> i % 4 == 0 }.map {
-				Item(
-					zonedHour(it.hour, info.location.zoneId).uppercase(),
-					it.iconResId,
-					it.pop.v,
-					it.temp.v,
-					0
-				)
-			}
+			// todo take best 6
+			val thisHour = thisHour(info.hourly)
+			info.hourly.dropWhile { it != thisHour }
+				.filterIndexed { i, _ -> i % 2 == 0 }
+				.take(6)
+				.map {
+					Item(
+						zonedHour(it.hour, info.location.zoneId).uppercase(),
+						it.iconResId,
+						it.pop.v,
+						it.temp.v,
+						0
+					)
+				}
 		} else {
 			val today = today(info.daily)
+			// take all available
 			info.daily.map {
 				val day = if(it == today) resources.getString(R.string.today)
 				else zonedDay(it.date, info.location.zoneId)

@@ -16,10 +16,7 @@ import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.shared.data.model.relativeTime
 import asceapps.weatheria.shared.data.model.zonedDay
 import asceapps.weatheria.shared.data.model.zonedHour
-import asceapps.weatheria.shared.data.repo.ACCURACY_OUTDATED
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
-import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.repo.*
 import asceapps.weatheria.ui.MainActivity
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -106,18 +103,22 @@ class AppWidget: AppWidgetProvider() {
 				val lastUpdate = context.getString(R.string.f_last_update, relativeTime(info.lastUpdate))
 				setTextViewText(R.id.tv_last_update, lastUpdate)
 				removeAllViews(R.id.ll_forecasts)
-				// add 3 views for hourly (each 6 hrs apart), and 2 for daily
-				val items = ArrayList<RemoteViews>(6)
-				info.hourly.take(24)
-					.filterIndexed { i, _ -> i % 6 == 0 } // returns 4
-					.drop(1) // keep 3
+				// add 3 views for hourly, 1 divider, and 3 for daily
+				val items = ArrayList<RemoteViews>(7)
+				val thisHour = thisHour(info.hourly)
+				// todo take best 6
+				info.hourly.dropWhile { it != thisHour }
+					.filterIndexed { i, _ -> i % 4 == 0 } // take 1 every 4 hours
+					.take(3)
 					.mapTo(items) {
 						val text = zonedHour(it.hour, info.location.zoneId)
 						getItemRemoteView(context, it.iconResId, text)
 					}
 				items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
-				info.daily.take(3)
-					.drop(1) // keep 2
+				// todo take best 3
+				val today = today(info.daily)
+				info.daily.dropWhile { it != today }
+					.take(3)
 					.mapTo(items) {
 						val text = zonedDay(it.date, info.location.zoneId)
 						getItemRemoteView(context, it.dayIconResId, text) // todo use both icons

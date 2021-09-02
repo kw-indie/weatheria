@@ -16,7 +16,7 @@ var locale = Locale.getDefault()
 	set(value) {
 		if(field != value) {
 			field = value
-			reset()
+			initialize()
 		}
 	}
 private val isMetric get() = unitSystem == 0
@@ -33,7 +33,7 @@ private lateinit var dayFormatter: DateTimeFormatter
 private lateinit var tFormatter: DateTimeFormatter
 private lateinit var hourFormatter: DateTimeFormatter
 
-private fun reset() {
+internal fun initialize() {
 	nFormat = NumberFormat.getInstance(locale).apply {
 		minimumFractionDigits = 0
 		maximumFractionDigits = 2
@@ -91,7 +91,6 @@ value class Percent internal constructor(val v: Int) {
 		pFormat.format(v / 100f)
 }
 
-// todo make m: Int
 @JvmInline
 value class Distance internal constructor(private val v: Float) {
 	/**

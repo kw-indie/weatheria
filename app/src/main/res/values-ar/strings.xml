@@ -22,58 +22,50 @@
 	<string name="cd_sunset">وقت غروب الشمس</string>
 	<string name="cd_moonrise">وقت شروق القمر</string>
 	<string name="cd_moonset">وقت غروب القمر</string>
-	<string name="hourly_label">لاحقًا اليوم</string>
-	<string name="daily_label">لاحقًا هذا الأسبوع</string>
+	<string name="hourly_label">بالساعة</string>
+	<string name="daily_label">باليوم</string>
 	<string name="today">اليوم</string>
 	<string-array name="weather_conditions">
-		<item>صافي</item>
+		<item>مشمس</item>
+		<item>غالبًا مشمس</item>
 		<item>غائم جزئيًا</item>
+		<item>غيوم متقطعة</item>
+		<item>ضبابي مشمس</item>
+		<item>غالبًا غائم</item>
 		<item>غائم</item>
 		<item>معتم</item>
-		<item>سديم</item>
-		<item>أمطار متفرقة محتملة</item>
-		<item>ثلج متفرق محتمل</item>
-		<item>مطر متجمد متفرق محتمل</item>
-		<item>رذاذ ثلجي متفرق محتمل</item>
-		<item>طلقات رعدية محتملة</item>
-		<item>ثلوج عاصفة</item>
-		<item>عاصفة ثلجية</item>
-		<item>ضباب كثيف</item>
-		<item>ضباب ثلجي</item>
-		<item>رذاذ خفيف متفرق</item>
-		<item>رذاذ خفيف</item>
-		<item>رذاذ ثلجي</item>
-		<item>رذاذ ثلجي كثيف</item>
-		<item>أمطار خفيفة متفرقة</item>
-		<item>مطر خفيف</item>
-		<item>أمطار معتدلة في بعض الأحيان</item>
-		<item>أمطار معتدلة</item>
-		<item>أمطار غزيرة في بعض الأحيان</item>
-		<item>أمطار غزيرة</item>
-		<item>أمطار ثلجية خفيفة</item>
-		<item>أمطار ثلجية معتدلة أو شديدة</item>
-		<item>مطر متجمد خفيف</item>
-		<item>مطر متجمد معتدل أو شديد</item>
-		<item>ثلوج خفيفة متفرقة</item>
-		<item>ثلوج خفيفة</item>
-		<item>ثلوج معتدلة متفرقة</item>
-		<item>ثلوج معتدلة</item>
-		<item>ثلوج كثيفة متفرقة</item>
-		<item>ثلوج كثيفة</item>
-		<item>برَد</item>
-		<item>أمطار خفيفة مؤقتة</item>
-		<item>أمطار معتدلة أو غزيرة مؤقتة</item>
-		<item>أمطار غزيرة مؤقتة</item>
-		<item>مطر متجمد خفيف مؤقت</item>
-		<item>مطر متجمد معتدل أو غزير مؤقت</item>
-		<item>ثلج خفيف مؤقت</item>
-		<item>ثلج معتدل أو غزير مؤقت</item>
-		<item>برَد خفيف مؤقت</item>
-		<item>برَد معتدل أو غزير مؤقت</item>
-		<item>أمطار رعدية خفيفة متفرقة</item>
-		<item>أمطار رعدية معتدلة أو غزيرة</item>
-		<item>ثلوج خفيفة متفرقة مع رعد</item>
-		<item>ثلوج معتدلة أو كثيفة مصحوبة برعد</item>
+		<item>ضباب</item>
+		<item>أمطار متفرقة</item>
+		<item>غائم جزئيًا مع أمطار متفرقة</item>
+		<item>مشمس جزئيًا مع أمطار متفرقة</item>
+		<item>عواصف رعدية</item>
+		<item>غالبًا غائم مع عواصف رعدية</item>
+		<item>مشمس جزئيًا مع عواصف رعدية</item>
+		<item>مطر</item>
+		<item>ثلج خفيف ورياح</item>
+		<item>غالبًا غائم مع ثلج خفيف ورياح</item>
+		<item>مشمس جزئيًا مع ثلج خفيف ورياح</item>
+		<item>ثلج</item>
+		<item>غالبًا غائم مع ثلج</item>
+		<item>جليد</item>
+		<item>ثلج مخلوط بالمطر</item>
+		<item>أمطار شديدة البرودة</item>
+		<item>أمطار وثلوج</item>
+		<item>حار</item>
+		<item>بارد</item>
+		<item>عاصف</item>
+		<item>صافي</item>
+		<item>غالبًا صافي</item>
+		<item>غائم جزئيًا</item>
+		<item>غيوم متقطعة</item>
+		<item>ضبابي تحت ضوء القمر</item>
+		<item>غالبًا غائم</item>
+		<item>غائم جزئيًا مع أمطار متفرقة</item>
+		<item>غائم مع أمطار متفرقة</item>
+		<item>غائم جزئيًا مع عواصف رعدية</item>
+		<item>غالبًا غائم مع عواصف رعدية</item>
+		<item>غالبًا غائم مع ثلج خفيف ورياح</item>
+		<item>غالبًا غائم مع ثلج</item>
 	</string-array>
 	<string-array name="uv_levels">
 		<item>منخفضة</item>

@@ -17,7 +17,7 @@ internal class CurrentWeatherResponse(
 	@Flatten("RealFeelTemperature.Metric.Value") val feelsLike_c: Float,
 	@SerializedName("WeatherIcon") val condition: Int,
 	@SerializedName("IsDayTime") val isDay: Boolean,
-	@Flatten("Wind.Direction.Speed.Metric.Value") val wind_kph: Float,
+	@Flatten("Wind.Speed.Metric.Value") val wind_kph: Float,
 	@Flatten("Wind.Direction.Degrees") val wind_degree: Int,
 	@Flatten("Pressure.Metric.Value") val pressure_mb: Int,
 	@Flatten("Precip1hr.Metric.Value") val precip_mm: Int,

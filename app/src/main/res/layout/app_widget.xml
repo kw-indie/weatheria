@@ -79,10 +79,11 @@
 		<include layout="@layout/item_app_widget_forecast_divider"/>
 		<include layout="@layout/item_app_widget_forecast"/>
 		<include layout="@layout/item_app_widget_forecast"/>
+		<include layout="@layout/item_app_widget_forecast"/>
 	</LinearLayout>
 	<TextView
 		android:id="@+id/tv_uv_value"
-		android:layout_width="84dp"
+		android:layout_width="82dp"
 		android:layout_height="wrap_content"
 		android:layout_above="@id/ll_forecasts"
 		android:layout_alignParentEnd="true"
@@ -104,10 +105,11 @@
 		android:text="@string/cd_uv"/>
 	<TextView
 		android:id="@+id/tv_humidity_value"
-		android:layout_width="84dp"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_above="@id/tv_uv_value"
 		android:layout_alignEnd="@id/tv_uv_value"
+		android:layout_alignStart="@id/tv_uv_value"
 		android:layout_marginBottom="4dp"
 		android:gravity="end"
 		android:maxLines="1"

@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import asceapps.weatheria.data.repo.Error
-import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Success
-import asceapps.weatheria.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.repo.Error
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
 import asceapps.weatheria.ui.widget.AppWidget
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

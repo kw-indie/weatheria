@@ -16,15 +16,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
-import asceapps.weatheria.data.repo.Error
-import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentAddLocationBinding
+import asceapps.weatheria.ext.addDividers
+import asceapps.weatheria.ext.hideKeyboard
+import asceapps.weatheria.ext.observe
+import asceapps.weatheria.ext.onSubmit
+import asceapps.weatheria.shared.data.repo.Error
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
-import asceapps.weatheria.util.hideKeyboard
-import asceapps.weatheria.util.observe
-import asceapps.weatheria.util.onSubmit
 import com.google.android.gms.location.LocationRequest
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
@@ -81,6 +82,8 @@ class AddLocationFragment: Fragment() {
 			}
 		})
 		binding.rvResult.apply {
+			setHasFixedSize(true)
+			addDividers()
 			adapter = addLocationAdapter
 		}
 

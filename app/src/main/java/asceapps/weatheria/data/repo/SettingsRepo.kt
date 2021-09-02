@@ -7,8 +7,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
-import asceapps.weatheria.util.onChangeFlow
+import asceapps.weatheria.ext.onChangeFlow
+import asceapps.weatheria.util.Formatter
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
@@ -26,9 +26,6 @@ class SettingsRepo @Inject constructor(
 		private const val defVal = 0
 		private const val defValStr = "0"
 
-		const val UNITS_METRIC = 0
-		const val UNITS_IMPERIAL = 1
-
 		const val LOCATION_PROVIDER_IP = 0
 		const val LOCATION_PROVIDER_NETWORK = 1
 		const val LOCATION_PROVIDER_ALL = 2
@@ -36,14 +33,9 @@ class SettingsRepo @Inject constructor(
 		const val AUTO_REFRESH_NEVER = 0
 		const val AUTO_REFRESH_ONCE = 1
 		const val AUTO_REFRESH_TWICE = 2
-
-		const val API_OPEN_WEATHER_MAP = 0
-		const val API_ACCU_WEATHER = 1
-		const val API_WEATHER_API = 2
 	}
 
 	private val unitsKey = appContext.getString(R.string.key_units)
-	private val apiKey = appContext.getString(R.string.key_api)
 	private val locProviderKey = appContext.getString(R.string.key_loc_provider)
 	private val autoRefreshKey = appContext.getString(R.string.key_auto_refresh)
 	private val selectedKey = appContext.getString(R.string.key_selected)
@@ -59,9 +51,6 @@ class SettingsRepo @Inject constructor(
 
 	private val units: Int
 		get() = prefs.getString(unitsKey, defValStr)!!.toInt()
-
-	val api: Int
-		get() = prefs.getString(apiKey, defValStr)!!.toInt()
 
 	private val locationProvider: Int
 		get() = prefs.getString(locProviderKey, defValStr)!!.toInt()
@@ -87,7 +76,7 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateUnits() {
-		WeatherInfo.setUnitsSystem(units)
+		Formatter.unitSystem = units
 	}
 
 	private fun updateAutoRefresh() {

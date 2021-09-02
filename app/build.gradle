@@ -1,12 +1,12 @@
 plugins {
 	id 'com.android.application'
 	id 'kotlin-android' // for kotlin support
-	id 'kotlin-kapt' // for annotations: data binding, etc
+	id 'kotlin-kapt' // for annotations: room, hilt, etc
 	id 'dagger.hilt.android.plugin'
 }
 
 android {
-	compileSdkVersion targetSdkVer
+	compileSdk targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
 	buildToolsVersion buildToolsVer
 	ndkVersion ndkVer
@@ -15,38 +15,29 @@ android {
 	defaultConfig {
 		// if not specified, package name from manifest will be used, will change when that one changes
 		applicationId "asceapps.weatheria"
-		minSdkVersion minSdkVer
-		targetSdkVersion targetSdkVer
-		versionCode 7
-		versionName "0.7.2"
+		minSdk minSdkVer
+		targetSdk targetSdkVer
+		versionCode 8
+		versionName "0.7.8"
 
 		vectorDrawables.useSupportLibrary = true
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
 		Properties ps = new Properties()
 		rootProject.file("local.properties").withInputStream { ps.load(it) }
-		buildConfigField("String", "WEATHER_API_KEY", ps.weather_api_key)
 		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused l10n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
-
-		javaCompileOptions {
-			annotationProcessorOptions {
-				arguments += [
-					"room.schemaLocation": "$projectDir/schemas".toString(),
-					"room.incremental"   : "true"
-				]
-			}
-		}
 	}
 
 	buildFeatures {
-		dataBinding true
+		viewBinding true
 	}
 
 	buildTypes {
+		// anything related to applicationId is only specified in app module
+		// minifyEnabled (and supposedly similar properties) are controlled only by app module
+		// no need to copy them into other modules
 		debug {
 			applicationIdSuffix ".debug"
 		}
@@ -78,28 +69,36 @@ android {
 		jvmTarget = javaVer
 		// IR compiler: default (since AS 4.2) kotlin compiler backend (supposedly faster, needed for Compose)
 		freeCompilerArgs += [
-			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // todo find out what for
+			"-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi", // many flow operators
 			"-Xopt-in=kotlinx.coroutines.FlowPreview", // for debounce
-			"-Xopt-in=kotlin.time.ExperimentalTime" // for kotlin duration
 		]
 	}
 
 }
 
 dependencies {
+	implementation project(":shared")
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
-	// no longer need to add kotlin stdlib here, included by default w/ plugin
+	// - no longer need to add kotlin stdlib here, included by default w/ plugin
+	// - libs marked with * are ones that if u don't explicitly add, they add 2 diff versions
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
+	// *
+	implementation "androidx.collection:collection-ktx:$collectionVer"
 	// general & ui
 	implementation "androidx.core:core-ktx:$coreVer"
+	// *
+	implementation "androidx.appcompat:appcompat:$appCompatVer"
 	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
 	implementation "androidx.viewpager2:viewpager2:$viewPager2Ver"
 	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
+	// *
+	implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVer"
+	// *
 	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
 	implementation "com.google.android.material:material:$materialVer"
 
@@ -108,10 +107,14 @@ dependencies {
 	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
 
 	// viewModel & liveData
-	// runtime offers new flow consumers (e.g repeatOnLifecycle)
+	// runtime offers lifecycleOwner val, new flow consumers (e.g repeatOnLifecycle), etc.
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
-	// todo remove, we aren't using liveData anywhere
+	// if i don't include these 2, older versions will load anyway
+	implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleExVer"
+	// * all 3 below
+	implementation "androidx.lifecycle:lifecycle-process:$lifecycleVer"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
@@ -120,6 +123,8 @@ dependencies {
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
+	// *
+	implementation "androidx.transition:transition:$transitionVer"
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
 	implementation "androidx.core:core-animation:$coreAnimationVer"
@@ -127,19 +132,6 @@ dependencies {
 
 	// new preferences (fragment, etc.)
 	implementation "androidx.preference:preference-ktx:$preferenceVer"
-
-	// room
-	// runtime is core
-	// ktx adds suspend and Flow support
-	kapt "androidx.room:room-compiler:$roomVer"
-	implementation "androidx.room:room-runtime:$roomVer"
-	implementation "androidx.room:room-ktx:$roomVer"
-
-	// retrofit.
-	// using gson partly because it's already a transient dep in many other google libs
-	implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
-	implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-	implementation "com.squareup.okhttp3:logging-interceptor:$okLoggerVer"
 
 	// maps & location
 	implementation "com.google.android.libraries.maps:maps:$mapsVer"
@@ -151,7 +143,7 @@ dependencies {
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"
 
-	// hilt
+	// hilt todo remove if not needed
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 
@@ -164,8 +156,4 @@ dependencies {
 	// multi screen size support
 	implementation "com.intuit.sdp:sdp-android:$intuitVer"
 	implementation "com.intuit.ssp:ssp-android:$intuitVer"
-
-	// android tests
-	testImplementation "junit:junit:$junitVer"
-	androidTestImplementation "androidx.test.ext:junit:$junitTestVer"
 }

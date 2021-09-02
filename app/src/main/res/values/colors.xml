@@ -30,7 +30,6 @@
 	<!--accuracy colors-->
 	<color name="accuracy_fresh">#388E3C</color>
 	<color name="accuracy_high">#8BC34A</color>
-	<color name="accuracy_medium">#FFEB3B</color>
 	<color name="accuracy_low">#FF9800</color>
 	<color name="accuracy_outdated">#F44336</color>
 	<!--icon colors-->

@@ -13,20 +13,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import asceapps.weatheria.R
-import asceapps.weatheria.data.model.WeatherInfo
-import asceapps.weatheria.data.repo.Error
-import asceapps.weatheria.data.repo.Loading
-import asceapps.weatheria.data.repo.Success
 import asceapps.weatheria.databinding.FragmentHomeBinding
+import asceapps.weatheria.ext.getColors
+import asceapps.weatheria.ext.observe
+import asceapps.weatheria.ext.onItemInserted
+import asceapps.weatheria.ext.onPageChanged
+import asceapps.weatheria.shared.data.model.WeatherInfo
+import asceapps.weatheria.shared.data.repo.Error
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
-import asceapps.weatheria.util.getColors
-import asceapps.weatheria.util.observe
-import asceapps.weatheria.util.onItemInserted
-import asceapps.weatheria.util.onPageChanged
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
 import java.io.IOException
 import java.io.InterruptedIOException
 
@@ -81,8 +80,9 @@ class HomeFragment: Fragment() {
 								is InterruptedIOException -> R.string.error_timed_out
 								// others like UnknownHostException when it can't resolve hostname
 								is IOException -> R.string.error_no_internet
-								// others like http error codes (400, 404, etc.)
-								is HttpException -> R.string.error_server_error
+								// others like http error codes (400, 404, etc.).
+								// fixme originally HttpException from retrofit
+								is RuntimeException -> R.string.error_server_error
 								else -> R.string.error_unknown
 							}
 							showMessage(msg)

@@ -20,5 +20,6 @@
 		android:layout_height="wrap_content"
 		android:gravity="center_horizontal"
 		android:maxLines="1"
-		android:text="@string/ph_value"/>
+		android:text="@string/ph_value"
+		android:textSize="11sp"/>
 </LinearLayout>

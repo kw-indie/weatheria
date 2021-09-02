@@ -8,7 +8,7 @@ import androidx.preference.Preference.SummaryProvider
 import androidx.preference.PreferenceFragmentCompat
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
-import asceapps.weatheria.util.observe
+import asceapps.weatheria.ext.observe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

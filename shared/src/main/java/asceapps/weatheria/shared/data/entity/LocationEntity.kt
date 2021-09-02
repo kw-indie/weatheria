@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "locations")
-class LocationEntity(
+internal class LocationEntity(
 	@PrimaryKey val id: Int,
 	val lat: Float,
 	val lng: Float,

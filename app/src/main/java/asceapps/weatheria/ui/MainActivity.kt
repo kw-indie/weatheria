@@ -10,7 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ActivityMainBinding
-import asceapps.weatheria.util.edgeToEdge
+import asceapps.weatheria.ext.edgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

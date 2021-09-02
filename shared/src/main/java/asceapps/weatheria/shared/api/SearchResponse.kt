@@ -3,7 +3,7 @@ package asceapps.weatheria.shared.api
 import com.google.gson.annotations.SerializedName
 
 internal class SearchResponse(
-	@SerializedName("Key") val id: Int,
+	@SerializedName("Key") val id: String,
 	@Flatten("GeoPosition.Latitude") val lat: Float,
 	@Flatten("GeoPosition.Longitude") val lng: Float,
 	@SerializedName("LocalizedName") val name: String,

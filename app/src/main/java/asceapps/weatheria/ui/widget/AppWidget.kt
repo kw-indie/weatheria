@@ -100,7 +100,7 @@ class AppWidget: AppWidgetProvider() {
 					context.resources.getStringArray(R.array.uv_levels)[Formatter.uvLevel(current.uv)]
 				)
 				setTextViewText(R.id.tv_uv_value, uvString)
-				setImageViewResource(R.id.iv_icon, IconMapper[current.icon])
+				setImageViewResource(R.id.iv_icon, IconMapper[current.iconIndex])
 				setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
 				val lastUpdate = context.getString(R.string.f_last_update, Formatter.relativeTime(info.lastUpdate))
 				setTextViewText(R.id.tv_last_update, lastUpdate)
@@ -114,7 +114,7 @@ class AppWidget: AppWidgetProvider() {
 					.take(3)
 					.mapTo(items) {
 						val text = Formatter.zonedHour(it.hour, info.location.zoneId)
-						getItemRemoteView(context, IconMapper[it.icon], text)
+						getItemRemoteView(context, IconMapper[it.iconIndex], text)
 					}
 				items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
 				// todo take best 3
@@ -123,7 +123,7 @@ class AppWidget: AppWidgetProvider() {
 					.take(3)
 					.mapTo(items) {
 						val text = Formatter.zonedDay(it.date, info.location.zoneId)
-						getItemRemoteView(context, IconMapper[it.dayIcon], text) // todo use both icons
+						getItemRemoteView(context, IconMapper[it.dayIconIndex], text) // todo use both icons
 					}
 				for(i in items) {
 					addView(R.id.ll_forecasts, i)

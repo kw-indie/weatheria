@@ -7,8 +7,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
+import asceapps.weatheria.ext.onChangeFlow
 import asceapps.weatheria.util.Formatter
-import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit

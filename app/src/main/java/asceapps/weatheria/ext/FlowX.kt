@@ -1,4 +1,4 @@
-package asceapps.weatheria.util
+package asceapps.weatheria.ext
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

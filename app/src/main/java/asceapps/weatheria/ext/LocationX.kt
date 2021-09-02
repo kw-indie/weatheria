@@ -1,4 +1,4 @@
-package asceapps.weatheria.util
+package asceapps.weatheria.ext
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,12 +12,7 @@ import android.os.Looper
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.CancellationSignal
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor

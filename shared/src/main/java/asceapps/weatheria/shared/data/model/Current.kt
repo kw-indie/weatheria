@@ -7,8 +7,7 @@ import asceapps.weatheria.shared.data.repo.UNKNOWN_INT
  * Values that are no longer available for approximation are set to [UNKNOWN_INT] and [UNKNOWN_FLT]
  */
 class Current internal constructor(
-	val conditionIndex: Int,
-	val icon: Int,
+	val iconIndex: Int,
 	val temp: Int,
 	val feelsLike: Int,
 	val windSpeed: Float,

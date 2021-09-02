@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.get
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemChartBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
@@ -135,7 +134,7 @@ class WeatherChart @JvmOverloads constructor(
 				.map {
 					Item(
 						Formatter.zonedHour(it.hour, info.location.zoneId).uppercase(),
-						IconMapper[it.icon],
+						IconMapper[it.iconIndex],
 						it.pop,
 						it.temp,
 						0
@@ -149,7 +148,7 @@ class WeatherChart @JvmOverloads constructor(
 				else Formatter.zonedDay(it.date, info.location.zoneId)
 				Item(
 					day.uppercase(),
-					IconMapper[it.dayIcon],
+					IconMapper[it.dayIconIndex],
 					it.pop,
 					it.min,
 					it.max
@@ -157,9 +156,7 @@ class WeatherChart @JvmOverloads constructor(
 			}
 		}
 		addChildren()
-		if(isLaidOut) {
-			measurePathAndInvalidate()
-		}
+		measurePathAndInvalidate()
 	}
 
 	private fun addChildren() {
@@ -176,38 +173,40 @@ class WeatherChart @JvmOverloads constructor(
 	}
 
 	private fun measurePathAndInvalidate() {
-		if(items.isEmpty()) return
 		paths.clear()
 		points.clear()
 		textPoints.clear()
-		val wOf1 = width / items.size
-		val xOffset = paddingStart + wOf1 / 2f
-		val yOffset = get(0).measuredHeight + graphPadding // min in value, highest in graph
-		val graphHeight = height - graphPadding - yOffset
-		if(dataType == HOURLY) {
-			val path = Path()
-			paths.add(path)
-			val values = items.map { it.v1 }
-			val min = values.minOrNull()!!
-			val max = values.maxOrNull()!!
-			setupPath(wOf1, xOffset, yOffset, graphHeight, path, values, min, max)
-		} else {
-			val p1 = Path()
-			val p2 = Path()
-			paths.add(p1)
-			paths.add(p2)
-			val minValues = items.map { it.v1 }
-			val maxValues = items.map { it.v2 }
-			val min = minValues.minOrNull()!!
-			val max = maxValues.maxOrNull()!!
-			setupPath(wOf1, xOffset, yOffset, graphHeight, p1, minValues, min, max)
-			setupPath(wOf1, xOffset, yOffset, graphHeight, p2, maxValues, min, max)
+		if(items.isNotEmpty()) {
+			val wOf1 = width / items.size
+			val xOffset = paddingStart + wOf1 / 2f
+			// min in value is highest in graph
+			val yOffset = resources.getDimensionPixelSize(R.dimen._72sdp) + graphPadding
+			val graphHeight = height - graphPadding - yOffset // this is botPadding (top is inc. in yOffset)
+			if(dataType == HOURLY) {
+				val path = Path()
+				paths.add(path)
+				val values = items.map { it.v1 }
+				val min = values.minOrNull()!!
+				val max = values.maxOrNull()!!
+				setUpPath(wOf1, xOffset, yOffset, graphHeight, path, values, min, max)
+			} else {
+				val p1 = Path()
+				val p2 = Path()
+				paths.add(p1)
+				paths.add(p2)
+				val minValues = items.map { it.v1 }
+				val maxValues = items.map { it.v2 }
+				val min = minValues.minOrNull()!!
+				val max = maxValues.maxOrNull()!!
+				setUpPath(wOf1, xOffset, yOffset, graphHeight, p1, minValues, min, max)
+				setUpPath(wOf1, xOffset, yOffset, graphHeight, p2, maxValues, min, max)
+			}
 		}
 
 		invalidate()
 	}
 
-	private fun setupPath(
+	private fun setUpPath(
 		wOf1: Int, xOffset: Float, yOffset: Float, graphH: Float, path: Path,
 		values: List<Int>, minVal: Int, maxVal: Int
 	) {

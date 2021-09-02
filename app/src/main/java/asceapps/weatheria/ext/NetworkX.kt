@@ -1,4 +1,4 @@
-package asceapps.weatheria.util
+package asceapps.weatheria.ext
 
 import android.Manifest
 import android.content.Context

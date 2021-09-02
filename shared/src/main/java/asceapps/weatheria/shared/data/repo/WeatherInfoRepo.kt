@@ -49,8 +49,12 @@ class WeatherInfoRepo @Inject internal constructor(
 			} else q
 			val resp = weatherApi.search(query)
 			resp.map {
+				// there are special locations where the id is a mix of digits and letters, eg. 1-299427_1_AL
+				val itsId = it.id
+				val parsedId = itsId.toIntOrNull()
+					?: itsId.substring(itsId.indexOf('-') + 1, itsId.indexOf('_')).toInt()
 				with(it) {
-					Location(id, lat, lng, name, country, ZoneId.of(zoneId))
+					Location(parsedId, lat, lng, name, country, ZoneId.of(zoneId))
 				}
 			}
 		}
@@ -115,8 +119,8 @@ class WeatherInfoRepo @Inject internal constructor(
 					toInstant(dt),
 					minTemp,
 					maxTemp,
-					dayCondition,
-					nightCondition,
+					conditionIndex(dayCondition),
+					conditionIndex(nightCondition),
 					max(dayPop, nightPop),
 					uv,
 					toInstant(sunrise),
@@ -131,7 +135,7 @@ class WeatherInfoRepo @Inject internal constructor(
 			with(it) {
 				Hourly(
 					toInstant(dt),
-					condition,
+					conditionIndex(condition),
 					temp,
 					pop
 				)
@@ -150,7 +154,6 @@ class WeatherInfoRepo @Inject internal constructor(
 				with(info.current) {
 					Current(
 						conditionIndex(condition),
-						condition,
 						temp,
 						feelsLike,
 						windSpeed,
@@ -169,7 +172,6 @@ class WeatherInfoRepo @Inject internal constructor(
 				thisHourEntity.run {
 					Current(
 						conditionIndex(condition),
-						condition,
 						temp,
 						feelsLike,
 						windSpeed,
@@ -191,7 +193,6 @@ class WeatherInfoRepo @Inject internal constructor(
 					val isDay = nowSeconds in sunrise..sunset
 					Current(
 						conditionIndex(if(isDay) dayCondition else nightCondition),
-						if(isDay) dayCondition else nightCondition,
 						if(isDay) maxTemp else minTemp,  // too simple approximation
 						UNKNOWN_INT,
 						if(isDay) dayWindSpeed else nightWindSpeed,

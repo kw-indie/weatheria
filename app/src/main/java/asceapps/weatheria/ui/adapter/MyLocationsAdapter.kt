@@ -48,7 +48,7 @@ class MyLocationsAdapter(
 			tvName.text = item.location.name
 			tvCountry.text = item.location.country
 			tvDt.text = Formatter.zonedNow(item.location.zoneId)
-			ivIcon.setImageResource(IconMapper[item.current.icon])
+			ivIcon.setImageResource(IconMapper[item.current.iconIndex])
 			tvTemp.text = Formatter.temp(item.current.temp)
 		}
 	}

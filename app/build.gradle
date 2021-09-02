@@ -17,8 +17,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdk minSdkVer
 		targetSdk targetSdkVer
-		versionCode 7
-		versionName "0.7.2"
+		versionCode 8
+		versionName "0.7.8"
 
 		vectorDrawables.useSupportLibrary = true
 

@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
+import asceapps.weatheria.ext.appendAccuracy
+import asceapps.weatheria.ext.setDirectionDrawable
 import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.ui.view.WeatherChart
 import asceapps.weatheria.util.Formatter
 import asceapps.weatheria.util.IconMapper
-import asceapps.weatheria.util.appendAccuracy
-import asceapps.weatheria.util.setDirectionDrawable
 
 class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 
@@ -27,10 +27,10 @@ class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 			val res = root.resources
 			tvLastUpdate.text = res.getString(R.string.f_last_update, Formatter.relativeTime(item.lastUpdate))
 			tvLastUpdate.appendAccuracy(item.accuracy)
-			ivIcon.setImageResource(IconMapper[item.current.icon])
+			ivIcon.setImageResource(IconMapper[item.current.iconIndex])
 			tvTemp.text = Formatter.temp(item.current.temp)
 			tvFeelsLike.text = res.getString(R.string.f_feels_like, Formatter.temp(item.current.feelsLike))
-			tvWeather.text = res.getStringArray(R.array.weather_conditions)[item.current.conditionIndex]
+			tvWeather.text = res.getStringArray(R.array.weather_conditions)[item.current.iconIndex]
 			tvWind.text = res.getString(
 				R.string.f_2s,
 				Formatter.distance(item.current.windSpeed),

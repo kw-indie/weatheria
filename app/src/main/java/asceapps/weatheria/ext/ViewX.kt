@@ -1,4 +1,4 @@
-package asceapps.weatheria.util
+package asceapps.weatheria.ext
 
 import android.content.res.Configuration
 import android.graphics.Rect

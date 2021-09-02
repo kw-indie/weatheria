@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.repo.SettingsRepo
+import asceapps.weatheria.ext.asyncPing
+import asceapps.weatheria.ext.onlineStatusFlow
 import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.shared.data.repo.Loading
 import asceapps.weatheria.shared.data.repo.Result
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
-import asceapps.weatheria.util.asyncPing
-import asceapps.weatheria.util.onlineStatusFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*

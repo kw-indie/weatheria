@@ -1,4 +1,4 @@
-package asceapps.weatheria.util
+package asceapps.weatheria.ext
 
 import android.content.SharedPreferences
 import kotlinx.coroutines.channels.awaitClose

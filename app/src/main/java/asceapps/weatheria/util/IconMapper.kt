@@ -1,11 +1,9 @@
-package asceapps.weatheria.ui
+package asceapps.weatheria.util
 
 import android.util.SparseIntArray
 import asceapps.weatheria.R
-import asceapps.weatheria.shared.data.base.IconMapper
 
-class AccuWeatherIconMapper: IconMapper {
-
+object IconMapper {
 	private val map = SparseIntArray(40).apply {
 		// todo fix mismatching icons and remove excess
 		// https://developer.accuweather.com/weather-icons
@@ -51,6 +49,5 @@ class AccuWeatherIconMapper: IconMapper {
 		append(44, R.drawable.w_snow_h_n) // mostly cloudy w/ snow n
 	}
 
-	override fun get(condition: Int) = map[condition]
-
+	operator fun get(condition: Int) = map[condition]
 }

@@ -10,10 +10,8 @@ import androidx.core.view.get
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemChartBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.model.zonedDay
-import asceapps.weatheria.shared.data.model.zonedHour
-import asceapps.weatheria.shared.data.repo.thisHour
-import asceapps.weatheria.shared.data.repo.today
+import asceapps.weatheria.util.Formatter
+import asceapps.weatheria.util.IconMapper
 
 class WeatherChart @JvmOverloads constructor(
 	context: Context,
@@ -21,7 +19,10 @@ class WeatherChart @JvmOverloads constructor(
 	defStyleAttr: Int = 0
 ): LinearLayoutCompat(context, attrs, defStyleAttr) {
 
-	private class Item(val time: String, val imgResId: Int, val pop: Int, val v1: Int, val v2: Int)
+	private class Item(val time: String, val imgResId: Int, val pop: Int, val v1: Int, val v2: Int) {
+		val v1str = Formatter.temp(v1)
+		val v2str = Formatter.temp(v2)
+	}
 
 	private var items = emptyList<Item>()
 	private val paths = mutableListOf<Path>()
@@ -86,6 +87,7 @@ class WeatherChart @JvmOverloads constructor(
 			dataType = getInt(R.styleable.WeatherChart_dataType, HOURLY)
 		}
 
+		// region edit mode
 		if(isInEditMode) {
 			val sampleHours = listOf("4 AM", "8 AM", "12 PM", "4 PM", "8 PM", "12 AM")
 			val sampleDays = listOf("Today", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri")
@@ -113,6 +115,7 @@ class WeatherChart @JvmOverloads constructor(
 			}
 			addChildren()
 		}
+		// endregion
 	}
 
 	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -123,32 +126,33 @@ class WeatherChart @JvmOverloads constructor(
 	fun setInfo(info: WeatherInfo, dataType: Int) {
 		this.dataType = dataType
 		items = if(dataType == HOURLY) {
-			// todo take best 6
-			val thisHour = thisHour(info.hourly)
+			// todo take best 6 grey-out old
+			val thisHour = info.thisHourOrNull
+			// todo check all equalities in project, need most 2 b reference equality
 			info.hourly.dropWhile { it != thisHour }
 				.filterIndexed { i, _ -> i % 2 == 0 }
 				.take(6)
 				.map {
 					Item(
-						zonedHour(it.hour, info.location.zoneId).uppercase(),
-						it.iconResId,
-						it.pop.v,
-						it.temp.v,
+						Formatter.zonedHour(it.hour, info.location.zoneId).uppercase(),
+						IconMapper[it.icon],
+						it.pop,
+						it.temp,
 						0
 					)
 				}
 		} else {
-			val today = today(info.daily)
+			val today = info.todayOrNull
 			// take all available
 			info.daily.map {
 				val day = if(it == today) resources.getString(R.string.today)
-				else zonedDay(it.date, info.location.zoneId)
+				else Formatter.zonedDay(it.date, info.location.zoneId)
 				Item(
 					day.uppercase(),
-					it.dayIconResId,
-					it.pop.v,
-					it.min.v,
-					it.max.v
+					IconMapper[it.dayIcon],
+					it.pop,
+					it.min,
+					it.max
 				)
 			}
 		}
@@ -165,7 +169,7 @@ class WeatherChart @JvmOverloads constructor(
 			val view = ItemChartBinding.inflate(inflater, this, false).apply {
 				tvTime.text = it.time
 				ivIcon.setImageResource(it.imgResId)
-				tvPop.text = it.pop.toString()
+				tvPop.text = Formatter.percent(it.pop)
 			}.root
 			addView(view)
 		}
@@ -234,15 +238,15 @@ class WeatherChart @JvmOverloads constructor(
 		if(dataType == HOURLY) {
 			items.forEachIndexed { i, item ->
 				val p = textPoints[i]
-				canvas.drawText(item.v1.toString(), p.x, p.y, pointsPaint)
+				canvas.drawText(item.v1str, p.x, p.y, pointsPaint)
 			}
 		} else {
 			val half = textPoints.size / 2
 			items.forEachIndexed { i, item ->
 				val pMin = textPoints[i]
 				val pMax = textPoints[i + half]
-				canvas.drawText(item.v1.toString(), pMin.x, pMin.y, pointsPaint)
-				canvas.drawText(item.v2.toString(), pMax.x, pMax.y, pointsPaint)
+				canvas.drawText(item.v1str, pMin.x, pMin.y, pointsPaint)
+				canvas.drawText(item.v2str, pMax.x, pMax.y, pointsPaint)
 			}
 		}
 	}

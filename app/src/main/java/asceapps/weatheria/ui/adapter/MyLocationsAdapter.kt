@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import asceapps.weatheria.databinding.ItemMyLocationsBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.model.zonedNow
+import asceapps.weatheria.util.Formatter
+import asceapps.weatheria.util.IconMapper
 import java.util.*
 
 class MyLocationsAdapter(
@@ -46,9 +47,9 @@ class MyLocationsAdapter(
 		holder.binding.apply {
 			tvName.text = item.location.name
 			tvCountry.text = item.location.country
-			tvDt.text = zonedNow(item.location.zoneId)
-			ivIcon.setImageResource(item.current.iconResId)
-			tvTemp.text = item.current.temp.toString()
+			tvDt.text = Formatter.zonedNow(item.location.zoneId)
+			ivIcon.setImageResource(IconMapper[item.current.icon])
+			tvTemp.text = Formatter.temp(item.current.temp)
 		}
 	}
 

@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemWeatherInfoBinding
-import asceapps.weatheria.shared.data.model.*
+import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.ui.view.WeatherChart
+import asceapps.weatheria.util.Formatter
+import asceapps.weatheria.util.IconMapper
 import asceapps.weatheria.util.appendAccuracy
 import asceapps.weatheria.util.setDirectionDrawable
 
@@ -21,46 +23,46 @@ class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 	override fun onHolderBound(holder: BindingHolder<WeatherInfo, ItemWeatherInfoBinding>, item: WeatherInfo) {
 		holder.binding.apply {
 			tvLocation.text = item.location.name
-			tvTime.text = zonedNow(item.location.zoneId)
+			tvTime.text = Formatter.zonedNow(item.location.zoneId)
 			val res = root.resources
-			tvLastUpdate.text = res.getString(R.string.f_last_update, relativeTime(item.lastUpdate))
+			tvLastUpdate.text = res.getString(R.string.f_last_update, Formatter.relativeTime(item.lastUpdate))
 			tvLastUpdate.appendAccuracy(item.accuracy)
-			ivIcon.setImageResource(item.current.iconResId)
-			tvTemp.text = item.current.temp.toString()
-			tvFeelsLike.text = res.getString(R.string.f_feels_like, item.current.feelsLike.toString())
+			ivIcon.setImageResource(IconMapper[item.current.icon])
+			tvTemp.text = Formatter.temp(item.current.temp)
+			tvFeelsLike.text = res.getString(R.string.f_feels_like, Formatter.temp(item.current.feelsLike))
 			tvWeather.text = res.getStringArray(R.array.weather_conditions)[item.current.conditionIndex]
 			tvWind.text = res.getString(
 				R.string.f_2s,
-				item.current.windSpeed.toString(),
-				res.getStringArray(R.array.units_speed)[unitSystem]
+				Formatter.distance(item.current.windSpeed),
+				res.getStringArray(R.array.units_speed)[Formatter.unitSystem]
 			)
 			tvWind.setDirectionDrawable(item.current.windDir)
-			tvHumidity.text = item.current.humidity.toString()
+			tvHumidity.text = Formatter.percent(item.current.humidity)
 			tvPressure.text = res.getString(
 				R.string.f_2s,
-				item.current.pressure.toString(),
-				res.getStringArray(R.array.units_pressure)[unitSystem]
+				Formatter.pressure(item.current.pressure),
+				res.getStringArray(R.array.units_pressure)[Formatter.unitSystem]
 			)
-			tvClouds.text = item.current.clouds.toString()
-			tvDewPoint.text = item.current.dewPoint.toString()
+			tvClouds.text = Formatter.percent(item.current.clouds)
+			tvDewPoint.text = Formatter.temp(item.current.dewPoint)
 			tvVisibility.text = res.getString(
 				R.string.f_2s,
-				item.current.visibility.toString(),
-				res.getStringArray(R.array.units_distance)[unitSystem]
+				Formatter.distance(item.current.visibility),
+				res.getStringArray(R.array.units_distance)[Formatter.unitSystem]
 			)
 			tvUv.text = res.getString(
 				R.string.f_2s_p,
-				item.current.uv.toString(),
-				res.getStringArray(R.array.uv_levels)[item.current.uv.level]
+				Formatter.number(item.current.uv),
+				res.getStringArray(R.array.uv_levels)[Formatter.uvLevel(item.current.uv)]
 			)
-			val today = item.today // today(item.daily) // todo when this is null?
-			tvMax.text = today.max.toString()
-			tvMin.text = today.min.toString()
-			tvSunrise.text = zonedTime(today.sunrise, item.location.zoneId)
-			tvSunset.text = zonedTime(today.sunset, item.location.zoneId)
-			tvPop.text = today.pop.toString()
-			tvMoonrise.text = zonedTime(today.moonrise, item.location.zoneId)
-			tvMoonset.text = zonedTime(today.moonset, item.location.zoneId)
+			val today = item.today
+			tvMax.text = Formatter.temp(today.max)
+			tvMin.text = Formatter.temp(today.min)
+			tvSunrise.text = Formatter.zonedTime(today.sunrise, item.location.zoneId)
+			tvSunset.text = Formatter.zonedTime(today.sunset, item.location.zoneId)
+			tvPop.text = Formatter.percent(today.pop)
+			tvMoonrise.text = Formatter.zonedTime(today.moonrise, item.location.zoneId)
+			tvMoonset.text = Formatter.zonedTime(today.moonset, item.location.zoneId)
 			hourlyChart.setInfo(item, WeatherChart.HOURLY)
 			dailyChart.setInfo(item, WeatherChart.DAILY)
 		}

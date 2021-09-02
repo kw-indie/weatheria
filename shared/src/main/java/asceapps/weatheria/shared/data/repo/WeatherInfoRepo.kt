@@ -1,7 +1,6 @@
 package asceapps.weatheria.shared.data.repo
 
 import asceapps.weatheria.shared.api.*
-import asceapps.weatheria.shared.data.base.IconMapper
 import asceapps.weatheria.shared.data.dao.WeatherInfoDao
 import asceapps.weatheria.shared.data.entity.*
 import asceapps.weatheria.shared.data.model.*
@@ -24,13 +23,8 @@ class WeatherInfoRepo @Inject internal constructor(
 	private val weatherApi: AccuWeatherApi,
 	private val whoisApi: IPWhoisApi,
 	private val dao: WeatherInfoDao,
-	private val iconMapper: IconMapper,
 	@IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-
-	init {
-		initialize() // fixme really?
-	}
 
 	// todo optimize these so they only return needed data, especially
 	fun getAll() = dao.loadAll()
@@ -119,12 +113,12 @@ class WeatherInfoRepo @Inject internal constructor(
 			with(it) {
 				Daily(
 					toInstant(dt),
-					Temp(minTemp),
-					Temp(maxTemp),
-					iconMapper[dayCondition],
-					iconMapper[nightCondition],
-					Percent(max(dayPop, nightPop)),
-					UV(uv),
+					minTemp,
+					maxTemp,
+					dayCondition,
+					nightCondition,
+					max(dayPop, nightPop),
+					uv,
 					toInstant(sunrise),
 					toInstant(sunset),
 					toInstant(moonrise),
@@ -137,9 +131,9 @@ class WeatherInfoRepo @Inject internal constructor(
 			with(it) {
 				Hourly(
 					toInstant(dt),
-					iconMapper[condition],
-					Temp(temp),
-					Percent(pop)
+					condition,
+					temp,
+					pop
 				)
 			}
 		}
@@ -156,17 +150,17 @@ class WeatherInfoRepo @Inject internal constructor(
 				with(info.current) {
 					Current(
 						conditionIndex(condition),
-						iconMapper[condition],
-						Temp(temp),
-						Temp(feelsLike),
-						Distance(windSpeed),
+						condition,
+						temp,
+						feelsLike,
+						windSpeed,
 						meteorologicalToCircular(windDir),
-						Pressure(pressure),
-						Percent(humidity),
-						Temp(dewPoint),
-						Percent(clouds),
-						Distance(visibility),
-						UV(uv)
+						pressure,
+						humidity,
+						dewPoint,
+						clouds,
+						visibility,
+						uv
 					)
 				}
 			}
@@ -175,17 +169,17 @@ class WeatherInfoRepo @Inject internal constructor(
 				thisHourEntity.run {
 					Current(
 						conditionIndex(condition),
-						iconMapper[condition],
-						Temp(temp),
-						Temp(feelsLike),
-						Distance(windSpeed),
+						condition,
+						temp,
+						feelsLike,
+						windSpeed,
 						meteorologicalToCircular(windDir),
-						Pressure(UNKNOWN_INT),
-						Percent(humidity),
-						Temp(dewPoint),
-						Percent(clouds),
-						Distance(visibility),
-						UV(uv)
+						UNKNOWN_INT,
+						humidity,
+						dewPoint,
+						clouds,
+						visibility,
+						uv
 					)
 				}
 			}
@@ -197,17 +191,17 @@ class WeatherInfoRepo @Inject internal constructor(
 					val isDay = nowSeconds in sunrise..sunset
 					Current(
 						conditionIndex(if(isDay) dayCondition else nightCondition),
-						iconMapper[dayCondition],
-						if(isDay) Temp(maxTemp) else Temp(minTemp),  // too simple approximation
-						Temp(UNKNOWN_INT),
-						if(isDay) Distance(dayWindSpeed) else Distance(nightWindSpeed),
+						if(isDay) dayCondition else nightCondition,
+						if(isDay) maxTemp else minTemp,  // too simple approximation
 						UNKNOWN_INT,
-						Pressure(UNKNOWN_INT),
-						Percent(UNKNOWN_INT),
-						Temp(UNKNOWN_INT),
-						if(isDay) Percent(dayClouds) else Percent(nightClouds),
-						Distance(UNKNOWN_FLT),
-						UV(uv)
+						if(isDay) dayWindSpeed else nightWindSpeed,
+						UNKNOWN_INT,
+						UNKNOWN_INT,
+						UNKNOWN_INT,
+						UNKNOWN_INT,
+						if(isDay) dayClouds else nightClouds,
+						UNKNOWN_FLT,
+						uv
 					)
 				}
 			}

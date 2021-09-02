@@ -13,11 +13,13 @@ import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.model.relativeTime
-import asceapps.weatheria.shared.data.model.zonedDay
-import asceapps.weatheria.shared.data.model.zonedHour
-import asceapps.weatheria.shared.data.repo.*
+import asceapps.weatheria.shared.data.repo.ACCURACY_OUTDATED
+import asceapps.weatheria.shared.data.repo.Loading
+import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
 import asceapps.weatheria.ui.MainActivity
+import asceapps.weatheria.util.Formatter
+import asceapps.weatheria.util.IconMapper
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.GlobalScope
@@ -90,38 +92,38 @@ class AppWidget: AppWidgetProvider() {
 			} else {
 				val current = info.current
 				setTextViewText(R.id.tv_location, info.location.name)
-				setTextViewText(R.id.tv_temp, current.temp.toString())
-				setTextViewText(R.id.tv_humidity_value, current.humidity.toString())
+				setTextViewText(R.id.tv_temp, Formatter.temp(current.temp))
+				setTextViewText(R.id.tv_humidity_value, Formatter.percent(current.humidity))
 				val uvString = context.getString(
 					R.string.f_2s_p,
-					current.uv.toString(),
-					context.resources.getStringArray(R.array.uv_levels)[current.uv.level]
+					Formatter.number(current.uv),
+					context.resources.getStringArray(R.array.uv_levels)[Formatter.uvLevel(current.uv)]
 				)
 				setTextViewText(R.id.tv_uv_value, uvString)
-				setImageViewResource(R.id.iv_icon, current.iconResId)
+				setImageViewResource(R.id.iv_icon, IconMapper[current.icon])
 				setOnClickPendingIntent(R.id.iv_refresh, getUpdateDataBroadcastIntent(context))
-				val lastUpdate = context.getString(R.string.f_last_update, relativeTime(info.lastUpdate))
+				val lastUpdate = context.getString(R.string.f_last_update, Formatter.relativeTime(info.lastUpdate))
 				setTextViewText(R.id.tv_last_update, lastUpdate)
 				removeAllViews(R.id.ll_forecasts)
 				// add 3 views for hourly, 1 divider, and 3 for daily
 				val items = ArrayList<RemoteViews>(7)
-				val thisHour = thisHour(info.hourly)
+				val thisHour = info.thisHourOrNull
 				// todo take best 6
 				info.hourly.dropWhile { it != thisHour }
 					.filterIndexed { i, _ -> i % 4 == 0 } // take 1 every 4 hours
 					.take(3)
 					.mapTo(items) {
-						val text = zonedHour(it.hour, info.location.zoneId)
-						getItemRemoteView(context, it.iconResId, text)
+						val text = Formatter.zonedHour(it.hour, info.location.zoneId)
+						getItemRemoteView(context, IconMapper[it.icon], text)
 					}
 				items.add(RemoteViews(context.packageName, R.layout.item_app_widget_forecast_divider))
 				// todo take best 3
-				val today = today(info.daily)
+				val today = info.todayOrNull
 				info.daily.dropWhile { it != today }
 					.take(3)
 					.mapTo(items) {
-						val text = zonedDay(it.date, info.location.zoneId)
-						getItemRemoteView(context, it.dayIconResId, text) // todo use both icons
+						val text = Formatter.zonedDay(it.date, info.location.zoneId)
+						getItemRemoteView(context, IconMapper[it.dayIcon], text) // todo use both icons
 					}
 				for(i in items) {
 					addView(R.id.ll_forecasts, i)
@@ -129,7 +131,6 @@ class AppWidget: AppWidgetProvider() {
 				setOnClickPendingIntent(R.id.root, getOpenAppIntent(context))
 			}
 		}
-		// Instruct the widget manager to update the widget
 		awm.updateAppWidget(ids, views)
 	}
 

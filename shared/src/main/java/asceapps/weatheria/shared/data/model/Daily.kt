@@ -4,12 +4,12 @@ import java.time.Instant
 
 class Daily internal constructor(
 	val date: Instant,
-	val min: Temp,
-	val max: Temp,
-	val dayIconResId: Int,
-	val nightIconResId: Int,
-	val pop: Percent,
-	val uv: UV,
+	val min: Int,
+	val max: Int,
+	val dayIcon: Int,
+	val nightIcon: Int,
+	val pop: Int,
+	val uv: Int,
 	val sunrise: Instant,
 	val sunset: Instant,
 	val moonrise: Instant,

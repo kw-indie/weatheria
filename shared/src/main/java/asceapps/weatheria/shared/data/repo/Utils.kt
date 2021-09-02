@@ -4,11 +4,10 @@ import asceapps.weatheria.shared.data.entity.DailyEntity
 import asceapps.weatheria.shared.data.entity.HourlyEntity
 import asceapps.weatheria.shared.data.model.Daily
 import asceapps.weatheria.shared.data.model.Hourly
-import asceapps.weatheria.shared.data.model.WeatherInfo
 import java.time.Instant
 import kotlin.math.min
 
-fun today(daily: List<Daily>): Daily? {
+internal fun today(daily: List<Daily>): Daily? {
 	val today = thisDaySeconds()
 	val index = daily.binarySearch { truncateToDaySeconds(it.date) - today }
 	return if(index < 0) null else daily[index]
@@ -20,7 +19,7 @@ internal fun todayEntity(daily: List<DailyEntity>): DailyEntity? {
 	return if(index < 0) null else daily[index]
 }
 
-fun thisHour(hourly: List<Hourly>): Hourly? {
+internal fun thisHour(hourly: List<Hourly>): Hourly? {
 	val thisHour = thisHourSeconds() + 3600 // start from next hour
 	val index = hourly.binarySearch { (it.hour.epochSecond - thisHour).toInt() }
 	return if(index < 0) null else hourly[index]
@@ -52,16 +51,15 @@ private fun truncateToDaySeconds(sec: Int) = sec - sec % 86_400
  *
  * where f is fraction of transition between day/night and dawn/dusk
  */
-fun partOfDay(info: WeatherInfo): Pair<Int, Float> {
-	val today = info.today
+internal fun partOfDay(day: Daily): Pair<Int, Float> {
 	val night = 0 to 0f
 	val secondsInDay = 86_400f
 	val nowSecondOfDay = currentSeconds() % secondsInDay
 	// all values below are in fractions and not seconds
 	val nowF = nowSecondOfDay / secondsInDay
 	// sunrise/set are taken from approx of `today`
-	val sunriseF = (today.sunrise.epochSecond % secondsInDay) / secondsInDay
-	val sunsetF = (today.sunset.epochSecond % secondsInDay) / secondsInDay
+	val sunriseF = (day.sunrise.epochSecond % secondsInDay) / secondsInDay
+	val sunsetF = (day.sunset.epochSecond % secondsInDay) / secondsInDay
 	// transitionF is dawn or dusk (~70 min at the equator).
 	// for simplicity, make it 1 hour before/after sun- rise/set.
 	// near poles, days/nights can be too long, so

@@ -4,7 +4,7 @@ import java.time.Instant
 
 class Hourly internal constructor(
 	val hour: Instant,
-	val iconResId: Int,
-	val temp: Temp,
-	val pop: Percent
+	val icon: Int,
+	val temp: Int,
+	val pop: Int
 )

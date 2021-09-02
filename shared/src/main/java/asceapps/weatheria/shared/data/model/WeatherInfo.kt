@@ -21,4 +21,7 @@ class WeatherInfo internal constructor(
 	override val hash get() = id + lastUpdate.epochSecond.toInt()
 
 	val today = today(daily) ?: daily.last()
+	val todayOrNull get() = today(daily)
+	val thisHourOrNull get() = thisHour(hourly)
+	val partOfDay get() = partOfDay(today)
 }

@@ -8,15 +8,15 @@ import asceapps.weatheria.shared.data.repo.UNKNOWN_INT
  */
 class Current internal constructor(
 	val conditionIndex: Int,
-	val iconResId: Int,
-	val temp: Temp,
-	val feelsLike: Temp,
-	val windSpeed: Distance,
+	val icon: Int,
+	val temp: Int,
+	val feelsLike: Int,
+	val windSpeed: Float,
 	val windDir: Int,
-	val pressure: Pressure,
-	val humidity: Percent,
-	val dewPoint: Temp,
-	val clouds: Percent,
-	val visibility: Distance,
-	val uv: UV
+	val pressure: Int,
+	val humidity: Int,
+	val dewPoint: Int,
+	val clouds: Int,
+	val visibility: Float,
+	val uv: Int
 )

@@ -7,7 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import asceapps.weatheria.R
-import asceapps.weatheria.shared.data.model.unitSystem
+import asceapps.weatheria.util.Formatter
 import asceapps.weatheria.util.onChangeFlow
 import asceapps.weatheria.worker.RefreshWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -76,7 +76,7 @@ class SettingsRepo @Inject constructor(
 	}
 
 	private fun updateUnits() {
-		unitSystem = units
+		Formatter.unitSystem = units
 	}
 
 	private fun updateAutoRefresh() {

@@ -5,40 +5,45 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="?attr/listPreferredItemHeight"
-	android:background="?attr/selectableItemBackground">
+	android:background="?attr/selectableItemBackground"
+	android:padding="@dimen/_8sdp">
 	<ImageButton
 		android:id="@+id/ib_delete"
 		style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-		android:layout_width="@dimen/_48sdp"
+		android:layout_width="0dp"
 		android:layout_height="0dp"
 		android:contentDescription="@string/cd_delete"
 		android:scaleType="center"
 		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toStartOf="@id/tv_name"
+		app:layout_constraintDimensionRatio="1:1"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
 		app:srcCompat="@drawable/ic_clear"/>
+	<ImageButton
+		android:id="@+id/iv_drag_handle"
+		style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:contentDescription="@string/cd_reorder"
+		android:scaleType="center"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintDimensionRatio="1:1"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/ic_drag_handle"/>
 	<TextView
 		android:id="@+id/tv_name"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/_8sdp"
+		android:ellipsize="end"
+		android:marqueeRepeatLimit="marquee_forever"
 		android:maxLines="1"
 		android:textAppearance="?attr/textAppearanceListItem"
-		app:layout_constraintBottom_toTopOf="@id/tv_country"
+		app:layout_constraintBottom_toTopOf="@id/tv_dt"
 		app:layout_constraintEnd_toStartOf="@id/iv_icon"
 		app:layout_constraintStart_toEndOf="@id/ib_delete"
 		app:layout_constraintTop_toTopOf="parent"
-		tools:text="@tools:sample/cities"/>
-	<TextView
-		android:id="@+id/tv_country"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:maxLines="1"
-		android:textSize="@dimen/_10ssp"
-		app:layout_constraintBottom_toTopOf="@id/tv_dt"
-		app:layout_constraintEnd_toEndOf="@id/tv_name"
-		app:layout_constraintStart_toStartOf="@id/tv_name"
-		app:layout_constraintTop_toBottomOf="@id/tv_name"
 		tools:text="@tools:sample/cities"/>
 	<TextView
 		android:id="@+id/tv_dt"
@@ -46,11 +51,11 @@
 		android:layout_height="wrap_content"
 		android:alpha="0.75"
 		android:maxLines="1"
-		android:textSize="@dimen/_10ssp"
+		android:textSize="11sp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="@id/tv_name"
 		app:layout_constraintStart_toStartOf="@id/tv_name"
-		app:layout_constraintTop_toBottomOf="@id/tv_country"
+		app:layout_constraintTop_toBottomOf="@id/tv_name"
 		tools:text="Mon 3:51 PM (+01:00)"/>
 	<ImageView
 		android:id="@+id/iv_icon"
@@ -67,21 +72,10 @@
 		android:id="@+id/tv_temp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_marginEnd="@dimen/_8sdp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@id/iv_drag_handle"
 		app:layout_constraintStart_toEndOf="@id/iv_icon"
 		app:layout_constraintTop_toTopOf="parent"
 		tools:text="111°"/>
-	<ImageButton
-		android:id="@+id/iv_drag_handle"
-		style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-		android:layout_width="@dimen/_48sdp"
-		android:layout_height="0dp"
-		android:contentDescription="@string/cd_reorder"
-		android:scaleType="center"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toEndOf="@id/tv_temp"
-		app:layout_constraintTop_toTopOf="parent"
-		app:srcCompat="@drawable/ic_drag_handle"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

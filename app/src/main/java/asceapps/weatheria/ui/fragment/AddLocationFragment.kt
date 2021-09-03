@@ -21,9 +21,9 @@ import asceapps.weatheria.ext.addDividers
 import asceapps.weatheria.ext.hideKeyboard
 import asceapps.weatheria.ext.observe
 import asceapps.weatheria.ext.onSubmit
-import asceapps.weatheria.shared.data.repo.Error
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.result.Error
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Success
 import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
 import com.google.android.gms.location.LocationRequest

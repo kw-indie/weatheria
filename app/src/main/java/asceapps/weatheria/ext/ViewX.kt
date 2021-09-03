@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import asceapps.weatheria.R
-import asceapps.weatheria.shared.data.repo.ACCURACY_FRESH
-import asceapps.weatheria.shared.data.repo.ACCURACY_HIGH
-import asceapps.weatheria.shared.data.repo.ACCURACY_LOW
+import asceapps.weatheria.shared.data.util.ACCURACY_FRESH
+import asceapps.weatheria.shared.data.util.ACCURACY_HIGH
+import asceapps.weatheria.shared.data.util.ACCURACY_LOW
 import asceapps.weatheria.ui.drawable.DirectionDrawable
 
 fun hideKeyboard(any: View) {

@@ -2,6 +2,7 @@ package asceapps.weatheria.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemAddLocationBinding
 import asceapps.weatheria.shared.data.model.Location
 
@@ -21,7 +22,7 @@ class AddLocationAdapter(
 	override fun onHolderBound(holder: BindingHolder<Location, ItemAddLocationBinding>, item: Location) {
 		holder.binding.apply {
 			tvName.text = item.name
-			tvCountry.text = item.country
+			tvCountry.text = root.resources.getString(R.string.f_2s, item.country, item.countryFlag)
 		}
 	}
 }

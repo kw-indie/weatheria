@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.ext.awaitCurrentLocation
 import asceapps.weatheria.shared.data.model.Location
-import asceapps.weatheria.shared.data.repo.Result
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.result.Result
 import asceapps.weatheria.shared.ext.resultFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*

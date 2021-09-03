@@ -80,7 +80,7 @@ dependencies {
 	// runtime is core
 	// ktx adds suspend and Flow support
 	kapt "androidx.room:room-compiler:$roomVer"
-	// fixme only needed here and app module, other modules don't wanna see
+	// fixme this should def. be implementation, no idea why app module doesn't compile w/o api
 	api "androidx.room:room-runtime:$roomVer"
 	implementation "androidx.room:room-ktx:$roomVer"
 

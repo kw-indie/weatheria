@@ -120,6 +120,7 @@
 	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
 	<string name="error_timed_out">انتهت مهلة الطلب</string>
 	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
+	<string name="error_server_quota">تم استهلاك جميع الطلبات المجانية اليومية إلى السيرفر</string>
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--endregion-->
 	<!--region settings-->

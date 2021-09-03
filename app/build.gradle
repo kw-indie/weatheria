@@ -17,8 +17,8 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdk minSdkVer
 		targetSdk targetSdkVer
-		versionCode 8
-		versionName "0.7.8"
+		versionCode 9
+		versionName "0.7.9"
 
 		vectorDrawables.useSupportLibrary = true
 
@@ -143,7 +143,7 @@ dependencies {
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"
 
-	// hilt todo remove if not needed
+	// hilt
 	kapt "com.google.dagger:hilt-android-compiler:$hiltVer"
 	implementation "com.google.dagger:hilt-android:$hiltVer"
 

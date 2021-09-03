@@ -19,15 +19,18 @@ import asceapps.weatheria.ext.observe
 import asceapps.weatheria.ext.onItemInserted
 import asceapps.weatheria.ext.onPageChanged
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.repo.Error
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.result.Error
+import asceapps.weatheria.shared.data.result.KnownError
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Success
+import asceapps.weatheria.shared.data.util.ERROR_NO_INTERNET
+import asceapps.weatheria.shared.data.util.ERROR_SERVER
+import asceapps.weatheria.shared.data.util.ERROR_SERVER_DAILY_QUOTA
+import asceapps.weatheria.shared.data.util.ERROR_TIMED_OUT
 import asceapps.weatheria.ui.adapter.PagerAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.IOException
-import java.io.InterruptedIOException
 
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
@@ -75,14 +78,14 @@ class HomeFragment: Fragment() {
 					} else {
 						isRefreshing = false
 						if(it is Error) {
-							val msg = when(it.t) {
-								// obvious timeout
-								is InterruptedIOException -> R.string.error_timed_out
-								// others like UnknownHostException when it can't resolve hostname
-								is IOException -> R.string.error_no_internet
-								// others like http error codes (400, 404, etc.).
-								// fixme originally HttpException from retrofit
-								is RuntimeException -> R.string.error_server_error
+							val msg = when(val t = it.t) {
+								is KnownError -> when(t.message) {
+									ERROR_NO_INTERNET -> R.string.error_no_internet
+									ERROR_TIMED_OUT -> R.string.error_timed_out
+									ERROR_SERVER_DAILY_QUOTA -> R.string.error_server_quota
+									ERROR_SERVER -> R.string.error_server_error
+									else -> 0 // should be impossible
+								}
 								else -> R.string.error_unknown
 							}
 							showMessage(msg)

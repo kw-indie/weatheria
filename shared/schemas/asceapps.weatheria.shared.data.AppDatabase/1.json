@@ -2,11 +2,11 @@
 	"formatVersion": 1,
 	"database": {
 		"version": 1,
-		"identityHash": "7288e676944f7e3d7300e4545ddb522d",
+		"identityHash": "6a7e2607fe2a1715fccb80545c332124",
 		"entities": [
 			{
 				"tableName": "locations",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, `zoneId` TEXT NOT NULL, `lastUpdate` INTEGER NOT NULL, `pos` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `name` TEXT NOT NULL, `country` TEXT NOT NULL, `cc` TEXT NOT NULL, `zoneId` TEXT NOT NULL, `lastUpdate` INTEGER NOT NULL, `pos` INTEGER NOT NULL, PRIMARY KEY(`id`))",
 				"fields": [
 					{
 						"fieldPath": "id",
@@ -35,6 +35,12 @@
 					{
 						"fieldPath": "country",
 						"columnName": "country",
+						"affinity": "TEXT",
+						"notNull": true
+					},
+					{
+						"fieldPath": "cc",
+						"columnName": "cc",
 						"affinity": "TEXT",
 						"notNull": true
 					},
@@ -289,7 +295,7 @@
 			},
 			{
 				"tableName": "daily",
-				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `dayCondition` INTEGER NOT NULL, `nightCondition` INTEGER NOT NULL, `dayWindSpeed` REAL NOT NULL, `nightWindSpeed` REAL NOT NULL, `dayPop` INTEGER NOT NULL, `nightPop` INTEGER NOT NULL, `dayClouds` INTEGER NOT NULL, `nightClouds` INTEGER NOT NULL, `uv` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `moonrise` INTEGER NOT NULL, `moonset` INTEGER NOT NULL, `moonPhaseIndex` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+				"createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `dt` INTEGER NOT NULL, `minTemp` INTEGER NOT NULL, `maxTemp` INTEGER NOT NULL, `dayCondition` INTEGER NOT NULL, `nightCondition` INTEGER NOT NULL, `dayWindSpeed` REAL NOT NULL, `nightWindSpeed` REAL NOT NULL, `dayWindDir` INTEGER NOT NULL, `nightWindDir` INTEGER NOT NULL, `dayPop` INTEGER NOT NULL, `nightPop` INTEGER NOT NULL, `dayClouds` INTEGER NOT NULL, `nightClouds` INTEGER NOT NULL, `uv` INTEGER NOT NULL, `sunrise` INTEGER NOT NULL, `sunset` INTEGER NOT NULL, `moonrise` INTEGER NOT NULL, `moonset` INTEGER NOT NULL, `moonAge` INTEGER NOT NULL, PRIMARY KEY(`locationId`, `dt`), FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
 				"fields": [
 					{
 						"fieldPath": "locationId",
@@ -337,6 +343,18 @@
 						"fieldPath": "nightWindSpeed",
 						"columnName": "nightWindSpeed",
 						"affinity": "REAL",
+						"notNull": true
+					},
+					{
+						"fieldPath": "dayWindDir",
+						"columnName": "dayWindDir",
+						"affinity": "INTEGER",
+						"notNull": true
+					},
+					{
+						"fieldPath": "nightWindDir",
+						"columnName": "nightWindDir",
+						"affinity": "INTEGER",
 						"notNull": true
 					},
 					{
@@ -394,8 +412,8 @@
 						"notNull": true
 					},
 					{
-						"fieldPath": "moonPhaseIndex",
-						"columnName": "moonPhaseIndex",
+						"fieldPath": "moonAge",
+						"columnName": "moonAge",
 						"affinity": "INTEGER",
 						"notNull": true
 					}
@@ -426,7 +444,7 @@
 		"views": [],
 		"setupQueries": [
 			"CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7288e676944f7e3d7300e4545ddb522d')"
+			"INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6a7e2607fe2a1715fccb80545c332124')"
 		]
 	}
 }

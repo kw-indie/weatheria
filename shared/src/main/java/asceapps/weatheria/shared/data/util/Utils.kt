@@ -1,4 +1,4 @@
-package asceapps.weatheria.shared.data.repo
+package asceapps.weatheria.shared.data.util
 
 import asceapps.weatheria.shared.data.entity.DailyEntity
 import asceapps.weatheria.shared.data.entity.HourlyEntity
@@ -6,6 +6,31 @@ import asceapps.weatheria.shared.data.model.Daily
 import asceapps.weatheria.shared.data.model.Hourly
 import java.time.Instant
 import kotlin.math.min
+
+internal fun countryFlag(cc: String): String {
+	val offset = 0x1F1E6 - 0x41 // tiny A - normal A
+	val cps = IntArray(2) { i -> cc[i].code + offset }
+	return String(cps, 0, cps.size)
+}
+
+internal fun uvLevel(index: Int) = when(index) {
+	in 0..2 -> UV_LOW
+	in 3..5 -> UV_MODERATE
+	in 6..7 -> UV_HIGH
+	in 8..10 -> UV_V_HIGH
+	else -> UV_EXTREME
+}
+
+internal fun moonPhase(age: Float) = when(age) {
+	in 1f..6.38f -> MOON_WAXING_CRESCENT
+	in 6.38f..8.38f -> MOON_FIRST_QUARTER
+	in 8.38f..13.77f -> MOON_WAXING_GIBBOUS
+	in 13.77f..15.77f -> MOON_FULL
+	in 15.77f..21.15f -> MOON_WANING_GIBBOUS
+	in 21.15f..23.15f -> MOON_THIRD_QUARTER
+	in 23.15f..28.5f -> MOON_WANING_CRESCENT
+	else -> MOON_NEW
+}
 
 internal fun today(daily: List<Daily>): Daily? {
 	val today = thisDaySeconds()
@@ -37,20 +62,6 @@ internal fun thisHourSeconds() = (System.currentTimeMillis() / 1000).toInt().let
 
 internal fun thisDaySeconds() = truncateToDaySeconds((System.currentTimeMillis() / 1000).toInt())
 
-private fun truncateToDaySeconds(i: Instant) = (i.epochSecond - i.epochSecond % 86_400).toInt()
-private fun truncateToDaySeconds(sec: Int) = sec - sec % 86_400
-
-/**
- * returns one of:
- *  * 0:0 = night,
- *  * 1:f = pre dawn,
- *  * 2:f = post dawn,
- *  * 3:0 = day,
- *  * 4:f = pre dusk,
- *  * 5:f = post dusk.
- *
- * where f is fraction of transition between day/night and dawn/dusk
- */
 internal fun partOfDay(day: Daily): Pair<Int, Float> {
 	val night = 0 to 0f
 	val secondsInDay = 86_400f
@@ -82,3 +93,6 @@ internal fun partOfDay(day: Daily): Pair<Int, Float> {
 		else -> night
 	}
 }
+
+private fun truncateToDaySeconds(i: Instant) = (i.epochSecond - i.epochSecond % 86_400).toInt()
+private fun truncateToDaySeconds(sec: Int) = sec - sec % 86_400

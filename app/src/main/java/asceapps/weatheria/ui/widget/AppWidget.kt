@@ -13,10 +13,10 @@ import androidx.work.WorkManager
 import asceapps.weatheria.R
 import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.repo.ACCURACY_OUTDATED
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Success
+import asceapps.weatheria.shared.data.util.ACCURACY_OUTDATED
 import asceapps.weatheria.ui.MainActivity
 import asceapps.weatheria.util.Formatter
 import asceapps.weatheria.util.IconMapper
@@ -97,7 +97,7 @@ class AppWidget: AppWidgetProvider() {
 				val uvString = context.getString(
 					R.string.f_2s_p,
 					Formatter.number(current.uv),
-					context.resources.getStringArray(R.array.uv_levels)[Formatter.uvLevel(current.uv)]
+					context.resources.getStringArray(R.array.uv_levels)[current.uvLevel]
 				)
 				setTextViewText(R.id.tv_uv_value, uvString)
 				setImageViewResource(R.id.iv_icon, IconMapper[current.iconIndex])

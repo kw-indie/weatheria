@@ -24,6 +24,8 @@ internal class DailyEntity(
 	val nightCondition: Int,
 	val dayWindSpeed: Float,
 	val nightWindSpeed: Float,
+	val dayWindDir: Int,
+	val nightWindDir: Int,
 	val dayPop: Int,
 	val nightPop: Int,
 	val dayClouds: Int,
@@ -33,5 +35,5 @@ internal class DailyEntity(
 	val sunset: Int,
 	val moonrise: Int,
 	val moonset: Int,
-	val moonPhaseIndex: Int
+	val moonAge: Int
 )

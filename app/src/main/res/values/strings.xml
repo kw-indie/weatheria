@@ -141,6 +141,7 @@
 	<string name="error_no_internet">No Internet connection</string>
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
+	<string name="error_server_quota">Exceeded server daily quota of free requests</string>
 	<string name="error_unknown">Unknown error</string>
 	<!--endregion-->
 	<!--region settings-->

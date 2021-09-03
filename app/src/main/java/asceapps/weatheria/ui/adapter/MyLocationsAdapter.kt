@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ItemMyLocationsBinding
 import asceapps.weatheria.shared.data.model.WeatherInfo
 import asceapps.weatheria.util.Formatter
@@ -30,9 +31,9 @@ class MyLocationsAdapter(
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onHolderCreated(holder: BindingHolder<WeatherInfo, ItemMyLocationsBinding>) {
 		holder.binding.apply {
-			val item = holder.item!!
-			ibDelete.setOnClickListener { itemCallback.onDeleteClick(item) }
-			root.setOnClickListener { itemCallback.onItemClick(item.pos) }
+			// don't create local variable for item, it's always null at creation
+			ibDelete.setOnClickListener { itemCallback.onDeleteClick(holder.item!!) }
+			root.setOnClickListener { itemCallback.onItemClick(holder.item!!.pos) }
 			ivDragHandle.setOnTouchListener { _, e ->
 				if(e.action == MotionEvent.ACTION_DOWN) {
 					touchHelper.startDrag(holder)
@@ -45,8 +46,7 @@ class MyLocationsAdapter(
 
 	override fun onHolderBound(holder: BindingHolder<WeatherInfo, ItemMyLocationsBinding>, item: WeatherInfo) {
 		holder.binding.apply {
-			tvName.text = item.location.name
-			tvCountry.text = item.location.country
+			tvName.text = root.resources.getString(R.string.f_2s_p, item.location.name, item.location.cc)
 			tvDt.text = Formatter.zonedNow(item.location.zoneId)
 			ivIcon.setImageResource(IconMapper[item.current.iconIndex])
 			tvTemp.text = Formatter.temp(item.current.temp)

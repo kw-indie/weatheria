@@ -7,9 +7,9 @@ import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.ext.asyncPing
 import asceapps.weatheria.ext.onlineStatusFlow
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Result
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*

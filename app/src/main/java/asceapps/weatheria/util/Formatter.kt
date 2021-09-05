@@ -39,7 +39,7 @@ object Formatter {
 	// expects fraction. adds localized percent char
 	private lateinit var pFormat: NumberFormat
 
-	// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build() for arabic numbers
+	// use Locale.forLanguageTag("ar-u-nu-arab") for arabic numbers
 	private lateinit var nowFormatter: DateTimeFormatter
 	private lateinit var dayFormatter: DateTimeFormatter
 	private lateinit var tFormatter: DateTimeFormatter

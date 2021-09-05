@@ -122,9 +122,6 @@ class AddLocationFragment: Fragment() {
 				}
 			}
 		}
-		binding.btnMyLocation.setOnClickListener {
-			onMyLocationClick()
-		}
 
 		addLocationVM.searchResult.observe(viewLifecycleOwner) {
 			when(it) {
@@ -153,10 +150,18 @@ class AddLocationFragment: Fragment() {
 		inflater.inflate(R.menu.add_location_menu, menu)
 		searchMenuItem = menu.findItem(R.id.action_search)
 		searchView = (searchMenuItem.actionView as SearchView).apply {
-			setIconifiedByDefault(false)
-			queryHint = getString(R.string.hint_search)
+			maxWidth = resources.getDimensionPixelSize(R.dimen._192sdp)
+			queryHint = getString(R.string.action_search)
 			onSubmit { addLocationVM.search(it) }
 		}
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when(item.itemId) {
+			R.id.action_get_my_location -> onMyLocationClick()
+			else -> return false
+		}
+		return true
 	}
 
 	override fun onStart() {

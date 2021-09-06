@@ -1,5 +1,6 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
+	<string name="module_title_gmap">Google Maps Assisted Search</string>
 	<!--main-->
 	<string name="action_settings">Settings</string>
 	<!--region home-->

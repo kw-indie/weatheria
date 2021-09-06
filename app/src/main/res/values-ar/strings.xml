@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="module_title_gmap">البحث بمساعدة خرائط Google</string>
 	<!--region main-->
 	<string name="action_settings">الإعدادات</string>
 	<!--endregion-->

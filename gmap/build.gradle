@@ -1,0 +1,18 @@
+plugins {
+	id 'com.android.dynamic-feature'
+	id 'kotlin-android'
+}
+android {
+	compileSdk targetSdkVer
+	buildToolsVersion buildToolsVer
+
+	defaultConfig {
+		minSdk minSdkVer
+		targetSdk targetSdkVer
+	}
+}
+
+dependencies {
+	implementation project(":app")
+	implementation "androidx.core:core-ktx:$coreVer"
+}

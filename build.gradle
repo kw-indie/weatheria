@@ -38,7 +38,7 @@ buildscript {
 		vectorDrawableAnimVer = '1.1.0'
 		viewPager2Ver = '1.0.0'
 		volleyVer = '1.2.1'
-		workVer = '2.7.0-alpha05'
+		workVer = '2.7.0-beta01'
 	}
 
 	repositories {

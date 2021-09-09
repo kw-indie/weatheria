@@ -10,6 +10,7 @@ internal class LocationEntity(
 	val lng: Float,
 	val name: String,
 	val country: String,
+	val cc: String,
 	val zoneId: String,
 	val lastUpdate: Int,
 	val pos: Int

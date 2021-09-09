@@ -1,6 +1,7 @@
 package asceapps.weatheria.ui.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
@@ -21,18 +22,19 @@ import asceapps.weatheria.ext.addDividers
 import asceapps.weatheria.ext.hideKeyboard
 import asceapps.weatheria.ext.observe
 import asceapps.weatheria.ext.onSubmit
-import asceapps.weatheria.shared.data.repo.Error
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.result.Error
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Success
 import asceapps.weatheria.ui.adapter.AddLocationAdapter
 import asceapps.weatheria.ui.viewmodel.AddLocationViewModel
+import asceapps.weatheria.util.Formatter
 import com.google.android.gms.location.LocationRequest
-import com.google.android.libraries.maps.CameraUpdateFactory
-import com.google.android.libraries.maps.GoogleMap
-import com.google.android.libraries.maps.MapView
-import com.google.android.libraries.maps.model.LatLng
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.ktx.bytesDownloaded
+import com.google.android.play.core.ktx.status
+import com.google.android.play.core.ktx.totalBytesToDownload
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
 class AddLocationFragment: Fragment() {
@@ -41,19 +43,19 @@ class AddLocationFragment: Fragment() {
 
 	private lateinit var searchMenuItem: MenuItem
 	private lateinit var searchView: SearchView
-	private lateinit var mapView: MapView
-	private lateinit var googleMap: GoogleMap
-
-	// todo move to util or sth
-	private val latLngFormat = "%1$.3f,%2$.3f"
-	private val maxZoom = 13f
-	private val searchZoom = 10f
+	private lateinit var binding: FragmentAddLocationBinding
 
 	// need to register this anywhere before onCreateView
 	private val permissionRequester = registerForActivityResult(
 		ActivityResultContracts.RequestMultiplePermissions(),
 		::permissionRequestCallback
 	)
+
+	private lateinit var installProgressSnackbar: Snackbar
+	private lateinit var downloadMapMenuItem: MenuItem
+	private var mapView: MapView? = null
+	private val moduleName = "gmap"
+	private val fragmentQualifiedName = "asceapps.weatheria.$moduleName.MapsFragment"
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +64,36 @@ class AddLocationFragment: Fragment() {
 		// turns out this can be called from here as well
 		setHasOptionsMenu(true)
 
-		val binding = FragmentAddLocationBinding.inflate(inflater, container, false)
+		binding = FragmentAddLocationBinding.inflate(inflater, container, false)
+
+		installProgressSnackbar = Snackbar.make(container!!, "", Snackbar.LENGTH_INDEFINITE)
+		addLocationVM.moduleInstallProgress.observe(viewLifecycleOwner) { state ->
+			downloadMapMenuItem.isEnabled = state.status !in DOWNLOADING..INSTALLING
+			@SuppressLint("SwitchIntDef")
+			when(state.status) {
+				PENDING -> setProgressMessage(false, R.string.starting_download)
+				DOWNLOADING -> {
+					// per docs, this will only show if the app is really being downloaded from play store
+					val p = (state.bytesDownloaded * 100 / state.totalBytesToDownload).toInt()
+					val sizeText = android.text.format.Formatter.formatShortFileSize(
+						requireContext(),
+						state.totalBytesToDownload()
+					)
+					setProgressMessage(
+						false,
+						R.string.f_2s_p,
+						getString(R.string.f_2s, getString(R.string.downloading), sizeText),
+						Formatter.percent(p)
+					)
+				}
+				INSTALLING -> setProgressMessage(false, R.string.installing)
+				INSTALLED -> {
+					setProgressMessage(true, R.string.installed)
+					requireActivity().invalidateOptionsMenu()
+				}
+				FAILED -> setProgressMessage(true, R.string.install_failed)
+			}
+		}
 
 		val addLocationAdapter = AddLocationAdapter(onItemClick = { loc ->
 			addLocationVM.add(loc).observe(viewLifecycleOwner) {
@@ -75,7 +106,8 @@ class AddLocationFragment: Fragment() {
 						findNavController().navigateUp()
 					}
 					is Error -> {
-						// todo cover actual reasons
+						// todo cover actual reasons. should be same as any other network call
+						// better make 'add' and 'fetch info' separate actions
 						showMessage(R.string.error_unknown)
 					}
 				}
@@ -85,45 +117,6 @@ class AddLocationFragment: Fragment() {
 			setHasFixedSize(true)
 			addDividers()
 			adapter = addLocationAdapter
-		}
-
-		mapView = binding.map.apply {
-			onCreate(savedInstanceState)
-			getMapAsync { map ->
-				map.apply {
-					googleMap = this
-					setMaxZoomPreference(maxZoom)
-					uiSettings.apply {
-						isMyLocationButtonEnabled = false // we have our own
-						isZoomControlsEnabled = true
-						isRotateGesturesEnabled = false
-						isTiltGesturesEnabled = false
-						isIndoorEnabled = false
-						isMapToolbarEnabled = false
-					}
-					setOnMapClickListener { latLng ->
-						animateCamera(CameraUpdateFactory.newLatLng(latLng))
-					}
-					setOnCameraIdleListener {
-						val query = if(cameraPosition.zoom >= searchZoom) {
-							with(cameraPosition.target) {
-								// if numbers aren't in arabic (1234..) api doesn't understand
-								latLngFormat.format(Locale.US, latitude, longitude)
-							}
-						} else {
-							addLocationAdapter.submitList(emptyList())
-							""
-						}
-						searchView.apply {
-							// this does not submit empty queries regardless of passed value
-							setQuery(query, true)
-						}
-					}
-				}
-			}
-		}
-		binding.btnMyLocation.setOnClickListener {
-			onMyLocationClick()
 		}
 
 		addLocationVM.searchResult.observe(viewLifecycleOwner) {
@@ -153,53 +146,91 @@ class AddLocationFragment: Fragment() {
 		inflater.inflate(R.menu.add_location_menu, menu)
 		searchMenuItem = menu.findItem(R.id.action_search)
 		searchView = (searchMenuItem.actionView as SearchView).apply {
-			setIconifiedByDefault(false)
-			queryHint = getString(R.string.hint_search)
+			maxWidth = resources.getDimensionPixelSize(R.dimen._192sdp)
+			queryHint = getString(R.string.action_search)
 			onSubmit { addLocationVM.search(it) }
+		}
+
+		downloadMapMenuItem = menu.findItem(R.id.action_download_map)
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu) {
+		// a very convenient place to call this:
+		// - gets called when fragment is loaded, can be recalled via invalidate on module change
+		if(addLocationVM.isModuleInstalled(moduleName)) {
+			downloadMapMenuItem.title = getString(R.string.action_uninstall_map)
+			addMapFragment()
+		} else {
+			downloadMapMenuItem.title = getString(R.string.action_download_map)
+			removeMapFragment()
 		}
 	}
 
-	override fun onStart() {
-		super.onStart()
-		mapView.onStart()
-	}
-
-	override fun onResume() {
-		super.onResume()
-		mapView.onResume()
-	}
-
-	override fun onPause() {
-		super.onPause()
-		mapView.onPause()
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when(item.itemId) {
+			R.id.action_get_my_location -> onMyLocationClick()
+			R.id.action_download_map -> onDownloadMapMenuItemClicked()
+			else -> return false
+		}
+		return true
 	}
 
 	override fun onStop() {
 		super.onStop()
 		hideKeyboard(requireView())
-		mapView.onStop()
 	}
 
 	override fun onDestroy() {
 		super.onDestroy()
-		mapView.onDestroy()
-		mapView.removeAllViews()
 		permissionRequester.unregister()
 	}
 
-	override fun onSaveInstanceState(outState: Bundle) {
-		super.onSaveInstanceState(outState)
-		mapView.onSaveInstanceState(outState)
+	private fun addMapFragment() {
+		if(binding.mapContainer.childCount != 0) return // already loaded
+		binding.mapContainer.isVisible = true
+
+		val mapListener = object: MapViewListener {
+			override fun onMapFocus(lat: Double, lng: Double) {
+				updateSearchQuery(Formatter.coords(lat, lng))
+			}
+
+			override fun onMapOutOfFocus() {
+				// we used to clear recycler view result as well here, but they are expensive to get,
+				// so we will keep them
+				updateSearchQuery("")
+			}
+		}
+		val mapsFragment = Class.forName(fragmentQualifiedName)
+			.getConstructor(MapViewListener::class.java)
+			.newInstance(mapListener) as Fragment
+		mapView = mapsFragment as MapView
+		childFragmentManager.beginTransaction()
+			.add(R.id.map_container, mapsFragment)
+			.commitNow()
 	}
 
-	override fun onLowMemory() {
-		super.onLowMemory()
-		mapView.onLowMemory()
+	private fun removeMapFragment() {
+		if(binding.mapContainer.childCount == 0) return // already removed
+		childFragmentManager.beginTransaction()
+			.remove(mapView as Fragment)
+			.commitNow()
+
+		binding.mapContainer.isVisible = false
 	}
 
 	// todo share
 	private fun showMessage(resId: Int) {
 		Toast.makeText(requireContext(), resId, Toast.LENGTH_LONG).show()
+	}
+
+	private fun setProgressMessage(terminalMsg: Boolean, resId: Int, vararg args: Any) {
+		installProgressSnackbar.apply {
+			setText(getString(resId, *args))
+			if(!isShownOrQueued) show()
+			if(terminalMsg) {
+				view.postDelayed(::dismiss, 3000L)
+			}
+		}
 	}
 
 	private fun onMyLocationClick() {
@@ -229,8 +260,7 @@ class AddLocationFragment: Fragment() {
 					.setTitle(R.string.request_rationale_title)
 					.setMessage(R.string.location_request_rationale)
 					.setPositiveButton(R.string.give_permission) { _, _ -> requirePermission() }
-					.setNegativeButton(R.string.dismiss, null)
-					.create()
+					.setNegativeButton(R.string.deny, null)
 					.show()
 			// permission permanently denied, ask user to manually enable from settings
 			else -> showMessage(R.string.error_location_denied)
@@ -244,6 +274,7 @@ class AddLocationFragment: Fragment() {
 			if(addLocationVM.useHighAccuracyLocation) LocationRequest.PRIORITY_HIGH_ACCURACY
 			else LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 		if(LocationManagerCompat.isLocationEnabled(lm)) {
+			// this flow closes in 2 emissions: loading + a result
 			addLocationVM.getDeviceLocation(ctx, accuracy).observe(viewLifecycleOwner) {
 				when(it) {
 					is Loading -> {
@@ -251,9 +282,13 @@ class AddLocationFragment: Fragment() {
 					}
 					is Success -> {
 						with(it.data) {
-							googleMap.animateCamera(
-								CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), maxZoom)
-							)
+							if(mapView == null) {
+								updateSearchQuery(Formatter.coords(latitude, longitude))
+							} else {
+								// this causes onMapFocus() to be called, which itself contains a call to
+								// updateSearchQuery()
+								mapView!!.animateCamera(latitude, longitude)
+							}
 						}
 					}
 					is Error -> {
@@ -271,4 +306,44 @@ class AddLocationFragment: Fragment() {
 			showMessage(R.string.error_location_disabled)
 		}
 	}
+
+	private fun onDownloadMapMenuItemClicked() {
+		if(addLocationVM.isModuleInstalled(moduleName)) {
+			// confirmed that uninstall happens on next manual restart of app
+			// disable to avoid repetitive clicks, enabling again might not be necessary
+			addLocationVM.uninstallModule(moduleName)
+			showMessage(R.string.uninstall_note)
+			requireActivity().invalidateOptionsMenu()
+		} else {
+			AlertDialog.Builder(requireContext())
+				.setTitle(R.string.module_title_gmap)
+				.setMessage(R.string.gmaps_download_message)
+				.setNeutralButton(android.R.string.cancel, null)
+				.setPositiveButton(R.string.download) { _, _ ->
+					addLocationVM.installModule(moduleName)
+					// skip showing message here cuz we got 'pending' state covering that part
+				}
+				.show()
+		}
+	}
+
+	private fun updateSearchQuery(q: String) {
+		if(q.isEmpty()) {
+			searchMenuItem.collapseActionView()
+		} else {
+			searchMenuItem.expandActionView()
+		}
+		searchView.setQuery(q, false)
+	}
+}
+
+interface MapViewListener {
+
+	fun onMapFocus(lat: Double, lng: Double)
+	fun onMapOutOfFocus()
+}
+
+interface MapView {
+
+	fun animateCamera(lat: Double, lng: Double)
 }

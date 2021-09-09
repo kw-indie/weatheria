@@ -20,8 +20,8 @@ object IconMapper {
 		R.drawable.w_rain_l_d,  // mostly cloudy w/ showers d
 		R.drawable.w_rain_l_d,  // partly sunny w/ showers d
 		R.drawable.w_thunder,  // t storms d/n
-		R.drawable.w_rain_t_d,  // mostly cloudy w/ t storms d
-		R.drawable.w_rain_t_d,  // partly sunny w/ t storms d
+		R.drawable.w_thunder_d,  // mostly cloudy w/ t storms d
+		R.drawable.w_thunder_d,  // partly sunny w/ t storms d
 		R.drawable.w_rain_l,  // rain d/n
 		R.drawable.w_snow_l,  // flurries d/n
 		R.drawable.w_snow_l_d,  // mostly cloudy w/ flurries d
@@ -49,5 +49,5 @@ object IconMapper {
 		R.drawable.w_snow_h_n,  // mostly cloudy w/ snow n
 	)
 
-	operator fun get(condition: Int) = icons[condition]
+	operator fun get(index: Int) = icons[index]
 }

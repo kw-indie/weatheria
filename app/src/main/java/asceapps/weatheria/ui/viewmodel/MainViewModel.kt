@@ -7,9 +7,9 @@ import asceapps.weatheria.data.repo.SettingsRepo
 import asceapps.weatheria.ext.asyncPing
 import asceapps.weatheria.ext.onlineStatusFlow
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Result
 import asceapps.weatheria.shared.data.repo.WeatherInfoRepo
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
 
 	val weatherInfoList = infoRepo.getAll()
-		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000), 1)
+		.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60 * 1000L), 1)
 
 	// saving pos is straightforward/easy, saving id is doable but more complex for no gains
 	var selectedPos = settingsRepo.selectedPos // only assigns init value

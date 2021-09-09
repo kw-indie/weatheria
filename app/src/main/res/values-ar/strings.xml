@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="module_title_gmap">البحث بمساعدة خرائط Google</string>
 	<!--region main-->
 	<string name="action_settings">الإعدادات</string>
 	<!--endregion-->
@@ -99,12 +100,22 @@
 	<!--endregion-->
 	<!--region add location-->
 	<string name="action_search">بحث</string>
+	<string name="action_get_my_location">احصل على موقعي</string>
+	<string name="action_download_map">احصل على خريطة…</string>
+	<string name="action_uninstall_map">حذف الخريطة</string>
+	<string name="gmaps_download_message">للمحافظة على حجم التطبيق صغيرًا، ولعدم حاجة جميع المستخدمين إليها، قمنا بإزالة ميزة البحث بمساعدة خرائط Google من التطبيق بشكل افتراضي.\nما زال بإمكانك تحميلهاإن أردت، ثم حذفها مرة أخرى عند انتهاء حاجتك إليها.</string>
+	<string name="download">تحميل</string>
+	<string name="starting_download">جاري بدء التحميل…</string>
+	<string name="downloading">جاري التحميل…</string>
+	<string name="installing">جاري التثبيت…</string>
+	<string name="installed">تم التثبيت بنجاح!</string>
+	<string name="install_failed">فشل التثبيت! حاول مرة أخرى لاحقًا.</string>
+	<string name="uninstall_note">سيتم إنهاء الحذف عند إعادة تشغيل التطبيق.</string>
 	<string name="request_rationale_title">لماذا نحتاج الإذن</string>
 	<string name="location_request_rationale">يحتاج التطبيق لإذن الحصول على موقعك الحالي للحظة فقط. بإمكانك سحب الإذن بعدها بأمان.\nبإمكانك أيضًا تغيير الإعدادات لاستخدام عنوان الـIP لإيجاد موقعك.</string>
 	<string name="give_permission">أعط الإذن</string>
-	<string name="dismiss">رفض</string>
-	<string name="no_search_result">لا نتائج.\n\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة بقدر كافٍ، ثم اضغط زر البحث لإظهار النتائج.</string>
-	<string name="hint_search">ابحث بالاسم أو الإحداثيات</string>
+	<string name="deny">رفض</string>
+	<string name="no_search_result">لا نتائج.\n\nاستخدم شريط البحث أعلاه أو قم بتكبير الخريطة (إن قمت بتحميلها) للبحث عن الموقع.</string>
 	<!--endregion-->
 	<!--region locations-->
 	<string name="action_delete_all">حذف الكل</string>
@@ -120,6 +131,7 @@
 	<string name="error_no_internet">لا يوجد اتصال بالإنترنت</string>
 	<string name="error_timed_out">انتهت مهلة الطلب</string>
 	<string name="error_server_error">خطأ في رد السيرفر. حاول إدخال موقعٍ مختلف أو حاول مرة أخرى لاحقًا</string>
+	<string name="error_server_quota">تم استهلاك جميع الطلبات المجانية اليومية إلى السيرفر</string>
 	<string name="error_unknown">خطأ غير معروف</string>
 	<!--endregion-->
 	<!--region settings-->

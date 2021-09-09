@@ -1,8 +1,8 @@
 package asceapps.weatheria.util
 
 import android.text.format.DateUtils
-import asceapps.weatheria.shared.data.repo.UNKNOWN_FLT
-import asceapps.weatheria.shared.data.repo.UNKNOWN_INT
+import asceapps.weatheria.shared.data.util.UNKNOWN_FLT
+import asceapps.weatheria.shared.data.util.UNKNOWN_INT
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -39,7 +39,7 @@ object Formatter {
 	// expects fraction. adds localized percent char
 	private lateinit var pFormat: NumberFormat
 
-	// use Locale.Builder().setLanguageTag("ar-u-nu-arab").build() for arabic numbers
+	// use Locale.forLanguageTag("ar-u-nu-arab") for arabic numbers
 	private lateinit var nowFormatter: DateTimeFormatter
 	private lateinit var dayFormatter: DateTimeFormatter
 	private lateinit var tFormatter: DateTimeFormatter
@@ -116,16 +116,10 @@ object Formatter {
 	/**
 	 * same as input, localized
 	 */
-	fun number(index: Int): String = nFormat.format(index)
+	fun number(n: Int): String = nFormat.format(n)
 
 	/**
-	 * `0` for low, `1` for medium, `2` for high, `3` for very high and `4` for extreme
+	 * returns comma separated coords in US locale
 	 */
-	fun uvLevel(index: Int): Int = when(index) {
-		in 0..2 -> 0
-		in 3..5 -> 1
-		in 6..7 -> 2
-		in 8..10 -> 3
-		else -> 4
-	}
+	fun coords(lat: Number, lng: Number) = "%1$.3f,%2$.3f".format(Locale.US, lat, lng)
 }

@@ -11,9 +11,9 @@ import asceapps.weatheria.databinding.FragmentMyLocationsBinding
 import asceapps.weatheria.ext.addDividers
 import asceapps.weatheria.ext.observe
 import asceapps.weatheria.shared.data.model.WeatherInfo
-import asceapps.weatheria.shared.data.repo.Error
-import asceapps.weatheria.shared.data.repo.Loading
-import asceapps.weatheria.shared.data.repo.Success
+import asceapps.weatheria.shared.data.result.Error
+import asceapps.weatheria.shared.data.result.Loading
+import asceapps.weatheria.shared.data.result.Success
 import asceapps.weatheria.ui.adapter.MyLocationsAdapter
 import asceapps.weatheria.ui.viewmodel.MainViewModel
 

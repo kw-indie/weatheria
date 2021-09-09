@@ -1,5 +1,6 @@
 <resources>
 	<string name="app_name" translatable="false">Weatheria</string>
+	<string name="module_title_gmap">Google Maps Assisted Search</string>
 	<!--main-->
 	<string name="action_settings">Settings</string>
 	<!--region home-->
@@ -119,13 +120,22 @@
 	<!--endregion-->
 	<!--region add location-->
 	<string name="action_search">Search</string>
-	<string name="map_id" translatable="false">59fa2b52dfe5e82f</string>
+	<string name="action_get_my_location">Get My Location</string>
+	<string name="action_download_map">Get Map Assistance…</string>
+	<string name="action_uninstall_map">Uninstall Map</string>
+	<string name="gmaps_download_message">To keep the app size small, and also because not every user needs it, we removed the Google maps assisted search feature from the app by default.\nYou can still download it if you want, then delete it again once you are done with it.</string>
+	<string name="download">Download</string>
+	<string name="starting_download">Starting download…</string>
+	<string name="downloading">Downloading…</string>
+	<string name="installing">Installing…</string>
+	<string name="installed">Installed successfully!</string>
+	<string name="install_failed">Installation failed! Try again later.</string>
+	<string name="uninstall_note">Uninstallation will finish upon app restart.</string>
 	<string name="request_rationale_title">Why we need permission</string>
 	<string name="location_request_rationale">The app only needs location permission for a moment to find your current location. You can safely revoke it afterwards.\nYou can also change settings to use IP geolocation instead.</string>
 	<string name="give_permission">Give permission</string>
-	<string name="dismiss">Dismiss</string>
-	<string name="no_search_result">No result.\n\nUse the search bar above or zoom the map enough, then press the search button to show results.</string>
-	<string name="hint_search">Search by name or coordinates</string>
+	<string name="deny">Deny</string>
+	<string name="no_search_result">No result.\n\nUse the search bar above or zoom the map in (if downloaded) to find a location.</string>
 	<!--endregion-->
 	<!--region locations-->
 	<string name="action_delete_all">Delete all</string>
@@ -141,6 +151,7 @@
 	<string name="error_no_internet">No Internet connection</string>
 	<string name="error_timed_out">Request timed out</string>
 	<string name="error_server_error">Server response error. Try a different location or try again later</string>
+	<string name="error_server_quota">Exceeded server daily quota of free requests</string>
 	<string name="error_unknown">Unknown error</string>
 	<!--endregion-->
 	<!--region settings-->

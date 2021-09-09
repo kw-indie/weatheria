@@ -73,11 +73,11 @@ private fun createLocationRequest(accuracy: Int, updates: Int = 1): LocationRequ
 		isWaitForAccurateLocation = false
 		priority = accuracy
 		numUpdates = updates
-		interval = 1000 * 20
-		fastestInterval = 1000 * 10
+		interval = 1000L * 20
+		fastestInterval = 1000L * 10
 		smallestDisplacement = 5f
-		maxWaitTime = 1000 * 30 * 1
-		setExpirationDuration(1000 * 30 * 1)
+		maxWaitTime = 1000L * 30 * 1
+		setExpirationDuration(1000L * 30 * 1)
 	}
 
 sealed class LocationSettingsStatus {

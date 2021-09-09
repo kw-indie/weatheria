@@ -6,22 +6,12 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	tools:context=".ui.fragment.AddLocationFragment">
-	<com.google.android.libraries.maps.MapView
-		android:id="@+id/map"
+	<FrameLayout
+		android:id="@+id/map_container"
 		android:layout_width="match_parent"
 		android:layout_height="@dimen/_160sdp"
-		app:layout_constraintTop_toTopOf="parent"
-		app:mapId="@string/map_id"/>
-	<ImageButton
-		android:id="@+id/btn_my_location"
-		style="@style/Widget.AppCompat.Button.Borderless"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:contentDescription="@string/maps_MY_LOCATION_ALT_TEXT"
-		android:minWidth="0dp"
-		app:layout_constraintEnd_toEndOf="@id/map"
-		app:layout_constraintTop_toTopOf="@id/map"
-		app:srcCompat="@drawable/maps_btn_myl"/>
+		android:visibility="gone"
+		app:layout_constraintTop_toTopOf="parent"/>
 	<TextView
 		android:id="@+id/tv_no_result"
 		android:layout_width="0dp"
@@ -33,7 +23,7 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@id/map"/>
+		app:layout_constraintTop_toBottomOf="@id/map_container"/>
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/rv_result"
 		android:layout_width="match_parent"
@@ -41,6 +31,6 @@
 		android:scrollbars="vertical"
 		app:layoutManager="LinearLayoutManager"
 		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintTop_toBottomOf="@id/map"
+		app:layout_constraintTop_toBottomOf="@id/map_container"
 		tools:listitem="@layout/item_add_location"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// todo move to shared
 @Singleton
 class SettingsRepo @Inject constructor(
 	@ApplicationContext appContext: Context,

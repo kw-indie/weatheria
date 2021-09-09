@@ -24,9 +24,9 @@ import asceapps.weatheria.shared.data.entity.LocationEntity
 internal abstract class AppDatabase: RoomDatabase() {
 
 	companion object {
-		fun create(appContext: Context) = Room.databaseBuilder(
-			appContext, AppDatabase::class.java, "weatheria"
-		).build()
+		fun create(appContext: Context) =
+			Room.databaseBuilder(appContext, AppDatabase::class.java, "weatheria")
+				.build()
 	}
 
 	abstract fun weatherInfoDao(): WeatherInfoDao

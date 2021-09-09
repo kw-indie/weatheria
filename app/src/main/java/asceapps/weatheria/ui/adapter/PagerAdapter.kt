@@ -53,7 +53,7 @@ class PagerAdapter: BaseAdapter<WeatherInfo, ItemWeatherInfoBinding>() {
 			tvUv.text = res.getString(
 				R.string.f_2s_p,
 				Formatter.number(item.current.uv),
-				res.getStringArray(R.array.uv_levels)[Formatter.uvLevel(item.current.uv)]
+				res.getStringArray(R.array.uv_levels)[item.current.uvLevel]
 			)
 			val today = item.today
 			tvMax.text = Formatter.temp(today.max)

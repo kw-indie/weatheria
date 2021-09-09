@@ -8,7 +8,7 @@ import asceapps.weatheria.shared.data.result.KnownError
 import asceapps.weatheria.shared.data.result.Loading
 import asceapps.weatheria.shared.data.util.*
 import asceapps.weatheria.shared.di.IoDispatcher
-import asceapps.weatheria.shared.ext.asResult
+import asceapps.weatheria.shared.ext.asResultFlow
 import asceapps.weatheria.shared.ext.resultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
@@ -44,17 +44,17 @@ class WeatherInfoRepo @Inject internal constructor(
 	// todo optimize these so they only return needed data, especially
 	fun getAll() = dao.loadAll()
 		.map { list -> list.map { e -> entityToModel(e) } }
-		.asResult() // concerned over 2 consecutive Flow.map()'s
+		.asResultFlow() // concerned over 2 consecutive Flow.map()'s
 		.flowOn(ioDispatcher)
 
 	fun get(locationId: Int) = dao.get(locationId)
 		.map { e -> entityToModel(e) }
-		.asResult()
+		.asResultFlow()
 		.flowOn(ioDispatcher)
 
 	fun getByPos(pos: Int) = dao.getByPos(pos)
 		.map { e -> entityToModel(e) }
-		.asResult()
+		.asResultFlow()
 		.flowOn(ioDispatcher)
 
 	fun search(q: String? = null) = resultFlow<List<Location>>(netErrTransformer) {

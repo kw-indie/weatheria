@@ -21,7 +21,4 @@
 # puts all classes in root package to save space by omitting 'package x.y.z'
 -repackageclasses
 
-# Fix maps v3 crash (taken from official docs):
--keep,allowoptimization class com.google.android.libraries.maps.** {*;}
-
 # check for hints https://medium.com/androiddevelopers/practical-proguard-rules-examples-5640a3907dc9

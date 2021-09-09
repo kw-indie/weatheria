@@ -20,7 +20,7 @@ inline fun <T> resultFlow(
 	}
 }
 
-fun <T> Flow<T>.asResult() = flow {
+fun <T> Flow<T>.asResultFlow() = flow {
 	emit(Loading())
 	emitAll(map { Success(it) })
 }

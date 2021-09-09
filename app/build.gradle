@@ -1,7 +1,7 @@
 plugins {
 	id 'com.android.application'
-	id 'kotlin-android' // for kotlin support
-	id 'kotlin-kapt' // for annotations: room, hilt, etc
+	id 'kotlin-android'
+	id 'kotlin-kapt' // annotations: hilt
 	id 'dagger.hilt.android.plugin'
 }
 
@@ -9,7 +9,6 @@ android {
 	compileSdk targetSdkVer
 	// if not specified, latest + whatever external libs use will be used = a mess
 	buildToolsVersion buildToolsVer
-	ndkVersion ndkVer
 
 	// these config apply to all build types
 	defaultConfig {
@@ -17,14 +16,10 @@ android {
 		applicationId "asceapps.weatheria"
 		minSdk minSdkVer
 		targetSdk targetSdkVer
-		versionCode 9
-		versionName "0.7.9"
+		versionCode 13 // don't need to change for internal app sharing
+		versionName "0.8.0"
 
 		vectorDrawables.useSupportLibrary = true
-
-		Properties ps = new Properties()
-		rootProject.file("local.properties").withInputStream { ps.load(it) }
-		resValue "string", "google_api_key", ps.google_api_key
 
 		// removes unused l10n in libs like AppCompat/play services/maps?
 		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
@@ -49,11 +44,8 @@ android {
 		}
 		release {
 			minifyEnabled true
-			shrinkResources true // verify needed
+			shrinkResources true // is different from code shrinking (aka minifyEnabled)
 			proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "release-rules.pro"
-			ndk {
-				debugSymbolLevel "full" // include android vitals debug file in app bundle
-			}
 		}
 	}
 
@@ -82,41 +74,32 @@ dependencies {
 	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugarVer"
 
 	// - no longer need to add kotlin stdlib here, included by default w/ plugin
-	// - libs marked with * are ones that if u don't explicitly add, they add 2 diff versions
 
 	// coroutines
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVer"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVer"
 
-	// *
-	implementation "androidx.collection:collection-ktx:$collectionVer"
 	// general & ui
-	implementation "androidx.core:core-ktx:$coreVer"
-	// *
-	implementation "androidx.appcompat:appcompat:$appCompatVer"
+	api "androidx.core:core-ktx:$coreVer" // also used by gmap
 	implementation "androidx.recyclerview:recyclerview:$recyclerViewVer"
 	implementation "androidx.viewpager2:viewpager2:$viewPager2Ver"
 	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVer"
-	// *
 	implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVer"
-	// *
 	implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVer"
 	implementation "com.google.android.material:material:$materialVer"
 
 	// to use viewModels delegate, new result system, and lots more
 	implementation "androidx.activity:activity-ktx:$activityVer"
-	implementation "androidx.fragment:fragment-ktx:$fragmentVer"
+	api "androidx.fragment:fragment-ktx:$fragmentVer" // also used by gmap
+
+	// split install
+	implementation "com.google.android.play:core:$playCoreVer"
+	implementation "com.google.android.play:core-ktx:$playCoreKtxVer"
 
 	// viewModel & liveData
 	// runtime offers lifecycleOwner val, new flow consumers (e.g repeatOnLifecycle), etc.
 	implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVer"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVer"
-	// if i don't include these 2, older versions will load anyway
-	implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleExVer"
-	// * all 3 below
-	implementation "androidx.lifecycle:lifecycle-process:$lifecycleVer"
-	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVer"
-	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVer"
 
 	// nav
 	// runtime offers findNavController() and navArgs property
@@ -124,22 +107,16 @@ dependencies {
 	implementation "androidx.navigation:navigation-fragment-ktx:$navVer"
 	implementation "androidx.navigation:navigation-ui-ktx:$navVer"
 
-	// *
-	implementation "androidx.transition:transition:$transitionVer"
 	// anim vector drawable
 	// core offers listeners, interpolators, etc
 	implementation "androidx.core:core-animation:$coreAnimationVer"
 	implementation "androidx.vectordrawable:vectordrawable-animated:$vectorDrawableAnimVer"
 
 	// new preferences (fragment, etc.)
-	implementation "androidx.preference:preference-ktx:$preferenceVer"
+	implementation "androidx.preference:preference-ktx:$preferenceVer"// flp (+ activity recognition + geofencing)
 
-	// maps & location
-	implementation "com.google.android.libraries.maps:maps:$mapsVer"
-	// flp (+ activity recognition + geofencing)
-	implementation "com.google.android.gms:play-services-location:$locationVer"
-	// manually specified the version available in google() instead of clinging to jcenter()
-	implementation "com.android.volley:volley:$volleyVer"
+	// for get my location using fused location provider
+	implementation "com.google.android.gms:play-services-location:$gmsLocationVer"
 
 	// work manager
 	implementation "androidx.work:work-runtime-ktx:$workVer"

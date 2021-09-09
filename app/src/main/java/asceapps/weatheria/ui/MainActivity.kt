@@ -1,5 +1,6 @@
 package asceapps.weatheria.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,10 +12,16 @@ import androidx.navigation.ui.NavigationUI
 import asceapps.weatheria.R
 import asceapps.weatheria.databinding.ActivityMainBinding
 import asceapps.weatheria.ext.edgeToEdge
+import com.google.android.play.core.splitcompat.SplitCompat
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity: AppCompatActivity() {
+
+	override fun attachBaseContext(newBase: Context?) {
+		super.attachBaseContext(newBase)
+		SplitCompat.installActivity(this)
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

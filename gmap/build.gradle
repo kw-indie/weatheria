@@ -5,14 +5,40 @@ plugins {
 android {
 	compileSdk targetSdkVer
 	buildToolsVersion buildToolsVer
+	// ndk is only needed for maps as it uses jni and we need debug symbols for those
+	ndkVersion ndkVer
 
 	defaultConfig {
 		minSdk minSdkVer
 		targetSdk targetSdkVer
+
+		Properties ps = new Properties()
+		rootProject.file("local.properties").withInputStream { ps.load(it) }
+		manifestPlaceholders += [MAPS_API_KEY: ps.maps_api_key]
+
+		// removes unused l10n in libs like AppCompat/play services/maps?
+		resConfigs "en", "ar"//, "fr", "es", "zh", "de", "ja", "ru", "ko", "pt", "in"
+	}
+
+	buildTypes {
+		release {
+			// minifyEnabled true // ignored in feature modules
+			proguardFiles "release-rules.pro" // does not accept default proguard files
+			ndk {
+				debugSymbolLevel "full" // include android vitals debug file in app bundle
+			}
+		}
+		staging {
+			initWith release
+			debuggable true
+		}
 	}
 }
 
 dependencies {
 	implementation project(":app")
-	implementation "androidx.core:core-ktx:$coreVer"
+
+	implementation "com.google.android.libraries.maps:maps:$mapsVer"
+	// manually specified the version available in google() instead of clinging to jcenter()
+	implementation "com.android.volley:volley:$volleyVer"
 }

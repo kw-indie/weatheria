@@ -117,4 +117,9 @@ object Formatter {
 	 * same as input, localized
 	 */
 	fun number(n: Int): String = nFormat.format(n)
+
+	/**
+	 * returns comma separated coords in US locale
+	 */
+	fun coords(lat: Number, lng: Number) = "%1$.3f,%2$.3f".format(Locale.US, lat, lng)
 }

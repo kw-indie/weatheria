@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:dist="http://schemas.android.com/apk/distribution"
 	package="asceapps.weatheria.gmap">
 
 	<dist:module
 		dist:instant="false"
-		dist:title="@string/title_gmap">
+		dist:title="@string/module_title_gmap">
 		<dist:delivery>
 			<dist:on-demand/>
 		</dist:delivery>
 		<dist:fusing dist:include="true"/>
 	</dist:module>
+	<application>
+		<meta-data
+			android:name="com.google.android.geo.API_KEY"
+			android:value="${MAPS_API_KEY}"/>
+	</application>
 </manifest>
